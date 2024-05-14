@@ -29,6 +29,7 @@ export const getStaticProps: GetStaticProps<
       posts,
       resources,
     },
+    revalidate: 60, // Revalidate every 60 seconds
   }
 }
 
@@ -43,7 +44,7 @@ export default function IndexPage(
     <Container>
       <Welcome />
       <section>
-        <div className='py-2 px-10 bg-orange-200 inline-block font-bold rounded-lg my-2'><h2>Blog Posts</h2></div>
+        <div className='py-2 px-10 bg-orange-200 dark:bg-orange-900 inline-block font-bold rounded-lg my-2'><h2>Blog Posts</h2></div>
         <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
         {posts.length ? (
           posts.map((post) => <Card key={post._id} post={post} />)
@@ -53,7 +54,7 @@ export default function IndexPage(
         </div>
       </section>
       <section>
-      <div className='py-2 px-10 bg-green-200 inline-block font-bold rounded-lg my-2'><h2>Brand Resources</h2></div>
+      <div className='py-2 px-10 bg-green-200 dark:bg-green-900 inline-block font-bold rounded-lg my-2'><h2>Brand Resources</h2></div>
         <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
         {resources.length ? (
           resources.map((resource) => <ResourceCard key={resource._id} resource={resource} />)

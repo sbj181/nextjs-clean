@@ -41,6 +41,7 @@ export const getStaticProps: GetStaticProps<
       token: draftMode ? readToken : '',
       resource,
     },
+    revalidate: 60, // Revalidate every 60 seconds
   }
 }
 
