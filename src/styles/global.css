@@ -1,3 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition for color and background */
+}
+
+body, button, input, textarea {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Light mode styles */
+.bg-custom {
+  @apply bg-slate-50;
+  @apply text-slate-900;
+}
+
+/* Dark mode styles */
+.dark .bg-custom {
+  @apply bg-slate-900; /* almost black */
+  @apply text-slate-50; /* light gray */
+}
+
 :root {
   --space-0: 0;
   --space-1: 4px;
@@ -11,7 +42,8 @@
   --space-9: 220px;
 
   --font-family-sans: Inter;
-  --font-family-serif: PT Serif;
+  --font-family-serif: Inter;
+  /* --font-family-serif: PT Serif; */
   --font-family-mono: IMB Plex Mono;
 
   --font-size-0: 12px;
@@ -63,6 +95,16 @@ body {
   margin: 0;
 }
 
+/* Sidebar */
+
+.sidebar-link {
+  @apply bg-slate-300 dark:bg-slate-900 rounded-lg text-center p-3 transition-colors duration-300;
+}
+
+.sidebar-link:hover {
+  @apply bg-slate-400 dark:bg-slate-800;
+}
+
 /* Post page */
 .post {
   width: 100%;
@@ -81,12 +123,12 @@ body {
   background: var(--black);
 }
 
-.post .post__container {
+.post .post__container, .resource .resource__container {
   padding: 0 var(--space-3);
 }
 
-.post .post__content {
-  font-family: var(--font-family-serif);
+.post .post__content, .resource .resource__content {
+  /* font-family: var(--font-family-serif); */
   font-weight: 400;
   font-size: var(--font-size-4);
   line-height: var(--line-height-5);
@@ -102,13 +144,13 @@ body {
   margin-left: var(--space-4);
 }
 
-.post .post__content a {
+.post .post__content a, .resource .resource__content a {
   color: var(--blue-600);
   text-decoration: none;
 }
 
-.post .post__title {
-  font-family: var(--font-family-sans);
+.post .post__title, .resource .resource__title {
+  /* font-family: var(--font-family-sans); */
   font-size: var(--font-size-7);
   line-height: var(--line-height-6);
   margin: var(--space-4) 0;
@@ -116,7 +158,7 @@ body {
 }
 
 .post .post__excerpt {
-  font-family: var(--font-family-serif);
+  /* font-family: var(--font-family-sans); */
   font-size: var(--font-size-5);
   line-height: var(--line-height-4);
   margin-top: 0;
@@ -124,9 +166,9 @@ body {
 }
 
 .post .post__date {
-  font-family: var(--font-family-sans);
+  /* font-family: var(--font-family-sans); */
   font-weight: 600;
-  font-family: var(--font-family-sans);
+  /* font-family: var(--font-family-sans); */
   font-size: var(--font-size-1);
   line-height: var(--line-height-1);
   margin-top: var(--space-4);
@@ -234,7 +276,7 @@ main {
   }
 
   .footer {
-    margin: var(--space-3) 0;
+    /* margin: var(--space-3) 0; */
   }
 }
 
@@ -338,12 +380,7 @@ main {
 /* Card */
 
 .card {
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-2);
-  padding: 9px;
-  position: relative;
-  border-bottom: 1px solid #ced2d9;
+  @apply border rounded-lg shadow-md;
 }
 
 .card .card__container {
@@ -360,7 +397,7 @@ main {
 .card .card__cover--none {
   width: 100%;
   height: 231px;
-  background: var(--black);
+  /* background: var(--black); */
 }
 
 .card .card__title {
@@ -373,11 +410,11 @@ main {
 }
 
 .card .card__excerpt {
-  font-family: var(--font-family-serif);
+  /* font-family: var(--font-family-sans); */
   font-weight: 400;
   font-size: var(--font-size-4);
   line-height: var(--line-height-3);
-  margin-top: 0;
+  @apply my-2;
 }
 
 .card .card__date {
@@ -388,7 +425,7 @@ main {
 }
 
 .card .card__link {
-  color: var(--black);
+  /* color: var(--black); */
   text-decoration: none;
 }
 
@@ -402,8 +439,15 @@ main {
   position: absolute;
   inset: 0;
 }
+.card h3 {
+  @apply text-2xl;
+  @apply font-bold;
+}
+.cardWrap {
+  @apply mb-10
+}
 
-.card:first-child {
+/* .card:first-child {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
@@ -411,12 +455,14 @@ main {
 .card:last-child {
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
-}
+} */
 
 @media (min-width: 575px) {
   .card {
+    @apply dark:border;
+    @apply dark:border-slate-500;
     border: 1px solid #ced2d9;
-    border-bottom: none;
+    /* border-bottom: none; */
   }
 
   .card .card__title {
@@ -434,13 +480,18 @@ main {
   }
 
   .card .card__container {
-    margin: 0 var(--space-4) 0;
+    margin: 2em var(--space-4) 1em;
   }
 
   .card .card__cover,
   .card .card__cover--none {
-    min-width: 366.5px;
+/*     min-width: 366.5px;
     max-width: 366.5px;
-    max-height: 231px;
+    max-height: 231px; */
   }
+}
+
+.card img {
+  max-width: 100%;
+  width: 100%;
 }

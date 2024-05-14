@@ -5,12 +5,16 @@ import { type Post } from '~/lib/sanity.queries'
 import { formatDate } from '~/utils'
 
 export default function Card({ post }: { post: Post }) {
+
+  const imageUrl = post.mainImage ? urlForImage(post.mainImage) : null;
+
   return (
-    <div className="card">
+    <div className="card w-full">
+      <div className='px-2 py-2 bg-orange-400 rounded-t-lg dark:bg-orange-800 text-slate-50 text-sm text-center uppercase font-bold'>Blog Post</div>
       {post.mainImage ? (
         <Image
           className="card__cover"
-          src={urlForImage(post.mainImage).width(500).height(300).url()}
+          src={imageUrl}
           height={300}
           width={500}
           alt=""
@@ -19,8 +23,8 @@ export default function Card({ post }: { post: Post }) {
         <div className="card__cover--none" />
       )}
       <div className="card__container">
-        <h3 className="card__title">
-          <a className="card__link" href={`/post/${post.slug.current}`}>
+        <h3 className="font-sans">
+          <a className="" href={`/post/${post.slug.current}`}>
             {post.title}
           </a>
         </h3>

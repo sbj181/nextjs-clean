@@ -8,11 +8,10 @@ const imageBuilder = createImageUrlBuilder({
   dataset: dataset || '',
 })
 
-export const urlForImage = (source: Image) => {
-  // Ensure that source image contains a valid reference
+export const urlForImage = (source) => {
   if (!source?.asset?._ref) {
-    return undefined
+    return null;  // Return null if the reference is invalid
   }
 
-  return imageBuilder?.image(source).auto('format')
+  return imageBuilder.image(source).auto('format').url();
 }

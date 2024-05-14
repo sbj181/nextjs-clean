@@ -24,7 +24,7 @@ import { schema } from '~/schemas'
 const iframeOptions = {
   url: defineUrlResolver({
     base: '/api/draft',
-    requiresSlug: ['post'],
+    requiresSlug: ['post','resource'],
   }),
   urlSecretId: previewSecretId,
   reload: { button: true },
@@ -32,8 +32,8 @@ const iframeOptions = {
 
 export default defineConfig({
   basePath: '/studio',
-  name: 'project-name',
-  title: 'Project Name',
+  name: 'core-rms',
+  title: 'CORE RMS',
   projectId,
   dataset,
   //edit schemas in './src/schemas'
@@ -57,7 +57,7 @@ export default defineConfig({
     // Add the "Open preview" action
     previewUrl({
       base: '/api/draft',
-      requiresSlug: ['post'],
+      requiresSlug: ['post','resource'],
       urlSecretId: previewSecretId,
     }),
     // Vision lets you query your content with GROQ in the studio

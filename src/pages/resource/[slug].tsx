@@ -8,10 +8,10 @@ import { readToken } from '~/lib/sanity.api'
 import { getClient } from '~/lib/sanity.client'
 import { urlForImage } from '~/lib/sanity.image'
 import {
-  getPost,
-  type Post,
-  postBySlugQuery,
-  postSlugsQuery,
+  getResource,
+  type Resource,
+  resourceBySlugQuery,
+  resourceSlugsQuery,
 } from '~/lib/sanity.queries'
 import type { SharedPageProps } from '~/pages/_app'
 import { formatDate } from '~/utils'
@@ -22,14 +22,14 @@ interface Query {
 
 export const getStaticProps: GetStaticProps<
   SharedPageProps & {
-    post: Post
+    resource: Resource
   },
   Query
 > = async ({ draftMode = false, params = {} }) => {
   const client = getClient(draftMode ? { token: readToken } : undefined)
-  const post = await getPost(client, params.slug)
+  const resource = await getResource(client, params.slug)
 
-  if (!post) {
+  if (!resource) {
     return {
       notFound: true,
     }
@@ -39,24 +39,24 @@ export const getStaticProps: GetStaticProps<
     props: {
       draftMode,
       token: draftMode ? readToken : '',
-      post,
+      resource,
     },
   }
 }
 
-export default function ProjectSlugRoute(
+export default function ResourceSlugRoute(
   props: InferGetStaticPropsType<typeof getStaticProps>,
 ) {
-  const [post] = useLiveQuery(props.post, postBySlugQuery, {
-    slug: props.post.slug.current,
+  const [resource] = useLiveQuery(props.resource, resourceBySlugQuery, {
+    slug: props.resource.slug.current,
   })
 
-  const imageUrl = post.mainImage ? urlForImage(post.mainImage) : null;
+  const imageUrl = resource.mainImage ? urlForImage(resource.mainImage) : null;
 
   return (
     <Container>
-      <section className="post">
-        {post.mainImage ? (
+      <section className="resource">
+        {resource.mainImage ? (
           <div className='rounded-lg block overflow-hidden'>
           <Image
             className="post__cover"
@@ -67,29 +67,30 @@ export default function ProjectSlugRoute(
           />
           </div>
         ) : (
-          <div className="post__cover--none" />
+          <div className="resource__cover--none" />
         )}
-        <div className="post__container">
-        
-
-          <h1 className="post__title">{post.title}</h1>
-          <p className="post__excerpt">{post.excerpt}</p>
-          <p className="post__date">{formatDate(post._createdAt)}</p>
-          <div className="post__content">
-            <PortableText value={post.body} />
-          </div>
+        <div className="resource__container">
+          <h1 className="resource__title">{resource.title}</h1>
+          <p className="resource__description">{resource.description}</p>
+          <p className="resource__date">{formatDate(resource._createdAt)}</p>
+          {resource.longDescription && (
+            <div className="resource__content">
+              <PortableText value={resource.longDescription} />
+            </div>
+          )}
         </div>
       </section>
     </Container>
   )
 }
 
+
 export const getStaticPaths = async () => {
   const client = getClient()
-  const slugs = await client.fetch(postSlugsQuery)
+  const slugs = await client.fetch(resourceSlugsQuery)
 
   return {
-    paths: slugs?.map(({ slug }) => `/post/${slug}`) || [],
+    paths: slugs?.map(({ slug }) => `/resource/${slug}`) || [],
     fallback: 'blocking',
   }
 }
