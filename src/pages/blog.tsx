@@ -3,7 +3,7 @@ import { useLiveQuery } from 'next-sanity/preview'
 import Head from 'next/head'
 
 import Card from '~/components/Card'
-import ResourceCard from '~/components/ResourceCard'
+
 import Container from '~/components/Container'
 import Welcome from '~/components/Welcome'
 import { readToken } from '~/lib/sanity.api'
@@ -16,7 +16,7 @@ import type { SharedPageProps } from '~/pages/_app'
 export const getStaticProps: GetStaticProps<
   SharedPageProps & {
     posts: Post[];
-    resources: Resource[];
+   
   }
 > = async ({ draftMode = false }) => {
   const client = getClient(draftMode ? { token: readToken } : undefined);
@@ -28,7 +28,7 @@ export const getStaticProps: GetStaticProps<
       draftMode,
       token: draftMode ? readToken : '',
       posts,
-      resources,
+      
     },
     revalidate: 60, // Revalidate every 60 seconds
   }
@@ -39,8 +39,7 @@ export default function IndexPage(
 ) {
   // Using useLiveQuery for real-time updates if needed
   const [posts] = useLiveQuery<Post[]>(props.posts, postsQuery);
-  const [resources] = useLiveQuery<Resource[]>(props.resources, resourcesQuery);
-
+  
   return (
     <Container>
       <Head>
@@ -60,16 +59,7 @@ export default function IndexPage(
         )}
         </div>
       </section>
-      <section>
-      <div className='py-2 px-10 bg-green-200 dark:bg-green-900 inline-block font-bold rounded-lg my-2'><h2>Brand Resources</h2></div>
-        <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
-        {resources.length ? (
-          resources.map((resource) => <ResourceCard key={resource._id} resource={resource} />)
-        ) : (
-          <p>No resources available.</p>
-        )}
-        </div>
-      </section>
+      
     </Container>
   )
   

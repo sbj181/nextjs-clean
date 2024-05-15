@@ -15,7 +15,7 @@ import type { SharedPageProps } from '~/pages/_app'
 
 export const getStaticProps: GetStaticProps<
   SharedPageProps & {
-    posts: Post[];
+
     resources: Resource[];
   }
 > = async ({ draftMode = false }) => {
@@ -27,7 +27,7 @@ export const getStaticProps: GetStaticProps<
     props: {
       draftMode,
       token: draftMode ? readToken : '',
-      posts,
+
       resources,
     },
     revalidate: 60, // Revalidate every 60 seconds
@@ -38,7 +38,7 @@ export default function IndexPage(
   props: InferGetStaticPropsType<typeof getStaticProps>,
 ) {
   // Using useLiveQuery for real-time updates if needed
-  const [posts] = useLiveQuery<Post[]>(props.posts, postsQuery);
+
   const [resources] = useLiveQuery<Resource[]>(props.resources, resourcesQuery);
 
   return (
@@ -50,16 +50,7 @@ export default function IndexPage(
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Welcome />
-      <section>
-        <div className='py-2 px-10 bg-orange-200 dark:bg-orange-900 inline-block font-bold rounded-lg my-2'><h2>Blog Posts</h2></div>
-        <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
-        {posts.length ? (
-          posts.map((post) => <Card key={post._id} post={post} />)
-        ) : (
-          <p>No posts available.</p>
-        )}
-        </div>
-      </section>
+      
       <section>
       <div className='py-2 px-10 bg-green-200 dark:bg-green-900 inline-block font-bold rounded-lg my-2'><h2>Brand Resources</h2></div>
         <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
