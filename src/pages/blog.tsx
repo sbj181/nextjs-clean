@@ -43,12 +43,12 @@ export default function IndexPage(
   return (
     <Container>
       <Head>
-        <title>CORE RMS by The Grovery</title>
+        <title>Learn | CORE RMS by The Grovery</title>
         <meta name="description" content="Welcome to CORE RMS, your source for the latest blog posts and resources." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Welcome />
+      <Welcome title="Learn Blog Posts" subtitle="Discover our latest blog posts" />
       <section>
         <div className='py-2 px-10 bg-orange-200 dark:bg-orange-900 inline-block font-bold rounded-lg my-2'><h2>Blog Posts</h2></div>
         <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">

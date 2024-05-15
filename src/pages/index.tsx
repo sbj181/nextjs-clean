@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { useLiveQuery } from 'next-sanity/preview'
 import Head from 'next/head'
@@ -49,7 +50,10 @@ export default function IndexPage(
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Welcome />
+      <Welcome 
+      title='Welcome to CORE RMS + CMS'       
+      subtitle={<span>Discover our latest blog posts. Visit the <Link href="/studio"><span className="text-blue-500 underline">CMS Studio</span></Link> to manage content.</span>}
+      />
       <section>
         <div className='py-2 px-10 bg-orange-200 dark:bg-orange-900 inline-block font-bold rounded-lg my-2'><h2>Blog Posts</h2></div>
         <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">

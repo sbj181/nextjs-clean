@@ -12,7 +12,7 @@ export default function Sidebar() {
         </svg>
       </button>
       <ul className="space-y-4 w-full">
-        <li><Link className='sidebar-link' href="/">Home</Link></li>
+        <li><Link className='sidebar-link' href="/">Dashboard</Link></li>
         <li><Link className='sidebar-link' href="/blog">Learn</Link></li>
         <li><Link className='sidebar-link' href="/resources">Resources</Link></li>
       </ul>

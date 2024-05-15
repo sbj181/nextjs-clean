@@ -1,10 +1,15 @@
-import Image from 'next/image'
-import Link from 'next/link'
+import Link from 'next/link';
 
-export default function Welcome() {
+interface WelcomeProps {
+  title: string;
+  subtitle?: React.ReactNode; // Allow subtitle to contain HTML elements
+}
+
+export default function Welcome({ title, subtitle }: WelcomeProps) {
   return (
     <div className="welcome__container">
-      <h1 className='homeTitle font-bold text-center w-full'>Welcome to CORE + Sanity CMS</h1>
+      <h1 className="homeTitle font-bold text-center w-full">{title}</h1>
+      {subtitle && <h2 className="subtitle font-medium text-center w-full">{subtitle}</h2>}
     </div>
-  )
+  );
 }
