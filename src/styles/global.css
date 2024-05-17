@@ -451,7 +451,7 @@ main {
 /* Card */
 
 .card {
-  @apply border-[6px] border-slate-50 dark:border-slate-950 bg-slate-50 dark:bg-slate-950 rounded-2xl drop-shadow-xl shadow-black;
+  @apply border-[6px] border-slate-50 dark:border-slate-950 bg-slate-50 dark:bg-slate-950 rounded-2xl relative drop-shadow-xl shadow-black;
 }
 .card .cardImg {
   @apply rounded-t-2xl;
@@ -469,13 +469,13 @@ main {
   @apply bg-green-200 dark:bg-green-900
 }
 .card .card__container {
-  @apply mt-8 mx-6 mb-10
+  @apply mt-8 mx-4 md:mx-6 mb-10
 }
 .card .resource__excerpt, .card .card__excerpt {
   @apply opacity-50
 }
 .cardDetailsBtn {
-  @apply bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-3 px-6 rounded-2xl ease-in
+  @apply bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-3 px-4 md:px-6 rounded-2xl ease-in
 }
 .cardDownloadBtn {
   @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
@@ -539,7 +539,7 @@ main {
   inset: 0;
 }
 .card h3 {
-  @apply text-2xl;
+  @apply text-xl md:text-2xl leading-tight;
   @apply font-bold;
 }
 .cardWrap {
