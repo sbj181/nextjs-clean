@@ -1,5 +1,5 @@
 import { defineField, defineType } from 'sanity'
-import CustomStringInput from './../components/CustomStringInput';
+
 import tag from './tag'; // Import the tag schema
 
 
@@ -13,9 +13,7 @@ export default defineType({
       type: 'string',
       title: 'Title',
       description: 'Enter the title of the resource.',
-      /* components: {
-        input: CustomStringInput, // Use custom input component
-      }, */
+      
     }),
     defineField({
       name: 'slug',

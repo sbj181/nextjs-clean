@@ -46,7 +46,7 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
             />
           </div>
         ) : (
-          <div className="cardEmpty h-[220px] bg-slate-300 dark:bg-slate-950 block" />
+          <div className="cardEmpty h-[220px] bg-slate-300 rounded-t-xl dark:bg-slate-550 block" />
         )}
         <div className='typeBadgeContainer'>
           <div className='typeBadge resource'>Resource</div>
@@ -86,7 +86,7 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
             <HiOutlineShare size={20} />
           </button>
           <button onClick={handleFavoriteClick} className="cardFavoriteBtn ml-auto">
-            {isFavorite(resource._id) ? <HiHeart size={20} /> : <HiOutlineHeart size={20} />}
+            {isFavorite(resource._id) ? <HiHeart className={'fill-red-600'} size={20} /> : <HiOutlineHeart size={20} />}
           </button>
         </div>
       </div>
