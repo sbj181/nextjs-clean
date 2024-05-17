@@ -3,6 +3,7 @@ import '~/styles/global.css';
 import type { AppProps } from 'next/app';
 import { IBM_Plex_Mono, Inter, PT_Serif } from 'next/font/google';
 import { lazy, Suspense } from 'react';
+import { FavoritesProvider } from '../contexts/FavoritesContext'; // Import the FavoritesProvider
 import { SidebarProvider } from '../contexts/SidebarContext'; // Ensure the path is correct
 
 export interface SharedPageProps {
@@ -36,6 +37,7 @@ export default function App({ Component, pageProps }: AppProps<SharedPageProps>)
 
   return (
     <>
+    <FavoritesProvider>
       <Suspense fallback={<div>Loading...</div>}>
         <SidebarProvider>
           {draftMode ? (
@@ -47,6 +49,7 @@ export default function App({ Component, pageProps }: AppProps<SharedPageProps>)
           )}
         </SidebarProvider>
       </Suspense>
+    </FavoritesProvider>
     </>
   );
 }

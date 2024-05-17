@@ -50,7 +50,6 @@ export default function IndexPage(
       </Head>
       <Welcome title="Learn Blog Posts" subtitle="Discover our latest blog posts" />
       <section>
-        <div className='py-2 px-10 bg-orange-200 dark:bg-orange-900 inline-block font-bold rounded-lg my-2'><h2>Blog Posts</h2></div>
         <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
         {posts.length ? (
           posts.map((post) => <Card key={post._id} post={post} />)

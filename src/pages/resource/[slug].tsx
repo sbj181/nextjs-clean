@@ -72,7 +72,7 @@ export default function ResourceSlugRoute(
         )}
         <div className="resource__container">
           <h1 className="resource__title">{resource.title}</h1>
-          <p className="resource__description">{resource.description}</p>
+         {/*  <p className="resource__description">{resource.description}</p> */}
           <p className="resource__date">{formatDate(resource._createdAt)}</p>
           {resource.longDescription && (
             <div className="resource__content">

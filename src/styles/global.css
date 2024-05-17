@@ -82,8 +82,56 @@ body, button, input, textarea {
   @apply text-slate-50; /* light gray */
 }
 
+/* Header */
+
+/* Add modal overlay styles */
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+/* Add modal content styles */
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 400px;
+  margin: 0 auto;
+  width: calc(100% - 32px);
+}
+
+.dark .modal-content {
+  background-color: #2d3748; /* Dark mode background */
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-close-button svg {
+  height: 24px;
+  width: 24px;
+}
+
+
+/* Page Title */
+
 .homeTitle {
-  font-size: var(--font-size-10);
+  font-size: var(--font-size-8);
   font-family: var(--font-family-sans);
 }
 
@@ -143,7 +191,25 @@ body {
   /* Targeting tags in PortableText */
 }
 
-.post .post__content blockquote {
+.post .post__content p, .resource .resource__content p {
+  @apply mb-4;
+}
+
+.post .post__content ul, .resource .resource__content ul,
+.post .post__content ol, .resource .resource__content ol {
+  margin-left: 1.5rem; /* Adjust as needed */
+  margin-bottom: 1rem;
+}
+
+.post .post__content li, .resource .resource__content li {
+  margin-bottom: 0.5rem;
+  list-style: inherit;
+  list-style-type:disc;
+}
+
+
+
+.post .post__content blockquote, .resource .resource__content blockquote {
   border-left: 5px solid var(--black);
   padding-left: var(--space-3);
   margin-left: var(--space-4);
@@ -164,10 +230,10 @@ body {
 
 .post .post__excerpt {
   /* font-family: var(--font-family-sans); */
-  font-size: var(--font-size-5);
+ /*  font-size: var(--font-size-5);
   line-height: var(--line-height-4);
   margin-top: 0;
-  font-weight: 400;
+  font-weight: 400; */
 }
 
 .post .post__date {
@@ -194,10 +260,10 @@ body {
   }
 
   .post .post__excerpt {
-    font-size: var(--font-size-5);
+    /* font-size: var(--font-size-5);
     line-height: var(--line-height-5);
     margin-top: var(--space-3);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-3); */
   }
 
   .post .post__date {
@@ -385,13 +451,41 @@ main {
 /* Card */
 
 .card {
-  @apply border rounded-lg shadow-md;
+  @apply border-[6px] border-slate-50 dark:border-slate-950 bg-slate-50 dark:bg-slate-950 rounded-2xl drop-shadow-xl shadow-black;
 }
-
+.card .cardImg {
+  @apply rounded-t-2xl;
+}
+.card .typeBadgeContainer {
+  @apply w-full flex justify-center
+}
+.card .typeBadge {
+  @apply px-2 py-2 -mt-5 z-10 w-[150px] border-[4px] rounded-2xl border-slate-50 dark:border-slate-950 text-sm text-center uppercase font-bold
+}
+.card .typeBadge.blog {
+  @apply bg-orange-200 dark:bg-orange-900
+}
+.card .typeBadge.resource {
+  @apply bg-green-200 dark:bg-green-900
+}
 .card .card__container {
-  margin: 0 var(--space-1) 0;
+  @apply mt-8 mx-8 mb-10
 }
-
+.card .resource__excerpt, .card .card__excerpt {
+  @apply opacity-50
+}
+.card .cardDetailsBtn {
+  @apply bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-3 px-6 rounded-2xl ease-in
+}
+.card .cardDownloadBtn {
+  @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
+}
+.card .cardShareBtn {
+  @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
+}
+.card .cardFavoriteBtn {
+  @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
+}
 .card .card__cover {
   width: 100%;
   height: 231px;
@@ -416,9 +510,9 @@ main {
 
 .card .card__excerpt {
   /* font-family: var(--font-family-sans); */
-  font-weight: 400;
+  /* font-weight: 400;
   font-size: var(--font-size-4);
-  line-height: var(--line-height-3);
+  line-height: var(--line-height-3); */
   @apply my-2;
 }
 
@@ -464,9 +558,8 @@ main {
 
 @media (min-width: 575px) {
   .card {
-    @apply dark:border;
-    @apply dark:border-slate-500;
-    border: 1px solid #ced2d9;
+   
+   
     /* border-bottom: none; */
   }
 
@@ -475,18 +568,18 @@ main {
   }
 
   .card:last-child {
-    border-bottom: 1px solid #ced2d9;
+    
   }
 }
 
 @media (min-width: 800px) {
-  .card {
+  /* .card {
     flex-direction: row;
-  }
+  } */
 
-  .card .card__container {
+ /*  .card .card__container {
     margin: 2em var(--space-4) 1em;
-  }
+  } */
 
   .card .card__cover,
   .card .card__cover--none {

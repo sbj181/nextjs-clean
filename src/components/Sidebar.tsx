@@ -13,8 +13,8 @@ export default function Sidebar() {
       </button>
       <ul className="space-y-4 w-full">
         <li><Link className='sidebar-link' href="/">Dashboard</Link></li>
-        <li><Link className='sidebar-link' href="/blog">Learn</Link></li>
         <li><Link className='sidebar-link' href="/resources">Resources</Link></li>
+        <li><Link className='sidebar-link' href="/blog">Training</Link></li>
       </ul>
     </aside>
   );

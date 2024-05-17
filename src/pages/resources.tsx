@@ -52,7 +52,6 @@ export default function IndexPage(
       <Welcome title="Resources" subtitle="Explore our collection of resources."  />
       
       <section>
-      <div className='py-2 px-10 bg-green-200 dark:bg-green-900 inline-block font-bold rounded-lg my-2'><h2>Brand Resources</h2></div>
         <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
         {resources.length ? (
           resources.map((resource) => <ResourceCard key={resource._id} resource={resource} />)
