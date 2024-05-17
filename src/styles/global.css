@@ -469,7 +469,7 @@ main {
   @apply bg-green-200 dark:bg-green-900
 }
 .card .card__container {
-  @apply mt-8 mx-8 mb-10
+  @apply mt-8 mx-6 mb-10
 }
 .card .resource__excerpt, .card .card__excerpt {
   @apply opacity-50
