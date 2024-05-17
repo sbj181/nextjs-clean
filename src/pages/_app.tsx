@@ -5,6 +5,7 @@ import { IBM_Plex_Mono, Inter, PT_Serif } from 'next/font/google';
 import { lazy, Suspense } from 'react';
 import { FavoritesProvider } from '../contexts/FavoritesContext'; // Import the FavoritesProvider
 import { SidebarProvider } from '../contexts/SidebarContext'; // Ensure the path is correct
+import Head from 'next/head';
 
 export interface SharedPageProps {
   draftMode: boolean;
@@ -38,6 +39,9 @@ export default function App({ Component, pageProps }: AppProps<SharedPageProps>)
   return (
     <>
     <FavoritesProvider>
+      <Head>
+        <link rel='icon' href='/core.png' />
+      </Head>
       <Suspense fallback={<div>Loading...</div>}>
         <SidebarProvider>
           {draftMode ? (

@@ -474,16 +474,16 @@ main {
 .card .resource__excerpt, .card .card__excerpt {
   @apply opacity-50
 }
-.card .cardDetailsBtn {
+.cardDetailsBtn {
   @apply bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-3 px-6 rounded-2xl ease-in
 }
-.card .cardDownloadBtn {
+.cardDownloadBtn {
   @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
 }
-.card .cardShareBtn {
+.cardShareBtn {
   @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
 }
-.card .cardFavoriteBtn {
+.cardFavoriteBtn {
   @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
 }
 .card .card__cover {
