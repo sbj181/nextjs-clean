@@ -55,7 +55,6 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
 
   const resourceLink = getResourceLink();
 
-
   return (
     <>
       <div className="card border-[4px] border-slate-50 flex-col w-full bg-slate-100 dark:bg-slate-950">
@@ -89,7 +88,11 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
               {resource.title}
             </Link>
           </h3>
-          <p className="resource__excerpt py-2">{resource.description}</p>
+          {resource.longDescription && (
+            <p className="resource__excerpt py-2">
+              {resource.longDescription[0]?.children?.[0]?.text.substring(0, 100) || ''}
+            </p>
+          )}
         </div>
         <div className="flex justify-start flex-wrap items-center mt-auto px-4 md:px-6 w-full gap-2 my-4">
           <Link href={`/resource/${resource.slug.current}`}>
@@ -111,7 +114,7 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
           <button onClick={handleShareClick} className="cardShareBtn">
             <HiOutlineShare size={20} />
           </button>
-          <button onClick={handleFavoriteClick} className="cardFavoriteBtn">
+          <button onClick={handleFavoriteClick} className="cardFavoriteBtn ml-auto">
             {isFavorite(resource._id) ? <HiHeart className={'fill-red-600'} size={20} /> : <HiOutlineHeart size={20} />}
           </button>
         </div>

@@ -10,14 +10,16 @@ interface FileAsset {
 
 // Utility to generate URLs for files
 export const urlForFile = (source: SanityDocument | FileAsset | null | undefined): string | null => {
-  if (!source) {
-    return null;  // Return null if the source is invalid
+  if (!source || !('asset' in source) || !source.asset || !('_ref' in source.asset)) {
+    return null;  // Return null if the reference is invalid
   }
 
-  // Check if source has the asset property and asset has _ref property
-  if ((source as FileAsset).asset && '_ref' in (source as FileAsset).asset) {
-    return `https://cdn.sanity.io/files/${projectId}/${dataset}/${(source as FileAsset).asset._ref}`;
+  const ref = source.asset._ref;
+  const [prefix, id, extension] = ref.split('-');
+
+  if (prefix !== 'file') {
+    return null;  // Return null if the reference does not have the correct prefix
   }
 
-  return null;
+  return `https://cdn.sanity.io/files/${projectId}/${dataset}/${id}.${extension}`;
 };

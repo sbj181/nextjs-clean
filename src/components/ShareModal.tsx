@@ -10,7 +10,9 @@ interface ShareModalProps {
 
 const ShareModal: React.FC<ShareModalProps> = ({ post, resource, onClose }) => {
   const item = post || resource; // Determine if it's a post or a resource
-  const shareLink = resource?.BMSResourceLink || `${window.location.origin}/post/${post?.slug.current}`;
+  const shareLink = resource 
+    ? `${window.location.origin}/resource/${resource.slug.current}`
+    : `${window.location.origin}/post/${post?.slug.current}`;
 
   const copyToClipboard = () => {
     if (shareLink) {
