@@ -2,7 +2,7 @@ import { PortableText } from '@portabletext/react';
 import type { GetStaticProps, InferGetStaticPropsType } from 'next';
 import Image from 'next/image';
 import { useState } from 'react';
-import { HiOutlineDownload, HiOutlineShare, HiHeart, HiOutlineHeart } from 'react-icons/hi';
+import { HiOutlineDownload, HiOutlineExternalLink, HiOutlineShare, HiHeart, HiOutlineHeart } from 'react-icons/hi';
 import { useLiveQuery } from 'next-sanity/preview';
 
 import Container from '~/components/Container';
@@ -10,6 +10,7 @@ import ShareModal from '~/components/ShareModal';
 import { readToken } from '~/lib/sanity.api';
 import { getClient } from '~/lib/sanity.client';
 import { urlForImage } from '~/lib/sanity.image';
+import { urlForFile } from '~/lib/sanity.file';
 import {
   getResource,
   type Resource,
@@ -77,32 +78,45 @@ export default function ResourceSlugRoute(
     setShareOpen(false);
   };
 
+  const getResourceLink = () => {
+    if (resource.resourceKind === 'file') {
+      return urlForFile(resource.fileUpload) || resource.fileShareURL;
+    }
+    return resource.BMSResourceLink;
+  };
+
+  const getLinkIcon = () => {
+    if (resource.resourceKind === 'file' || !resource.resourceKind) {
+      return <HiOutlineDownload size={20} />;
+    }
+    return <HiOutlineExternalLink size={20} />;
+  };
+
+  const getLinkText = () => {
+    if (resource.resourceKind === 'file' || !resource.resourceKind) {
+      return 'Download';
+    }
+    return 'Visit';
+  };
+
+  const resourceLink = getResourceLink();
+
   return (
     <Container>
-      <section className="resource min-h-screen grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {resource.mainImage && (
-          <div className='rounded-lg overflow-hidden'>
-            <Image
-              className="w-full h-auto object-cover"
-              src={imageUrl}
-              height={600}
-              width={1000}
-              alt=""
-            />
-          </div>
-        )}
+      <section className="resource min-h-screen gap-8">
         <div className="flex flex-col justify-start">
           <h1 className="resource__title text-2xl font-bold mb-4">{resource.title}</h1>
 
           <div className="flex gap-4 mb-4">
-            {resource.BMSResourceLink && (
+            {resourceLink && (
               <a
-                href={resource.BMSResourceLink}
-                className="cardDownloadBtn"
+                href={resourceLink}
+                className="cardDownloadBtn !bg-blue-500 !text-white !rounded-xl !px-8 !w-auto !flex gap-2"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <HiOutlineDownload size={20} />
+                {getLinkIcon()}
+                {getLinkText()}
               </a>
             )}
             <button onClick={handleShareClick} className="cardShareBtn">
@@ -112,10 +126,26 @@ export default function ResourceSlugRoute(
               {isFavorite(resource._id) ? <HiHeart className='fill-red-600' size={20} /> : <HiOutlineHeart size={20} />}
             </button>
           </div>
-
-          <p className="resource__date text-gray-600 dark:text-gray-300 mb-4">{formatDate(resource._createdAt)}</p>
+          <div className='border-2 border-opacity-25 border-slate-500 text-sm pt-3 pb-2 px-4 rounded-xl inline-block mb-4'>
+            <span className='uppercase mb-3 font-bold opacity-50 block'>File Details</span>
+            <p className="resource__date text-gray-600 mb-2 dark:text-gray-300"><span className='font-bold'>Last Updated: </span>{formatDate(resource._createdAt)}</p>
+            {resource.author && (
+              <p className="resource__date text-gray-600 dark:text-gray-300 mb-2"><span className='font-bold'>Created by: </span>{resource.author}</p>
+            )}
+          </div>
+          {resource.mainImage && (
+            <div className='rounded-lg overflow-hidden p-2 bg-slate-500 bg-opacity-20 w-full'>
+              <Image
+                className="max-w-[60%] mx-auto h-auto object-cover"
+                src={imageUrl}
+                height={600}
+                width={1000}
+                alt=""
+              />
+            </div>
+          )}
           {resource.longDescription && (
-            <div className="resource__content">
+            <div className="resource__content !my-6">
               <PortableText value={resource.longDescription} />
             </div>
           )}

@@ -1,5 +1,5 @@
 import type { PortableTextBlock } from '@portabletext/types';
-import type { ImageAsset, Slug } from '@sanity/types';
+import type { ImageAsset, Slug, FileAsset } from '@sanity/types';
 import groq from 'groq';
 import { type SanityClient } from 'next-sanity';
 
@@ -38,6 +38,9 @@ export const resourcesQuery = groq`
   longDescription,
   mainImage,
   resourceType,
+  resourceKind,
+  fileUpload,
+  fileShareURL,
   "tags": tags[]->{
     _id,
     title
@@ -62,7 +65,37 @@ export async function getResources(client: SanityClient): Promise<Resource[]> {
   return await client.fetch(resourcesQuery);
 }
 
-export const resourceBySlugQuery = groq`*[_type == "resource" && slug.current == $slug][0]`;
+export const resourceBySlugQuery = groq`*[_type == "resource" && slug.current == $slug][0]{
+  _id,
+  _createdAt,
+  title,
+  slug,
+  description,
+  longDescription,
+  mainImage,
+  resourceType,
+  resourceKind,
+  fileUpload,
+  fileShareURL,
+  "tags": tags[]->{
+    _id,
+    title
+  },
+  viewDetailsButtonText,
+  shareButtonText,
+  resourceDetailsLink,
+  author,
+  lastModified,
+  BMSResourceLink,
+  PfizerResourceLink,
+  "RelatedResources": {
+    "tags": tags[]->{
+      _id,
+      title
+    },
+    titles
+  }
+}`;
 
 export async function getResource(client: SanityClient, slug: string): Promise<Resource> {
   return await client.fetch(resourceBySlugQuery, { slug });
@@ -80,6 +113,9 @@ export interface Resource {
   longDescription?: PortableTextBlock[];
   mainImage?: ImageAsset;
   resourceType?: string;
+  resourceKind?: string; // Added
+  fileUpload?: FileAsset; // Added
+  fileShareURL?: string; // Added
   tags?: { _id: string; title: string }[];
   viewDetailsButtonText?: string;
   shareButtonText?: string;

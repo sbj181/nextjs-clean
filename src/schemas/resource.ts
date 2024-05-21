@@ -1,19 +1,19 @@
 import { defineField, defineType } from 'sanity'
+import { FiLayers, FiFileText, FiTag, FiBook } from 'react-icons/fi';
 
 import tag from './tag'; // Import the tag schema
 
-
 export default defineType({
   name: 'resource',
-  title: 'Resource',
+  title: 'Resources',
   type: 'document',
+  icon: FiLayers,
   fields: [
     defineField({
       name: 'title',
       type: 'string',
       title: 'Title',
       description: 'Enter the title of the resource.',
-      
     }),
     defineField({
       name: 'slug',
@@ -29,7 +29,7 @@ export default defineType({
       name: 'description',
       title: 'Description',
       rows: 4,
-      description: 'This is the short description that appears in tbe resource card.',
+      description: 'This is the short description that appears in the resource card.',
       type: 'text',
     }),
     defineField({
@@ -46,7 +46,7 @@ export default defineType({
       options: {
         hotspot: true,
       },
-    }), 
+    }),
     defineField({
       name: 'resourceType',
       title: 'Resource Type',
@@ -65,7 +65,39 @@ export default defineType({
       description: 'Categorize and group resources by selecting an existing tag below or by creating a new one.',
       of: [{ type: 'reference', to: { type: 'tag' } }],
     }),
-    
+    defineField({
+      name: 'resourceKind',
+      title: 'What kind of resource are you adding?',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Website', value: 'website' },
+          { title: 'File', value: 'file' },
+        ],
+        layout: 'radio', // Use radio buttons for better UX
+      },
+    }),
+    defineField({
+      name: 'BMSResourceLink',
+      title: 'Resource Location Link',
+      description: 'Paste the URL location or Share Link file URL here',
+      type: 'url',
+      hidden: ({ parent }) => parent.resourceKind !== 'website', // Conditionally hide this field
+    }),
+    defineField({
+      name: 'fileUpload',
+      title: 'Upload File',
+      type: 'file',
+      description: 'Upload the file if URL is not available',
+      hidden: ({ parent }) => parent.resourceKind !== 'file', // Conditionally hide this field
+    }),
+    defineField({
+      name: 'fileShareURL',
+      title: 'File Share URL',
+      type: 'url',
+      description: 'Paste the share URL for the file here',
+      hidden: ({ parent }) => parent.resourceKind !== 'file', // Conditionally hide this field
+    }),
     defineField({
       name: 'author',
       title: 'Author',
@@ -76,28 +108,20 @@ export default defineType({
       title: 'Last Modified',
       type: 'string',
     }),
-    defineField({
-      name: 'BMSResourceLink',
-      title: 'Resource Location Link',
-      description: 'Paste the URL location or Share Link file URL here',
-      type: 'url',
-    }),
-   
-    
   ],
   preview: {
     select: {
       title: 'title',
       media: 'mainImage',
-      subtitle: 'description'
+      subtitle: 'description',
     },
     prepare(selection) {
-      const { title, media, subtitle } = selection
+      const { title, media, subtitle } = selection;
       return {
         title,
         media,
-        subtitle
-      }
+        subtitle,
+      };
     },
   },
-})
+});

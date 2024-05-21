@@ -151,7 +151,11 @@ body {
 /* Sidebar */
 
 .sidebar-link {
-  @apply bg-slate-300 dark:bg-slate-900 block rounded-lg text-center p-3 transition-colors duration-300;
+  @apply bg-slate-300 dark:bg-slate-900 flex rounded-lg text-center p-3 transition-all text-lg duration-300 mb-2 relative;
+}
+.sidebar-link.sub {
+  @apply text-sm
+  /* @apply ml-4 bg-opacity-60 before:absolute before:block before:-left-3 before:border-l-2 before:border-slate-500 before:h-full before:top-0; */
 }
 
 .sidebar-link:hover {

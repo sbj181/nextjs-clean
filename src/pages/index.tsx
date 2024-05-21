@@ -74,10 +74,10 @@ export default function IndexPage(
           placeholder="Search resources..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="py-2 px-4 w-full md:w-1/2 border rounded-full"
+          className="py-2 px-4 w-full dark:text-slate-600 md:w-1/2 border rounded-full"
         />
       </div>
-      {favoriteResources.length > 0 && (
+      {favoriteResources.length > 0 ? (
         <section>
           <div className='border my-4 px-4 py-2 rounded-2xl bg-red-400 bg-opacity-10'>
             <div className='flex-col text-center mb-4 items-center justify-center w-full'>
@@ -91,6 +91,8 @@ export default function IndexPage(
             </div>
           </div>
         </section>
+      ) : (
+        <div className="cardEmpty h-[120px] border px-4 py-2 rounded-2xl bg-red-400 bg-opacity-10 items-center justify-center flex my-4">Click the heart on a resource below to add it to your favorites</div>
       )}
       <section>
         <div className='flex-col text-center mb-4 items-center justify-center w-full'>

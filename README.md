@@ -1,10 +1,8 @@
-# A minimal Next.js site with Sanity Studio
+# CORE RMS (Resource Management System) by The Grovery
 
-This starter is a statically generated site that uses [Next.js][nextjs] for the frontend and [Sanity][sanity-homepage] to handle its content.
-It comes with a native Sanity Studio that offers features like real-time collaboration, instant side-by-side content previews, and intuitive editing.
+This project is a statically generated site that uses [Next.js][nextjs] for the frontend and [Sanity][sanity-homepage] to handle its content. It comes with a native Sanity Studio that offers features like real-time collaboration, instant side-by-side content previews, and intuitive editing.
 
-The Studio connects to Sanity Content Lake, which gives you hosted content APIs with a flexible query language, on-demand image transformations, powerful patching, and more.
-You can use this starter to kick-start a clean slate site or learn these technologies.
+The Studio connects to Sanity Content Lake, which provides hosted content APIs with a flexible query language, on-demand image transformations, powerful patching, and more. This project serves as a basic model of CORE RMS, which will be white-labeled and customized for each brand team or company that needs to use the resource management features.
 
 [![Deploy with Vercel](https://vercel.com/button)][vercel-deploy]
 
@@ -12,25 +10,31 @@ You can use this starter to kick-start a clean slate site or learn these technol
 >
 > This starter uses the `/pages` directory for Next.js routing.
 >
-> The template will be migrated to the currently experimental [/app][app-dir] directory
-> when Vercel announce that it is production ready.
+> The template will be migrated to the currently experimental [/app][app-dir] directory when Vercel announces that it is production-ready.
 
 ## Table of Contents
 
-- [Features](#features)
-- [Table of Contents](#table-of-contents)
-- [Project Overview](#project-overview)
-  - [Important files and folders](#important-files-and-folders)
-- [Configuration](#configuration)
-  - [Step 1. Set up the environment](#step-1-set-up-the-environment)
-  - [Step 2. Set up the project locally](#step-2-set-up-the-project-locally)
-  - [Step 3. Run Next.js locally in development mode](#step-3-run-nextjs-locally-in-development-mode)
-  - [Step 4. Deploy to production](#step-4-deploy-to-production)
-- [Questions and Answers](#questions-and-answers)
-  - [It doesn't work! Where can I get help?](#it-doesnt-work-where-can-i-get-help)
-  - [How can I remove the "Next steps" block from my app?](#how-can-i-remove-the-next-steps-block-from-my-app)
-  - [How can I set up Incremental Static Revalidation?](#how-can-i-set-up-incremental-static-revalidation)
-- [Next steps](#next-steps)
+- [CORE RMS (Resource Management System) by The Grovery](#core-rms-resource-management-system-by-the-grovery)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Project Overview](#project-overview)
+    - [Important files and folders](#important-files-and-folders)
+  - [Configuration](#configuration)
+    - [Step 1. Set up the environment](#step-1-set-up-the-environment)
+    - [Step 2. Set up the project locally](#step-2-set-up-the-project-locally)
+    - [Step 3. Run Next.js locally in development mode](#step-3-run-nextjs-locally-in-development-mode)
+    - [Step 4. Deploy to production](#step-4-deploy-to-production)
+  - [Questions and Answers](#questions-and-answers)
+    - [It doesn't work! Where can I get help?](#it-doesnt-work-where-can-i-get-help)
+    - [How can I remove the "Next steps" block from my app?](#how-can-i-remove-the-next-steps-block-from-my-app)
+  - [Next steps](#next-steps)
+
+## Features
+
+- **Real-time collaboration**: Work together with your team seamlessly.
+- **Content previews**: See changes as you make them.
+- **Customizable**: Tailor the system to meet your specific needs.
+- **Hosted content APIs**: Use Sanity's powerful Content Lake for content management.
 
 ## Project Overview
 
@@ -38,7 +42,7 @@ You can use this starter to kick-start a clean slate site or learn these technol
 | ----------------------------------------------------------------------------------------------------------------------- |
 | ![Sanity Studio](https://user-images.githubusercontent.com/44635000/197511725-b2a2e2e5-287b-41a9-84c6-ec90d37ca480.png) |
 
-# Important files and folders
+### Important files and folders
 
 | File(s)                          | Description                                                                           |
 | -------------------------------- | ------------------------------------------------------------------------------------- |

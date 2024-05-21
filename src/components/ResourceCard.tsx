@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { HiOutlineDownload, HiOutlineShare, HiHeart, HiOutlineHeart } from 'react-icons/hi';
+import { HiOutlineDownload, HiOutlineExternalLink, HiOutlineShare, HiHeart, HiOutlineHeart } from 'react-icons/hi';
 import { useState } from 'react';
 
 import { urlForImage } from '~/lib/sanity.image';
+import { urlForFile } from '~/lib/sanity.file';
 import { type Resource } from '~/lib/sanity.queries';
 import { formatDate } from '~/utils';
 
@@ -30,6 +31,30 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
       addFavorite(resource._id);
     }
   };
+
+  const getResourceLink = () => {
+    if (resource.resourceKind === 'file') {
+      return urlForFile(resource.fileUpload) || resource.fileShareURL;
+    }
+    return resource.BMSResourceLink;
+  };
+
+  const getLinkIcon = () => {
+    if (resource.resourceKind === 'file' || !resource.resourceKind) {
+      return <HiOutlineDownload size={20} />;
+    }
+    return <HiOutlineExternalLink size={20} />;
+  };
+
+  const getLinkText = () => {
+    if (resource.resourceKind === 'file' || !resource.resourceKind) {
+      return '';
+    }
+    return '';
+  };
+
+  const resourceLink = getResourceLink();
+
 
   return (
     <>
@@ -66,26 +91,27 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
           </h3>
           <p className="resource__excerpt py-2">{resource.description}</p>
         </div>
-        <div className="flex justify-around items-center mt-auto px-4 md:px-6 w-full gap-2 my-4">
+        <div className="flex justify-start flex-wrap items-center mt-auto px-4 md:px-6 w-full gap-2 my-4">
           <Link href={`/resource/${resource.slug.current}`}>
             <div className="cardDetailsBtn">
               Details
             </div>
           </Link>
-          {resource.BMSResourceLink && (
+          {resourceLink && (
             <a
-              href={resource.BMSResourceLink}
-              className="cardDownloadBtn"
+              href={resourceLink}
+              className="cardDownloadBtn !w-auto !flex !gap-1"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <HiOutlineDownload size={20} />
+              {getLinkIcon()}
+              {getLinkText()}
             </a>
           )}
           <button onClick={handleShareClick} className="cardShareBtn">
             <HiOutlineShare size={20} />
           </button>
-          <button onClick={handleFavoriteClick} className="cardFavoriteBtn ml-auto">
+          <button onClick={handleFavoriteClick} className="cardFavoriteBtn">
             {isFavorite(resource._id) ? <HiHeart className={'fill-red-600'} size={20} /> : <HiOutlineHeart size={20} />}
           </button>
         </div>

@@ -4,7 +4,11 @@
 
 import { visionTool } from '@sanity/vision'
 import { defineConfig } from 'sanity'
-import { deskTool } from 'sanity/desk'
+import {structureTool} from 'sanity/structure'
+import CoreLogo from 'src/components/CoreLogo'; // Import your custom logo component
+
+import {media} from 'sanity-plugin-media'
+
 import {
   defineUrlResolver,
   Iframe,
@@ -39,7 +43,7 @@ export default defineConfig({
   //edit schemas in './src/schemas'
   schema,
   plugins: [
-    deskTool({
+    structureTool({
       // `defaultDocumentNode` is responsible for adding a “Preview” tab to the document pane
       // You can add any React component to `S.view.component` and it will be rendered in the pane
       // and have access to content in the form in real-time.
@@ -63,5 +67,21 @@ export default defineConfig({
     // Vision lets you query your content with GROQ in the studio
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({ defaultApiVersion: apiVersion }),
+    media(),
   ],
+  parts: [
+    {
+      name: 'part:@sanity/base/schema',
+      path: './schemas/schema'
+    },
+    {
+      implements: 'part:@sanity/base/root',
+      path: 'src/components/CoreLogo.tsx'
+    },
+    {
+      implements: 'part:@sanity/base/brand-logo',
+      path: 'src/components/CoreLogo.tsx'
+    }
+    
+  ]
 })
