@@ -27,7 +27,7 @@ export default defineType({
     }),
     defineField({
       name: 'description',
-      title: 'Description',
+      title: 'Short Description',
       rows: 4,
       description: 'This is the short description that appears in the resource card.',
       type: 'text',
