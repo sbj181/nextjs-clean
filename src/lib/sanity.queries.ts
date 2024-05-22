@@ -142,8 +142,19 @@ export const trainingsQuery = groq`
     stepNumber,
     "relatedResource": relatedResource->{
       _id,
+      _createdAt,
       title,
-      slug
+      slug,
+      description,
+      mainImage,
+      resourceKind,
+      fileUpload,
+      BMSResourceLink,
+      fileShareURL,
+      "tags": tags[]->{
+        _id,
+        title
+      }
     }
   }
 }`;
