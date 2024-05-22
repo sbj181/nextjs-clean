@@ -5,30 +5,27 @@ export default defineType({
   title: 'Training Step',
   type: 'document',
   fields: [
-    defineField({
+    {
       name: 'title',
-      title: 'Title',
       type: 'string',
-      description: 'Enter the title of the training step.',
-    }),
-    defineField({
+      title: 'Title',
+    },
+    {
       name: 'description',
+      type: 'array',
       title: 'Description',
-      type: 'blockContent',
-      description: 'Enter the detailed description of the training step.',
-    }),
-    defineField({
+      of: [{ type: 'block' }],
+    },
+    {
       name: 'stepNumber',
-      title: 'Step Number',
       type: 'number',
-      description: 'The order of this step in the training sequence.',
-    }),
-    defineField({
-      name: 'relatedResource',
-      title: 'Related Resource',
-      type: 'reference',
-      to: [{ type: 'resource' }],
-      description: 'Link to a related resource if any.',
-    }),
+      title: 'Step Number',
+    },
+    {
+      name: 'relatedResources',
+      type: 'array',
+      title: 'Related Resources',
+      of: [{ type: 'reference', to: [{ type: 'resource' }] }],
+    },
   ],
 });

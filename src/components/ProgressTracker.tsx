@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { PortableText } from '@portabletext/react';
-import { HiCheck } from 'react-icons/hi';
+import { FiChevronRight, FiCheck } from "react-icons/fi";
+import Link from 'next/link';
+
 import { TrainingStep } from '~/lib/sanity.queries';
+import ResourceCard from '~/components/ResourceCard'; // Import ResourceCard
+import { type Resource } from '~/lib/sanity.queries'; // Import Resource type
 
 interface ProgressTrackerProps {
   steps: TrainingStep[];
@@ -20,38 +24,49 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps }) => {
 
   return (
     <div>
-      <div className="flex justify-center bg-slate-500 bg-opacity-10 border-2 p-2 rounded-xl space-x-4 mb-6">
+      <div className="flex items-center justify-center bg-slate-500 bg-opacity-10 border-2 border-opacity-50 py-2 px-4 rounded-xl space-x-4 mb-6">
+        <div className='mr-auto'>Progress:</div>
         {steps.map((step) => (
           <div
             key={step._id}
-            className={`w-20 h-20 flex items-center justify-center rounded-full ${completedSteps.includes(step.stepNumber) ? 'bg-green-500 text-white' : 'bg-gray-300'}`}
+            className={`w-20 h-20 flex items-center justify-center rounded-full ${completedSteps.includes(step.stepNumber) ? 'bg-green-500 text-white' : 'bg-slate-500 border-2 bg-opacity-25'}`}
           >
-            {completedSteps.includes(step.stepNumber) ? <HiCheck size={24} /> : step.stepNumber}
+            {completedSteps.includes(step.stepNumber) ? <FiCheck size={24} /> : step.stepNumber}
           </div>
         ))}
       </div>
 
       {steps.map((step) => (
-        <div key={step._id} className="mb-6 border-2 px-4 py-8">
-          <h2 className="text-2xl text-center font-semibold mb-2">
-            Step {step.stepNumber}: {step.title}
+        <div key={step._id} className="mb-6 border-2 border-slate-500 border-opacity-50 px-4 py-8">
+          <div className='w-full flex mb-4'>
+            <span className='bg-slate-500 bg-opacity-20 px-8 py-4 flex flex-col uppercase text-lg font-bold items-center rounded-lg justify-center'>Step {step.stepNumber}</span>
+          </div>
+          <h2 className="text-2xl font-semibold pb-2 mb-4 border-solid border-slate-500 border-opacity-25 border-b">
+             {step.title}
           </h2>
+          
           <PortableText value={step.description} />
           {step.relatedResource && (
-            <div className="mt-4">
-              <h3 className="text-xl font-semibold">Related Resource:</h3>
-              <p>
-                <a href={`/resource/${step.relatedResource.slug.current}`} className="text-blue-500 underline">
-                  {step.relatedResource.title}
-                </a>
-              </p>
+            <div className='border my-4 px-4 py-2 rounded-2xl bg-green-400 bg-opacity-10'>
+              <h3 className="text-xl text-center font-semibold mb-2">Related Resource</h3>
+              <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
+              <ResourceCard resource={step.relatedResource as Resource} /> {/* Use ResourceCard component */}
+              </div>
             </div>
           )}
           <button
             onClick={() => handleCompleteStep(step.stepNumber)}
-            className={`mt-4 py-2 px-4 rounded-lg ${completedSteps.includes(step.stepNumber) ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}
+            className={`mt-4 py-4 px-8 flex justify-between items-center gap-2 rounded-full ${completedSteps.includes(step.stepNumber) ? 'bg-green-500 text-white' : 'bg-slate-500  bg-opacity-50 text-white'}`}
           >
-            {completedSteps.includes(step.stepNumber) ? 'Unmark as Complete' : 'Mark as Complete'}
+            {completedSteps.includes(step.stepNumber) ? (
+              <>
+                Completed <span className='bg-slate-500 bg-opacity-25 p-1 rounded-full'><FiCheck /></span>
+              </>
+            ) : (
+                <>
+                Mark Complete 
+              </>
+            )}
           </button>
         </div>
       ))}
