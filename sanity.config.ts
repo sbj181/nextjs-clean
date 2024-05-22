@@ -5,7 +5,6 @@
 import { visionTool } from '@sanity/vision'
 import { defineConfig } from 'sanity'
 import {structureTool} from 'sanity/structure'
-import CoreLogo from 'src/components/CoreLogo'; // Import your custom logo component
 
 import {media} from 'sanity-plugin-media'
 
@@ -69,19 +68,4 @@ export default defineConfig({
     visionTool({ defaultApiVersion: apiVersion }),
     media(),
   ],
-  parts: [
-    {
-      name: 'part:@sanity/base/schema',
-      path: './schemas/schema'
-    },
-    {
-      implements: 'part:@sanity/base/root',
-      path: 'src/components/CoreLogo.tsx'
-    },
-    {
-      implements: 'part:@sanity/base/brand-logo',
-      path: 'src/components/CoreLogo.tsx'
-    }
-    
-  ]
 })

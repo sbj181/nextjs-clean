@@ -113,9 +113,9 @@ export interface Resource {
   longDescription?: PortableTextBlock[];
   mainImage?: ImageAsset;
   resourceType?: string;
-  resourceKind?: string; // Added
-  fileUpload?: FileAsset; // Added
-  fileShareURL?: string; // Added
+  resourceKind?: string;
+  fileUpload?: FileAsset;
+  fileShareURL?: string;
   tags?: { _id: string; title: string }[];
   viewDetailsButtonText?: string;
   shareButtonText?: string;
@@ -128,4 +128,42 @@ export interface Resource {
     tags?: { _id: string; title: string }[];
     titles?: string[];
   };
+}
+
+// Training queries
+export const trainingsQuery = groq`
+*[_type == "training"] | order(_createdAt desc) {
+  _id,
+  title,
+  "steps": steps[]-> {
+    _id,
+    title,
+    description,
+    stepNumber,
+    "relatedResource": relatedResource->{
+      _id,
+      title,
+      slug
+    }
+  }
+}`;
+
+export async function getTrainings(client: SanityClient): Promise<Training[]> {
+  return await client.fetch(trainingsQuery);
+}
+
+export interface Training {
+  _type: 'training';
+  _id: string;
+  title: string;
+  steps: TrainingStep[];
+}
+
+export interface TrainingStep {
+  _type: 'trainingStep';
+  _id: string;
+  title: string;
+  description: PortableTextBlock[];
+  stepNumber: number;
+  relatedResource?: Resource;
 }

@@ -58,20 +58,12 @@ export default function Sidebar() {
 
         <div className="bg-slate-300 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between">
-            <Link href="/blog" className="flex items-center w-full font-normal">
+            <Link href="/training" className="flex items-center w-full font-normal">
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiBook /></span> Training
             </Link>
-            <button onClick={() => toggleSection('training')} className="bg-slate-900 bg-opacity-20 p-2 rounded-xl hover:bg-opacity-50 focus:outline-none">
-              {openSection === 'training' ? <FiChevronUp /> : <FiChevronDown />}
-            </button>
+            
           </li>
-          {openSection === 'training' && (
-            <ul>
-              <li><Link className='sidebar-link sub' href="/training/training1">Training 1</Link></li>
-              <li><Link className='sidebar-link sub' href="/training/training2">Training 2</Link></li>
-              <li><Link className='sidebar-link sub' href="/training/training3">Training 3</Link></li>
-            </ul>
-          )}
+          
         </div>
       </ul>
       <div className='mt-auto'>
