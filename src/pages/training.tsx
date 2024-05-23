@@ -31,7 +31,20 @@ export const getStaticProps: GetStaticProps<{
 export default function TrainingPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const { trainings } = props;
   const [trainingData] = useLiveQuery<Training[]>(props.trainings, trainingsQuery);
-  const [selectedTraining, setSelectedTraining] = useState<Training | undefined>();
+  const [selectedTrainingIndex, setSelectedTrainingIndex] = useState<number>(0);
+  const selectedTraining = trainingData ? trainingData[selectedTrainingIndex] : undefined;
+
+  const handlePrevious = () => {
+    if (selectedTrainingIndex > 0) {
+      setSelectedTrainingIndex(selectedTrainingIndex - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (trainingData && selectedTrainingIndex < trainingData.length - 1) {
+      setSelectedTrainingIndex(selectedTrainingIndex + 1);
+    }
+  };
 
   return (
     <Container>
@@ -49,16 +62,14 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
             <div className="hidden md:block">
               {trainingData && (
                 <ul className="flex space-x-4">
-                  {trainingData.map((training) => (
+                  {trainingData.map((training, index) => (
                     <li key={training._id}>
                       <button
                         className={`py-4 pl-5 pr-6 bg-opacity-100 hover:bg-opacity-90 shadow-sm flex items-center rounded-xl ${selectedTraining?._id === training._id ? 'bg-blue-500 text-white' : 'bg-slate-300 dark:bg-slate-700 bg-opacity-50'}`}
-                        onClick={() => setSelectedTraining(training)}
+                        onClick={() => setSelectedTrainingIndex(index)}
                       >
-                      <span className='pr-3'><FiBookOpen /></span>  {training.title}
+                        <span className='pr-3'><FiBookOpen /></span>  {training.title}
                       </button>
-
-                      
                     </li>
                   ))}
                 </ul>
@@ -69,8 +80,10 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
                 className="py-4 px-8 rounded-xl bg-slate-300 bg-opacity-50"
                 onChange={(e) => {
                   const selectedId = e.target.value;
-                  const training = trainingData?.find((training) => training._id === selectedId);
-                  setSelectedTraining(training);
+                  const trainingIndex = trainingData?.findIndex((training) => training._id === selectedId);
+                  if (trainingIndex !== undefined && trainingIndex >= 0) {
+                    setSelectedTrainingIndex(trainingIndex);
+                  }
                 }}
                 value={selectedTraining?._id || ''}
               >
@@ -85,7 +98,25 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
           </div>
 
           {selectedTraining ? (
-            <ProgressTracker steps={selectedTraining.steps} trainingId={selectedTraining._id} />
+            <>
+              <ProgressTracker steps={selectedTraining.steps} trainingId={selectedTraining._id} />
+              <div className="flex justify-between mt-8">
+                <button
+                  onClick={handlePrevious}
+                  disabled={selectedTrainingIndex === 0}
+                  className="py-2 px-4 rounded-xl bg-slate-300 dark:bg-slate-700 bg-opacity-50 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={trainingData && selectedTrainingIndex === trainingData.length - 1}
+                  className="py-2 px-4 rounded-xl bg-slate-300 dark:bg-slate-700 bg-opacity-50 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </>
           ) : (
             <div className="text-center py-10 rounded-xl bg-green-500 bg-opacity-15 px-8">
               <p className="text-xl">Welcome to the Training section. Please select a training module from the dropdown above to begin.</p>
