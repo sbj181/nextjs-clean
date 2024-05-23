@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useLiveQuery } from 'next-sanity/preview';
 import Container from '~/components/Container';
 import ProgressTracker from '~/components/ProgressTracker';
-import { FiBook } from "react-icons/fi";
 import { readToken } from '~/lib/sanity.api';
 import { getClient } from '~/lib/sanity.client';
 import { getTrainings, type Training, trainingsQuery } from '~/lib/sanity.queries';
@@ -41,13 +40,28 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Welcome title="Training" subtitle="Choose a training module from the options below." />
+      <Welcome title="Training" subtitle="Choose a training module from the dropdown below." />
       <section>
-        <div className="md:px-10 py-5">
+        <div className="py-5">
           <div className="mb-6">
             <h2 className="text-2xl font-semibold mb-4">Select a Training</h2>
-            {/* Dropdown for Mobile */}
-            <div className="block lg:hidden">
+            <div className="hidden md:block">
+              {trainingData && (
+                <ul className="flex space-x-4">
+                  {trainingData.map((training) => (
+                    <li key={training._id}>
+                      <button
+                        className={`py-2 px-4 rounded-xl ${selectedTraining?._id === training._id ? 'bg-blue-500 text-white' : 'bg-slate-300 bg-opacity-50'}`}
+                        onClick={() => setSelectedTraining(training)}
+                      >
+                        {training.title}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="md:hidden">
               <select
                 className="py-4 px-8 rounded-xl bg-slate-300 bg-opacity-50"
                 onChange={(e) => {
@@ -65,25 +79,13 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
                 ))}
               </select>
             </div>
-            {/* Buttons for Desktop */}
-            <div className="hidden lg:flex space-x-4">
-              {trainingData?.map((training) => (
-                <button
-                  key={training._id}
-                  className={`py-4 px-8 flex items-center gap-2 rounded-xl ${selectedTraining?._id === training._id ? 'bg-blue-500 text-white' : 'bg-slate-300 bg-opacity-50'}`}
-                  onClick={() => setSelectedTraining(training)}
-                >
-                   <span><FiBook /></span> {training.title}
-                </button>
-              ))}
-            </div>
           </div>
 
           {selectedTraining ? (
-            <ProgressTracker steps={selectedTraining.steps || []} />
+            <ProgressTracker steps={selectedTraining.steps || []} trainingId={selectedTraining._id} />
           ) : (
-            <div className="text-center py-10 rounded-xl bg-green-500 bg-opacity-15 px-8 mb-20">
-              <p className="text-xl">Welcome to the Training section. Please select a training module from the options above to begin.</p>
+            <div className="text-center py-10 rounded-xl bg-green-500 bg-opacity-15 px-8">
+              <p className="text-xl">Welcome to the Training section. Please select a training module from the dropdown above to begin.</p>
             </div>
           )}
         </div>

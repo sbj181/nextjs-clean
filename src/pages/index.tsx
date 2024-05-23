@@ -13,6 +13,7 @@ import { getClient } from '~/lib/sanity.client';
 import { getPosts, type Post, postsQuery } from '~/lib/sanity.queries';
 import { getResources, type Resource, resourcesQuery } from '~/lib/sanity.queries';
 import { useFavorites } from '~/contexts/FavoritesContext';
+import { useSidebar } from '~/contexts/SidebarContext'; // Import the Sidebar context
 
 import type { SharedPageProps } from '~/pages/_app';
 
@@ -43,6 +44,7 @@ export default function IndexPage(
   const [posts] = useLiveQuery<Post[]>(props.posts, postsQuery);
   const [resources] = useLiveQuery<Resource[]>(props.resources, resourcesQuery);
   const { favorites } = useFavorites();
+  const { isSidebarOpen } = useSidebar();
   const [searchQuery, setSearchQuery] = useState('');
 
   const favoriteResources = resources.filter((resource) => favorites.includes(resource._id));
@@ -84,7 +86,7 @@ export default function IndexPage(
               <div className='py-2 px-10 bg-red-200 dark:bg-red-900 inline-block font-bold rounded-2xl uppercase my-2'><h2>Favorite Resources</h2></div>
               <p>Favorited resources will appear below. Click the heart to remove.</p>
             </div>
-            <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
+            <div className={`cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${isSidebarOpen ? '3' : '4'}  gap-4 my-2`}>
               {favoriteResources.map((resource) => (
                 <ResourceCard key={resource._id} resource={resource} />
               ))}
@@ -99,7 +101,7 @@ export default function IndexPage(
           <div className='py-2 px-10 bg-green-200 dark:bg-green-900 inline-block font-bold rounded-2xl uppercase my-2'><h2>Brand Resources</h2></div>
           <p>Use the heart button to save your most used resources!</p>
         </div>
-        <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
+        <div className={`cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${isSidebarOpen ? '3' : '4'} gap-4 my-2`}>
           {filteredResources.length ? (
             filteredResources.map((resource) => <ResourceCard key={resource._id} resource={resource} />)
           ) : (
@@ -109,9 +111,9 @@ export default function IndexPage(
       </section>
       <section>
       <div className='flex-col text-center mb-4 items-center justify-center w-full'>
-        <div className='py-2 px-10 bg-orange-200 dark:bg-orange-900 inline-block font-bold rounded-2xl uppercase my-2'><h2>Learn</h2></div>
+        <div className='py-2 px-10 bg-orange-200 dark:bg-orange-900 inline-block font-bold rounded-2xl uppercase my-2'><h2>Blog Posts</h2></div>
       </div>
-        <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
+        <div className={`cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${isSidebarOpen ? '3' : '4'} gap-4 my-2`}>
           {posts.length ? (
             posts.map((post) => <Card key={post._id} post={post} />)
           ) : (

@@ -58,7 +58,7 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
   return (
     <>
       <div className="card border-[4px] border-slate-50 flex-col w-full bg-slate-100 dark:bg-slate-950">
-        <div className='absolute right-8 top-5 z-20 text-xs text-white uppercase bg-black bg-opacity-50 px-5 py-2 rounded-xl'>{formatDate(resource._createdAt)}</div>
+        <div className='absolute right-8 top-5 z-10 text-xs text-white uppercase bg-black bg-opacity-50 px-5 py-2 rounded-xl'>{formatDate(resource._createdAt)}</div>
         {resource.mainImage ? (
           <div className="cardImg">
             <Image
@@ -70,7 +70,7 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
             />
           </div>
         ) : (
-          <div className="cardEmpty h-[220px] bg-slate-300 rounded-t-xl dark:bg-slate-550 block" />
+          <div className="cardEmpty h-[180px] bg-slate-300 rounded-t-xl dark:bg-slate-550 block" />
         )}
         <div className='typeBadgeContainer'>
           <div className='typeBadge resource'>Resource</div>
@@ -83,7 +83,7 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
               </span>
             ))}
           </div>
-          <h3 className="">
+          <h3 className="!leading-snug !text-[18px] md:!text-[20px]">
             <Link href={`/resource/${resource.slug.current}`}>
               {resource.title}
             </Link>

@@ -181,7 +181,7 @@ body {
 }
 
 .post .post__container, .resource .resource__container {
-  padding: 0 var(--space-3);
+  /* padding: 0 var(--space-3); */
 }
 
 .post .post__content, .resource .resource__content {
@@ -455,7 +455,7 @@ main {
 /* Card */
 
 .card {
-  @apply border-[6px] border-slate-50 dark:border-slate-950 bg-slate-50 dark:bg-slate-950 rounded-2xl relative drop-shadow-xl shadow-black;
+  @apply border-[6px] border-slate-50 dark:border-slate-950 bg-slate-50 dark:bg-slate-950 rounded-2xl relative shadow-md shadow-slate-300/40;
 }
 .card .cardImg {
   @apply rounded-t-2xl;
@@ -492,7 +492,7 @@ main {
 }
 .card .card__cover {
   width: 100%;
-  height: 231px;
+  height: 180px;
   -o-object-fit: cover;
   object-fit: cover;
 }

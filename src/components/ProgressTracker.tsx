@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PortableText } from '@portabletext/react';
 import { FiChevronRight, FiCheck } from "react-icons/fi";
 import Link from 'next/link';
@@ -9,10 +9,24 @@ import { type Resource } from '~/lib/sanity.queries'; // Import Resource type
 
 interface ProgressTrackerProps {
   steps: TrainingStep[];
+  trainingId: string; // Pass the training ID to differentiate between trainings
 }
 
-const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps }) => {
+const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps, trainingId }) => {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+
+  // Load completed steps from localStorage
+  useEffect(() => {
+    const savedSteps = localStorage.getItem(`completedSteps-${trainingId}`);
+    if (savedSteps) {
+      setCompletedSteps(JSON.parse(savedSteps));
+    }
+  }, [trainingId]);
+
+  // Save completed steps to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(`completedSteps-${trainingId}`, JSON.stringify(completedSteps));
+  }, [completedSteps, trainingId]);
 
   const handleCompleteStep = (stepNumber: number) => {
     if (completedSteps.includes(stepNumber)) {
@@ -42,15 +56,17 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps }) => {
             <span className='bg-slate-500 bg-opacity-20 px-8 py-4 flex flex-col uppercase text-lg font-bold items-center rounded-lg justify-center'>Step {step.stepNumber}</span>
           </div>
           <h2 className="text-2xl font-semibold pb-2 mb-4 border-solid border-slate-500 border-opacity-25 border-b">
-             {step.title}
+            {step.title}
           </h2>
           
           <PortableText value={step.description} />
-          {step.relatedResource && (
+          {step.relatedResources && step.relatedResources.length > 0 && (
             <div className='border my-4 px-4 py-2 rounded-2xl bg-green-400 bg-opacity-10'>
-              <h3 className="text-xl text-center font-semibold mb-2">Related Resource</h3>
+              <h3 className="text-xl text-center font-semibold mb-2">Related Resources</h3>
               <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
-              <ResourceCard resource={step.relatedResource as Resource} /> {/* Use ResourceCard component */}
+                {step.relatedResources.map((resource: Resource) => (
+                  <ResourceCard key={resource._id} resource={resource as Resource} /> // Use ResourceCard component
+                ))}
               </div>
             </div>
           )}
@@ -63,7 +79,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps }) => {
                 Completed <span className='bg-slate-500 bg-opacity-25 p-1 rounded-full'><FiCheck /></span>
               </>
             ) : (
-                <>
+              <>
                 Mark Complete 
               </>
             )}

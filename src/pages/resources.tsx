@@ -10,6 +10,7 @@ import { readToken } from '~/lib/sanity.api'
 import { getClient } from '~/lib/sanity.client'
 import { getPosts, type Post, postsQuery } from '~/lib/sanity.queries'
 import { getResources, type Resource, resourcesQuery } from '~/lib/sanity.queries'
+import { useSidebar } from '~/contexts/SidebarContext'; // Import the Sidebar context
 
 import type { SharedPageProps } from '~/pages/_app'
 
@@ -40,6 +41,7 @@ export default function IndexPage(
   // Using useLiveQuery for real-time updates if needed
 
   const [resources] = useLiveQuery<Resource[]>(props.resources, resourcesQuery);
+  const { isSidebarOpen } = useSidebar();
 
   return (
     <Container>
@@ -52,7 +54,7 @@ export default function IndexPage(
       <Welcome title="Resources" subtitle="Explore our collection of resources."  />
       
       <section>
-        <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
+        <div className={`cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${isSidebarOpen ? '3' : '4'} gap-4 my-2`}>
         {resources.length ? (
           resources.map((resource) => <ResourceCard key={resource._id} resource={resource} />)
         ) : (
