@@ -9,36 +9,33 @@ import { type Resource } from '~/lib/sanity.queries'; // Import Resource type
 
 interface ProgressTrackerProps {
   steps: TrainingStep[];
-  trainingId: string; // Pass the training ID to differentiate between trainings
+  trainingId: string;
 }
 
 const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps, trainingId }) => {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
-  // Load completed steps from localStorage
   useEffect(() => {
-    const savedSteps = localStorage.getItem(`completedSteps-${trainingId}`);
-    if (savedSteps) {
-      setCompletedSteps(JSON.parse(savedSteps));
+    const storedCompletedSteps = localStorage.getItem(`completedSteps_${trainingId}`);
+    if (storedCompletedSteps) {
+      setCompletedSteps(JSON.parse(storedCompletedSteps));
     }
   }, [trainingId]);
 
-  // Save completed steps to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem(`completedSteps-${trainingId}`, JSON.stringify(completedSteps));
-  }, [completedSteps, trainingId]);
-
   const handleCompleteStep = (stepNumber: number) => {
+    let updatedSteps: number[];
     if (completedSteps.includes(stepNumber)) {
-      setCompletedSteps(completedSteps.filter(step => step !== stepNumber));
+      updatedSteps = completedSteps.filter(step => step !== stepNumber);
     } else {
-      setCompletedSteps([...completedSteps, stepNumber]);
+      updatedSteps = [...completedSteps, stepNumber];
     }
+    setCompletedSteps(updatedSteps);
+    localStorage.setItem(`completedSteps_${trainingId}`, JSON.stringify(updatedSteps));
   };
 
   return (
     <div>
-      <div className="flex items-center sticky top-24 z-10 justify-center bg-slate-50 dark:bg-slate-900 bg-opacity-95 dark:bg-opacity-95 border-2 border-opacity-50 py-2 px-4 rounded-xl space-x-4 mb-6">
+      <div className="flex items-center sticky top-24 z-30 justify-center bg-slate-50 dark:bg-slate-900 bg-opacity-95 dark:bg-opacity-95 border-2 border-opacity-50 py-2 px-4 rounded-xl space-x-4 mb-6">
         <div className='mr-auto'>Progress:</div>
         {steps.map((step) => (
           <div
@@ -56,7 +53,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps, trainingId }) 
             <span className='bg-slate-500 bg-opacity-20 px-8 py-4 flex flex-col uppercase text-lg font-bold items-center rounded-lg justify-center'>Step {step.stepNumber}</span>
           </div>
           <h2 className="text-2xl font-semibold pb-2 mb-4 border-solid border-slate-500 border-opacity-25 border-b">
-            {step.title}
+             {step.title}
           </h2>
           
           <PortableText value={step.description} />
@@ -65,7 +62,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps, trainingId }) 
               <h3 className="text-xl text-center font-semibold mb-2">Related Resources</h3>
               <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
                 {step.relatedResources.map((resource: Resource) => (
-                  <ResourceCard key={resource._id} resource={resource as Resource} /> // Use ResourceCard component
+                  <ResourceCard key={resource._id} resource={resource} /> // Use ResourceCard component
                 ))}
               </div>
             </div>
@@ -79,7 +76,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps, trainingId }) 
                 Completed <span className='bg-slate-500 bg-opacity-25 p-1 rounded-full'><FiCheck /></span>
               </>
             ) : (
-              <>
+                <>
                 Mark Complete 
               </>
             )}

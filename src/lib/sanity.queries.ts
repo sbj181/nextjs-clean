@@ -132,7 +132,7 @@ export interface Resource {
 
 // Training queries
 export const trainingsQuery = groq`
-*[_type == "training"] | order(_createdAt asc) {
+*[_type == "training"] | order(_createdAt desc) {
   _id,
   title,
   "steps": steps[]-> {
@@ -140,7 +140,7 @@ export const trainingsQuery = groq`
     title,
     description,
     stepNumber,
-    "relatedResource": relatedResource->{
+    "relatedResources": relatedResources[]->{
       _id,
       _createdAt,
       title,
@@ -163,26 +163,6 @@ export async function getTrainings(client: SanityClient): Promise<Training[]> {
   return await client.fetch(trainingsQuery);
 }
 
-export const trainingByIdQuery = groq`*[_type == "training" && _id == $id][0] {
-  _id,
-  title,
-  "steps": steps[]-> {
-    _id,
-    title,
-    description,
-    stepNumber,
-    "relatedResource": relatedResource->{
-      _id,
-      title,
-      slug
-    }
-  }
-}`;
-
-export async function getTrainingById(client: SanityClient, id: string): Promise<Training> {
-  return await client.fetch(trainingByIdQuery, { id });
-}
-
 export interface Training {
   _type: 'training';
   _id: string;
@@ -196,5 +176,5 @@ export interface TrainingStep {
   title: string;
   description: PortableTextBlock[];
   stepNumber: number;
-  relatedResource?: Resource;
+  relatedResources?: Resource[];
 }

@@ -94,7 +94,7 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
             </p>
           )}
         </div>
-        <div className="flex justify-start flex-wrap items-center mt-auto px-4 md:px-4 w-full gap-2 my-4">
+        <div className="flex justify-start flex-wrap items-center mt-auto px-3 xl:px-3 w-full gap-2 my-4">
           <Link href={`/resource/${resource.slug.current}`}>
             <div className="cardDetailsBtn">
               Details

@@ -31,7 +31,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={`fixed rounded-br-xl overflow-scroll inset-y-0 left-0 z-20 pt-36 flex flex-col bg-slate-200 dark:bg-slate-700 w-96 p-5 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+    <aside className={`fixed rounded-br-xl overflow-scroll inset-y-0 left-0 z-40 pt-36 flex flex-col bg-slate-200 dark:bg-slate-700 w-96 p-5 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <ul className="w-full">
         <div className="bg-slate-300 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between cursor-pointer">
