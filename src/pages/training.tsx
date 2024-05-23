@@ -65,10 +65,10 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
                   {trainingData.map((training, index) => (
                     <li key={training._id}>
                       <button
-                        className={`py-4 pl-5 pr-6 bg-opacity-100 hover:bg-opacity-90 shadow-sm flex items-center rounded-xl ${selectedTraining?._id === training._id ? 'bg-blue-500 text-white' : 'bg-slate-300 dark:bg-slate-700 bg-opacity-50'}`}
+                        className={`py-4 pl-5 pr-7 bg-opacity-100 hover:bg-opacity-90 shadow-sm flex items-center rounded-xl ${selectedTraining?._id === training._id ? 'bg-blue-500 text-white' : 'bg-slate-300 dark:bg-slate-700 bg-opacity-50'}`}
                         onClick={() => setSelectedTrainingIndex(index)}
                       >
-                        <span className='pr-3'><FiBookOpen /></span>  {training.title}
+                        <span className='mr-3 bg-slate-50 w-8 h-8 flex items-center justify-center rounded-xl bg-opacity-30 border-1 border-slate-50'><FiBookOpen /></span>  {training.title}
                       </button>
                     </li>
                   ))}
