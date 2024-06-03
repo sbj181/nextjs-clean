@@ -7,9 +7,9 @@ interface WelcomeProps {
 
 export default function Welcome({ title, subtitle }: WelcomeProps) {
   return (
-    <div className="welcome__container">
-      <h1 className=" leading-tight text-[32px] lg:text-[52px] mb-4 font-bold text-center w-full">{title}</h1>
-      {subtitle && <h2 className="subtitle font-medium text-center w-full">{subtitle}</h2>}
+    <div className="welcome__container text-center md:text-left my-4 border !p-6 !rounded-xl">
+      <h1 className="leading-tight text-[32px] lg:text-[42px] mb-4 font-bold  w-full">{title}</h1>
+      {subtitle && <h2 className="subtitle font-medium w-full">{subtitle}</h2>}
     </div>
   );
 }

@@ -13,7 +13,8 @@ import { getClient } from '~/lib/sanity.client';
 import { getPosts, type Post, postsQuery } from '~/lib/sanity.queries';
 import { getResources, type Resource, resourcesQuery } from '~/lib/sanity.queries';
 import { useFavorites } from '~/contexts/FavoritesContext';
-import { useSidebar } from '~/contexts/SidebarContext'; // Import the Sidebar context
+import { useSidebar } from '~/contexts/SidebarContext';
+import TagFilter from '~/components/TagFilter'; // Import the TagFilter component
 
 import type { SharedPageProps } from '~/pages/_app';
 
@@ -45,17 +46,24 @@ export default function IndexPage(
   const [resources] = useLiveQuery<Resource[]>(props.resources, resourcesQuery);
   const { favorites } = useFavorites();
   const { isSidebarOpen } = useSidebar();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const favoriteResources = resources.filter((resource) => favorites.includes(resource._id));
 
-  const filteredResources = resources.filter((resource) =>
-    (resource.title?.toLowerCase().includes(searchQuery.toLowerCase()) || '') ||
-    (resource.description?.toLowerCase().includes(searchQuery.toLowerCase()) || '')
-  );
+  // Get all unique tags from resources
+  const allTags = Array.from(new Set(resources.flatMap((resource) => resource.tags?.map(tag => tag.title) || [])));
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  // Filter resources based on selected tags
+  const filteredResources = selectedTags.length
+    ? resources.filter(resource =>
+        resource.tags?.some(tag => selectedTags.includes(tag.title))
+      )
+    : resources;
+
+  const handleTagClick = (tag: string) => {
+    setSelectedTags((prevTags) =>
+      prevTags.includes(tag) ? prevTags.filter((t) => t !== tag) : [...prevTags, tag]
+    );
   };
 
   return (
@@ -67,53 +75,53 @@ export default function IndexPage(
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Welcome 
-      title='Welcome to CORE RMS + CMS'       
-      subtitle={<span>Visit the <Link href="/studio"><span className="text-blue-500 underline">CMS Studio</span></Link> to manage content and add your own resources.</span>}
+        title='Welcome to CORE RMS + CMS'       
+        subtitle={<span>Visit the <Link href="/studio"><span className="text-blue-500 underline">CMS Studio</span></Link> to manage content and add your own resources.</span>}
       />
-      <div className="flex justify-center my-4">
-        <input
-          type="text"
-          placeholder="Search resources..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          className="py-2 px-4 w-full dark:text-slate-600 md:w-1/2 border rounded-full"
-        />
-      </div>
+      
       {favoriteResources.length > 0 ? (
-        <section>
-          <div className='border my-4 px-4 py-2 rounded-2xl bg-red-400 bg-opacity-10'>
-            <div className='flex-col text-center mb-4 items-center justify-center w-full'>
-              <div className='py-2 px-10 bg-red-200 dark:bg-red-900 inline-block font-bold rounded-2xl uppercase my-2'><h2>Favorite Resources</h2></div>
-              <p>Favorited resources will appear below. Click the heart to remove.</p>
-            </div>
-            <div className={`cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${isSidebarOpen ? '3' : '4'}  gap-4 my-2`}>
+        <section className='border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-50 p-6 rounded-2xl mb-6'>
+          <div className='mb-6'>
+            <h2 className='text-3xl font-bold'>Favorite Resources</h2>
+            <p>Resources you have favorited will appear here!</p>
+          </div>
+            <div className={`cardWrap gap-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${isSidebarOpen ? '3' : '4'} 2xl:grid-cols-${isSidebarOpen ? '4' : '5'}`}>
               {favoriteResources.map((resource) => (
                 <ResourceCard key={resource._id} resource={resource} />
               ))}
             </div>
-          </div>
         </section>
       ) : (
-        <div className="cardEmpty h-[120px] border px-4 py-2 rounded-2xl bg-red-400 bg-opacity-10 items-center justify-center flex my-4">Click the heart on a resource below to add it to your favorites</div>
+        <div></div>
       )}
-      <section>
-        <div className='flex-col text-center mb-4 items-center justify-center w-full'>
-          <div className='py-2 px-10 bg-green-200 dark:bg-green-900 inline-block font-bold rounded-2xl uppercase my-2'><h2>Brand Resources</h2></div>
+      <section className='border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-100 p-6 rounded-2xl mb-6'>
+        <div className='mb-6'>
+          <h2 className='text-3xl font-bold'>Brand Resources</h2>
           <p>Use the heart button to save your most used resources!</p>
         </div>
-        <div className={`cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${isSidebarOpen ? '3' : '4'} gap-4 my-2`}>
-          {filteredResources.length ? (
-            filteredResources.map((resource) => <ResourceCard key={resource._id} resource={resource} />)
-          ) : (
-            <p>No resources available.</p>
-          )}
+        
+        <TagFilter
+          tags={allTags}
+          selectedTags={selectedTags}
+          onTagClick={handleTagClick}
+        />
+        
+        <div className={`cardWrap grid gap-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-${isSidebarOpen ? '3' : '4'} 2xl:grid-cols-${isSidebarOpen ? '4' : '5'}` }>
+          
+            {filteredResources.length ? (
+              filteredResources.map((resource) => <ResourceCard key={resource._id} resource={resource} />)
+            ) : (
+              <p>No resources available.</p>
+            )}
+          
         </div>
       </section>
-      <section>
-      <div className='flex-col text-center mb-4 items-center justify-center w-full'>
-        <div className='py-2 px-10 bg-orange-200 dark:bg-orange-900 inline-block font-bold rounded-2xl uppercase my-2'><h2>Blog Posts</h2></div>
-      </div>
-        <div className={`cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${isSidebarOpen ? '3' : '4'} gap-4 my-2`}>
+      <section className='border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-50 p-6 rounded-2xl mb-6'>
+        <div className='mb-6'>
+          <h2 className='text-3xl font-bold'>Blog Posts</h2>
+          <p>Blog posts are articles that can be posted and shared core!</p>
+        </div>
+        <div className={`cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${isSidebarOpen ? '3' : '4'}  2xl:grid-cols-${isSidebarOpen ? '4' : '5'} gap-8 my-2`}>
           {posts.length ? (
             posts.map((post) => <Card key={post._id} post={post} />)
           ) : (

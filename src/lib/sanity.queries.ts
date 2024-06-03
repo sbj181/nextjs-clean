@@ -140,6 +140,7 @@ export const trainingsQuery = groq`
     title,
     description,
     stepNumber,
+    slug,
     "relatedResources": relatedResources[]->{
       _id,
       _createdAt,
@@ -163,6 +164,38 @@ export async function getTrainings(client: SanityClient): Promise<Training[]> {
   return await client.fetch(trainingsQuery);
 }
 
+// Training Step queries
+export const trainingStepBySlugQuery = groq`
+  *[_type == "trainingStep" && slug.current == $slug][0]{
+    _id,
+    _createdAt,
+    title,
+    slug,
+    stepNumber,
+    description,
+    "relatedResources": relatedResources[]->{
+      _id,
+      _createdAt,
+      title,
+      slug,
+      description,
+      mainImage,
+      resourceKind,
+      fileUpload,
+      BMSResourceLink,
+      fileShareURL,
+      "tags": tags[]->{
+        _id,
+        title
+      }
+    }
+  }
+`;
+
+export async function getTrainingStep(client: SanityClient, slug: string): Promise<TrainingStep> {
+  return await client.fetch(trainingStepBySlugQuery, { slug });
+}
+
 export interface Training {
   _type: 'training';
   _id: string;
@@ -176,5 +209,33 @@ export interface TrainingStep {
   title: string;
   description: PortableTextBlock[];
   stepNumber: number;
+  slug: Slug;
   relatedResources?: Resource[];
+}
+
+// Combined search query
+export const searchQuery = groq`
+  *[
+    _type == "resource" || _type == "trainingStep"
+  ] {
+    _id,
+    title,
+    _type,
+    "slug": slug.current,
+    "tags": tags[]->title,
+    mainImage
+  } | order(_type asc, title asc)
+`;
+
+export async function searchItems(client: SanityClient): Promise<SearchItem[]> {
+  return await client.fetch(searchQuery);
+}
+
+export interface SearchItem {
+  _id: string;
+  title: string;
+  _type: 'resource' | 'trainingStep';
+  slug: string;
+  tags?: string[];
+  mainImage?: ImageAsset;  // Ensure this is included in the interface
 }

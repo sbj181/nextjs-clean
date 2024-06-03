@@ -455,7 +455,7 @@ main {
 /* Card */
 
 .card {
-  @apply border-[6px] border-slate-50 dark:border-slate-950 bg-slate-50 dark:bg-slate-950 rounded-2xl relative shadow-md shadow-slate-300/40;
+  @apply border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-950 rounded-2xl relative hover:shadow-lg shadow-slate-500 hover:-translate-y-1 transition ;
 }
 .card .cardImg {
   @apply rounded-t-2xl;
@@ -479,7 +479,7 @@ main {
   @apply opacity-50
 }
 .cardDetailsBtn {
-  @apply bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-3 px-4 md:px-6 rounded-2xl ease-in
+  @apply bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-3 px-4 md:px-6 rounded-xl ease-in
 }
 .cardDownloadBtn {
   @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
@@ -593,10 +593,10 @@ main {
   }
 }
 .card .cardImg {
-  @apply overflow-hidden;
+  @apply overflow-hidden min-h-[180px];
 }
 .card img {
   max-width: 100%;
   width: 100%;
-  transform: scale(1.2);
+  transform: scale(1.2) rotate(2deg);
 }

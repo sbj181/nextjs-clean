@@ -106,7 +106,7 @@ export default function ResourceSlugRoute(
       <section className="resource min-h-screen gap-8">
         <div className="flex flex-col justify-start">
           <h1 className="resource__title text-2xl font-bold mb-4">{resource.title}</h1>
-
+          
           <div className="flex gap-4 mb-4">
             {resourceLink && (
               <a
@@ -132,6 +132,17 @@ export default function ResourceSlugRoute(
             {resource.author && (
               <p className="resource__date text-gray-600 dark:text-gray-300 mb-2"><span className='font-bold'>Created by: </span>{resource.author}</p>
             )}
+            {/* Tags Section */}
+          {resource.tags && (
+            <p className="resource__date text-gray-600 mb-2 dark:text-gray-300">
+              <span className='font-bold'>Tags: </span>
+              {resource.tags.map((tag) => (
+                <span key={tag._id} className="bg-gray-200 dark:bg-gray-700 mr-1 text-sm rounded-full px-3 py-1">
+                  {tag.title}
+                </span>
+              ))}
+            </p>
+          )}
           </div>
           {resource.mainImage && (
             <div className='rounded-lg overflow-hidden p-2 bg-slate-500 bg-opacity-20 w-full'>

@@ -3,6 +3,7 @@ import CoreLogo from './CoreLogo';
 import { useSidebar } from '../contexts/SidebarContext';
 import ThemeToggle from './ThemeToggler';
 import { FiMenu, FiX } from 'react-icons/fi';
+import SearchDropdown from './SearchDropdown';
 
 export default function Header() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
@@ -16,6 +17,7 @@ export default function Header() {
           </div>
         </Link>
         <div className="flex items-center">
+        <SearchDropdown />
           <div className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg">
             <ThemeToggle />
           </div>

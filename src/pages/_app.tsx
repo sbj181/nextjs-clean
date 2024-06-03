@@ -33,6 +33,15 @@ const serif = PT_Serif({
   weight: ['400', '700'],
 });
 
+// Hidden helper component to ensure classes are included
+const ClassHelper = () => (
+  <div className="hidden">
+    <div className="grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5"></div>
+  </div>
+);
+
+// Include this in your JSX structure somewhere
+
 export default function App({ Component, pageProps }: AppProps<SharedPageProps>) {
   const { draftMode, token } = pageProps;
 

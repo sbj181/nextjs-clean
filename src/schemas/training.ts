@@ -7,16 +7,27 @@ export default defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
       type: 'string',
-      description: 'Enter the title of the training.',
+      title: 'Title',
+    }),
+    defineField({
+      name: 'slug',
+      type: 'slug',
+      title: 'Slug',
+      options: {
+        source: 'title',
+        slugify: (input) => input
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .slice(0, 200), // Ensure slug is shorter than 200 characters
+        isUnique: (slug, context) => context.defaultIsUnique(slug, context),
+      },
     }),
     defineField({
       name: 'steps',
-      title: 'Steps',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'trainingStep' }] }],
-      description: 'List of training steps.',
+      title: 'Steps',
+      of: [{ type: 'reference', to: { type: 'trainingStep' } }],
     }),
   ],
 });
