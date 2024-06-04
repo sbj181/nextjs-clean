@@ -10,6 +10,7 @@ import { PortableText } from '@portabletext/react';
 import Head from 'next/head';
 import ProgressTracker from '~/components/ProgressTracker';
 import ResourceCard from '~/components/ResourceCard';
+import Link from 'next/link';
 
 interface TrainingStepPageProps {
   trainingStep: TrainingStep;
@@ -82,8 +83,11 @@ export default function TrainingStepPage({ trainingStep }: TrainingStepPageProps
             </div>
           )}
           <div className="mt-8">
-            <ProgressTracker steps={[liveTrainingStep]} trainingId={liveTrainingStep._id} />
+            <Link href='/training'><span className='py-2 px-4 rounded-xl bg-slate-300 dark:bg-slate-700 bg-opacity-50 disabled:opacity-50'>Back to Training</span></Link>
           </div>
+          {/* <div className="mt-8">
+            <ProgressTracker steps={[liveTrainingStep]} trainingId={liveTrainingStep._id} />
+          </div> */}
         </div>
       </section>
     </Container>

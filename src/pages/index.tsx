@@ -85,7 +85,7 @@ export default function IndexPage(
             <h2 className='text-3xl font-bold'>Favorite Resources</h2>
             <p>Resources you have favorited will appear here!</p>
           </div>
-            <div className={`cardWrap gap-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${isSidebarOpen ? '3' : '4'} 2xl:grid-cols-${isSidebarOpen ? '4' : '5'}`}>
+            <div className={`cardWrap gap-4 xl:gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${isSidebarOpen ? '3' : '4'} 2xl:grid-cols-${isSidebarOpen ? '4' : '5'}`}>
               {favoriteResources.map((resource) => (
                 <ResourceCard key={resource._id} resource={resource} />
               ))}
@@ -106,7 +106,7 @@ export default function IndexPage(
           onTagClick={handleTagClick}
         />
         
-        <div className={`cardWrap grid gap-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-${isSidebarOpen ? '3' : '4'} 2xl:grid-cols-${isSidebarOpen ? '4' : '5'}` }>
+        <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-${isSidebarOpen ? '3' : '4'} 2xl:grid-cols-${isSidebarOpen ? '4' : '5'}` }>
           
             {filteredResources.length ? (
               filteredResources.map((resource) => <ResourceCard key={resource._id} resource={resource} />)
@@ -121,7 +121,7 @@ export default function IndexPage(
           <h2 className='text-3xl font-bold'>Blog Posts</h2>
           <p>Blog posts are articles that can be posted and shared core!</p>
         </div>
-        <div className={`cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${isSidebarOpen ? '3' : '4'}  2xl:grid-cols-${isSidebarOpen ? '4' : '5'} gap-8 my-2`}>
+        <div className={`cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${isSidebarOpen ? '3' : '4'}  2xl:grid-cols-${isSidebarOpen ? '4' : '5'} gap-4 xl:gap-6 my-2`}>
           {posts.length ? (
             posts.map((post) => <Card key={post._id} post={post} />)
           ) : (

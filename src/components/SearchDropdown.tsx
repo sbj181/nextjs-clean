@@ -19,7 +19,7 @@ const SearchDropdown = () => {
   };
 
   return (
-    <div className='mr-4'>
+    <div className='hidden md:block mr-2'>
       <input
         type="text"
         placeholder="Start typing to search..."

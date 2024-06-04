@@ -66,6 +66,10 @@ body {
   transition: background-color 0.3s, color 0.3s; /* Smooth transition for color and background */
 }
 
+h2 {
+  @apply mb-1;
+}
+
 body, button, input, textarea {
   font-family: 'Inter', sans-serif;
 }
@@ -209,8 +213,27 @@ body {
   margin-bottom: 0.5rem;
   list-style: inherit;
   list-style-type:disc;
+  font-size: large;
+  & li {
+    list-style-type: circle;
+    & li {
+      list-style-type: square;
+    }
+  }
 }
 
+.post .post__content ul, .resource .resource__content {
+  & h2 {
+    font-size: 1.5em;
+    font-weight: 600;
+    @apply mb-4;
+  }
+  & h3 {
+    font-size: 1.3em;
+    font-weight: 600;
+    @apply mb-4;
+  }
+}
 
 
 .post .post__content blockquote, .resource .resource__content blockquote {
@@ -482,13 +505,13 @@ main {
   @apply bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-3 px-4 md:px-6 rounded-xl ease-in
 }
 .cardDownloadBtn {
-  @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
+  @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-2.5 rounded-2xl ease-in
 }
 .cardShareBtn {
-  @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
+  @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-2.5 rounded-2xl ease-in
 }
 .cardFavoriteBtn {
-  @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-3 rounded-2xl ease-in
+  @apply bg-slate-500 hover:bg-slate-700 hover:bg-opacity-10 bg-opacity-10 text-sm font-bold py-3 px-2.5 rounded-2xl ease-in
 }
 .card .card__cover {
   width: 100%;

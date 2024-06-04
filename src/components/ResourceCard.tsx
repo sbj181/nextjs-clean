@@ -95,7 +95,8 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
               </p>
             )}
           </div>
-          <div className="flex justify-start flex-wrap items-center mt-4 w-full gap-2">
+          <div className="flex justify-start flex-wrap items-center mt-4 w-full gap-1">
+            
             <Link href={`/resource/${resource.slug.current}`}>
               <div className="cardDetailsBtn">
                 Details
@@ -104,7 +105,7 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
             {resourceLink && (
               <a
                 href={resourceLink}
-                className="cardDownloadBtn !w-auto !flex !gap-1"
+                className="cardDownloadBtn !w-auto !flex !gap-2"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -115,8 +116,8 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
             <button onClick={handleShareClick} className="cardShareBtn">
               <HiOutlineShare size={20} />
             </button>
-            <button onClick={handleFavoriteClick} className="cardFavoriteBtn ml-auto">
-              {isFavorite(resource._id) ? <HiHeart className={'fill-red-600'} size={20} /> : <HiOutlineHeart size={20} />}
+            <button onClick={handleFavoriteClick} className="cardFavoriteBtn ml-auto !bg-red-400 !bg-opacity-25  order-last flex-grow-0">
+              {isFavorite(resource._id) ? <HiHeart className={'fill-red-600'} size={20} /> : <HiOutlineHeart className='stroke-red-600' size={20} />}
             </button>
           </div>
         </div>

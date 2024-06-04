@@ -103,7 +103,7 @@ export default function ResourceSlugRoute(
 
   return (
     <Container>
-      <section className="resource min-h-screen gap-8">
+      <section className="resource min-h-screen gap-6">
         <div className="flex flex-col justify-start">
           <h1 className="resource__title text-2xl font-bold mb-4">{resource.title}</h1>
           
@@ -122,8 +122,8 @@ export default function ResourceSlugRoute(
             <button onClick={handleShareClick} className="cardShareBtn">
               <HiOutlineShare size={20} />
             </button>
-            <button onClick={handleFavoriteClick} className="cardFavoriteBtn">
-              {isFavorite(resource._id) ? <HiHeart className='fill-red-600' size={20} /> : <HiOutlineHeart size={20} />}
+            <button onClick={handleFavoriteClick} className="cardFavoriteBtn !px-[0.7em] !py-[0.7em]  !bg-red-400 !bg-opacity-25  order-last flex-grow-0">
+            {isFavorite(resource._id) ? <HiHeart className='fill-red-600' size={24} /> : <HiOutlineHeart className='stroke-red-600' size={24} />}
             </button>
           </div>
           <div className='border-2 border-opacity-25 border-slate-500 text-sm pt-3 pb-2 px-4 rounded-xl inline-block mb-4'>

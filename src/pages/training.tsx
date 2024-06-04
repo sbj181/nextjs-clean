@@ -9,6 +9,7 @@ import { getClient } from '~/lib/sanity.client';
 import { getTrainings, type Training, trainingsQuery } from '~/lib/sanity.queries';
 import Head from 'next/head';
 import Welcome from '~/components/Welcome';
+import Link from 'next/link';
 
 export const getStaticProps: GetStaticProps<{
   trainings: Training[];

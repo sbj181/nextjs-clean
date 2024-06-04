@@ -52,15 +52,16 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps, trainingId }) 
           <div className='w-full flex mb-4'>
             <span className='bg-slate-500 bg-opacity-20 px-8 py-4 flex flex-col uppercase text-lg font-bold items-center rounded-lg justify-center'>Step {step.stepNumber}</span>
           </div>
-          <h2 className="text-2xl font-semibold pb-2 mb-4 border-solid border-slate-500 border-opacity-25 border-b">
-             {step.title}
-          </h2>
-          
+          <Link href={`/training/${step.slug.current}`} passHref>
+            <div className="cursor-pointer hover:opacity-50 text-2xl font-semibold pb-2 mb-4 border-solid border-slate-500 border-opacity-25 border-b">
+              {step.title}
+            </div>
+          </Link>
           <PortableText value={step.description} />
           {step.relatedResources && step.relatedResources.length > 0 && (
             <div className='border my-4 px-4 py-2 rounded-2xl bg-green-400 bg-opacity-10'>
               <h3 className="text-xl text-center font-semibold mb-2">Related Resources</h3>
-              <div className="cardWrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
+              <div className="cardWrap grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
                 {step.relatedResources.map((resource: Resource) => (
                   <ResourceCard key={resource._id} resource={resource} /> // Use ResourceCard component
                 ))}
