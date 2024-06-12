@@ -70,7 +70,7 @@ export default function ResourceCard({ resource }: { resource: Resource }) {
             />
           </div>
         ) : (
-          <div className="cardEmpty h-[180px] bg-slate-300 rounded-t-xl dark:bg-slate-550 block" />
+          <div className="cardEmpty h-[298px] bg-slate-300 rounded-t-xl dark:bg-slate-550 block" />
         )}
          {/* <div className='typeBadgeContainer'>
           <div className='typeBadge resource'>Resource</div>

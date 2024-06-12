@@ -16,7 +16,7 @@ export default function CallToAction({ title, subtitle }: CTAProps) {
       {subtitle && <p className="subtitle text-sm text-center w-full">{subtitle}</p>}
           <Link href="https://thegrovery.com">
             <div className="cardDetailsBtn w-unset text-center mt-4">
-              Details
+              Contact us
             </div>
           </Link>
     </div>

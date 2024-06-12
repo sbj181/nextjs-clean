@@ -76,7 +76,7 @@ export default function Sidebar() {
             <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiEdit /></span> Add & Edit Resources
           </a>
         </div>
-        <CallToAction title='Want to a CORE for your Project?' subtitle='Use the link below to get in touch with us' />
+        <CallToAction title='Want a CORE&trade; for your Team or Project?' subtitle='Use the link below to get in touch with us' />
       </div>
     </aside>
   );
