@@ -4,6 +4,7 @@ interface FavoritesContextProps {
   favorites: string[];
   addFavorite: (id: string) => void;
   removeFavorite: (id: string) => void;
+  clearFavorites: () => void;
   isFavorite: (id: string) => boolean;
 }
 
@@ -29,12 +30,19 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
   };
 
+  const clearFavorites = () => {
+    setFavorites([]);
+    localStorage.setItem('favorites', JSON.stringify([]));
+  };
+
   const isFavorite = (id: string) => {
     return favorites.includes(id);
   };
 
+
+
   return (
-    <FavoritesContext.Provider value={{ favorites, addFavorite, removeFavorite, isFavorite }}>
+    <FavoritesContext.Provider value={{ favorites, addFavorite, removeFavorite, isFavorite, clearFavorites }}>
       {children}
     </FavoritesContext.Provider>
   );

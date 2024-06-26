@@ -44,7 +44,7 @@ export default function IndexPage(
 ) {
   const [posts] = useLiveQuery<Post[]>(props.posts, postsQuery);
   const [resources] = useLiveQuery<Resource[]>(props.resources, resourcesQuery);
-  const { favorites } = useFavorites();
+  const { favorites, clearFavorites } = useFavorites();
   const { isSidebarOpen } = useSidebar();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -81,9 +81,17 @@ export default function IndexPage(
       
       {favoriteResources.length > 0 ? (
         <section className='border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-50 p-6 rounded-2xl mb-6'>
-          <div className='mb-6'>
+          <div className='mb-6 flex justify-between items-center'>
+            <div>
             <h2 className='text-3xl font-bold'>Favorite Resources</h2>
             <p>Resources you have favorited will appear here!</p>
+            </div>
+            <button
+              onClick={clearFavorites}
+              className="mt-2 px-4 py-2 text-sm bg-red-500 text-white rounded-lg transition hover:bg-red-600"
+            >
+              Clear All Favorites
+            </button>
           </div>
             <div className={`cardWrap gap-4 xl:gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${isSidebarOpen ? '3' : '4'} 2xl:grid-cols-${isSidebarOpen ? '4' : '5'}`}>
               {favoriteResources.map((resource) => (
