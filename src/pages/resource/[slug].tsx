@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { HiOutlineDownload, HiOutlineExternalLink, HiOutlineShare, HiHeart, HiOutlineHeart } from 'react-icons/hi';
 import { useLiveQuery } from 'next-sanity/preview';
-
+import Head from 'next/head';
 import Container from '~/components/Container';
 import ShareModal from '~/components/ShareModal';
 import { readToken } from '~/lib/sanity.api';
@@ -103,6 +103,10 @@ export default function ResourceSlugRoute(
 
   return (
     <Container>
+       <Head>
+        <title>{resource.title}{` | Resources | CORE RMS`}</title>
+        <meta name="description" content={`Resource ${resource.description}`} />
+      </Head>
       <section className="resource min-h-screen gap-6">
         <div className="flex flex-col justify-start">
           <h1 className="resource__title text-2xl font-bold mb-4">{resource.title}</h1>

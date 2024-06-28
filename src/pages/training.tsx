@@ -59,7 +59,7 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
       <section>
         <div className="py-5">
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Select a Training:</h2>
+            <h2 className="text-2xl font-semibold mb-4">Select a Training Module:</h2>
             <div className="hidden md:block">
               {trainingData && (
                 <ul className="flex space-x-4">

@@ -141,6 +141,12 @@ export const trainingsQuery = groq`
     description,
     stepNumber,
     slug,
+    requiresMedia,
+    mediaType,
+    TrainingVideoFile,
+    TrainingImageUrl,
+    mediaTitle,
+    mediaCaption,
     "relatedResources": relatedResources[]->{
       _id,
       _createdAt,
@@ -173,6 +179,13 @@ export const trainingStepBySlugQuery = groq`
     slug,
     stepNumber,
     description,
+    requiresMedia,
+    mediaType,
+    TrainingVideoFile,
+    TrainingImageUrl,
+    mediaTitle,
+    mediaCaption,
+    "parentTraining": *[_type == "training" && references(^._id)]{title}[0],
     "relatedResources": relatedResources[]->{
       _id,
       _createdAt,
@@ -210,6 +223,15 @@ export interface TrainingStep {
   description: PortableTextBlock[];
   stepNumber: number;
   slug: Slug;
+  requiresMedia?: boolean;
+  mediaType?: 'video' | 'image';
+  TrainingVideoFile?: FileAsset;
+  TrainingImageUrl?: ImageAsset;
+  mediaTitle?: string;
+  mediaCaption?: string;
+  parentTraining?: {
+    title: string;
+  };
   relatedResources?: Resource[];
 }
 

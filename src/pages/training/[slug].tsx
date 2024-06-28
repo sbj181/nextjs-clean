@@ -8,9 +8,11 @@ import { getTrainingStep, trainingStepBySlugQuery, type TrainingStep } from '~/l
 import { readToken } from '~/lib/sanity.api';
 import { PortableText } from '@portabletext/react';
 import Head from 'next/head';
-import ProgressTracker from '~/components/ProgressTracker';
 import ResourceCard from '~/components/ResourceCard';
 import Link from 'next/link';
+import { urlForImage } from '~/lib/sanity.image';
+import { urlForFile } from '~/lib/sanity.file';
+import Image from 'next/image';
 
 interface TrainingStepPageProps {
   trainingStep: TrainingStep;
@@ -62,16 +64,45 @@ export default function TrainingStepPage({ trainingStep }: TrainingStepPageProps
     return <div>Loading...</div>;
   }
 
+  // const imageUrl = liveTrainingStep.mediaType === 'image' && liveTrainingStep.TrainingImageUrl ? urlForImage(liveTrainingStep.TrainingImageUrl).url() : null;
+  const imageUrl = liveTrainingStep.mediaType === 'image' && liveTrainingStep.TrainingImageUrl ? urlForImage(liveTrainingStep.TrainingImageUrl) : null;
   return (
     <Container>
       <Head>
-        <title>{liveTrainingStep.title} | Training Step</title>
+        <title>{liveTrainingStep.title}{` | Training Step | Training | CORE RMS`}</title>
         <meta name="description" content={`Training step ${liveTrainingStep.title}`} />
       </Head>
       <section>
         <div className="py-5">
+          {liveTrainingStep.parentTraining && (
+            <div className="text-sm text-gray-500 mb-2">
+              Part of the training: <strong>{liveTrainingStep.parentTraining.title}</strong>
+            </div>
+          )}
           <h1 className="text-3xl font-semibold mb-4">{liveTrainingStep.title}</h1>
           <PortableText value={liveTrainingStep.description} />
+
+          {liveTrainingStep.requiresMedia && liveTrainingStep.mediaType === 'video' && liveTrainingStep.TrainingVideoFile && (
+            <div className='my-4 rounded-lg bg-slate-500 bg-opacity-20 w-full'>
+              <video controls className="w-full h-auto rounded-lg">
+                <source src={urlForFile(liveTrainingStep.TrainingVideoFile)} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          )}
+
+          {imageUrl && (
+            <div className='w-full h-auto mt-4 mb-4'>
+              <Image
+                src={imageUrl}
+                alt={liveTrainingStep.title}
+                width={800}
+                height={450}
+                className="object-cover rounded-lg overflow-hidden p-2 bg-slate-500 bg-opacity-20 w-full"
+              />
+            </div>
+          )}
+
           {liveTrainingStep.relatedResources && (
             <div>
               <h2 className="text-2xl font-semibold mt-8 mb-4">Related Resources</h2>
@@ -85,9 +116,6 @@ export default function TrainingStepPage({ trainingStep }: TrainingStepPageProps
           <div className="mt-8">
             <Link href='/training'><span className='py-2 px-4 rounded-xl bg-slate-300 dark:bg-slate-700 bg-opacity-50 disabled:opacity-50'>Back to Training</span></Link>
           </div>
-          {/* <div className="mt-8">
-            <ProgressTracker steps={[liveTrainingStep]} trainingId={liveTrainingStep._id} />
-          </div> */}
         </div>
       </section>
     </Container>
