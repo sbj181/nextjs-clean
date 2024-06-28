@@ -151,7 +151,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ steps, trainingId }) 
               </div>
             )}
             <div className='bg-blue-500 bg-opacity-10 p-4 rounded-xl text-center'>
-              <div className='mt-2'><p>Once you've reviewed the information above mark the button below to complete!</p></div>
+              <div className='mt-2'><p>Once you have reviewed the information above mark the button below to complete!</p></div>
               <button
                 onClick={() => handleCompleteStep(step.stepNumber)}
                 className={`mt-4 py-4 px-8 m-auto flex justify-between items-center gap-2 rounded-full ${completedSteps.includes(step.stepNumber) ? 'bg-green-500 text-white' : 'bg-slate-500  bg-opacity-50 text-white'}`}
