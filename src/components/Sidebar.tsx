@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSidebar } from '../contexts/SidebarContext';
-import { FiChevronDown, FiChevronUp, FiHome, FiBook, FiLayers, FiEdit } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiHome, FiBook, FiLayers, FiEdit, FiUser } from 'react-icons/fi';
 import { getResources, type Resource } from '~/lib/sanity.queries';
 import { getClient } from '~/lib/sanity.client';
 import CallToAction from './CallToAction';
@@ -61,11 +61,17 @@ export default function Sidebar() {
             </ul>
           )}
         </div>
-
         <div className="bg-slate-300 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between">
             <Link href="/training" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiBook /></span> Training
+            </Link>
+          </li>
+        </div>
+        <div className="bg-slate-300 dark:bg-slate-800 mb-4 rounded-lg">
+          <li className="sidebar-link flex items-center justify-between">
+            <Link href="/profile" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
+              <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiUser /></span> Profile
             </Link>
           </li>
         </div>

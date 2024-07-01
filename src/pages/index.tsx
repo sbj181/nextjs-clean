@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { GetStaticProps, InferGetStaticPropsType } from 'next';
+import { GetStaticProps, InferGetStaticPropsType } from 'next';
 import { useLiveQuery } from 'next-sanity/preview';
 import Head from 'next/head';
 import { useState } from 'react';
@@ -15,6 +15,8 @@ import { getResources, type Resource, resourcesQuery } from '~/lib/sanity.querie
 import { useFavorites } from '~/contexts/FavoritesContext';
 import { useSidebar } from '~/contexts/SidebarContext';
 import TagFilter from '~/components/TagFilter'; // Import the TagFilter component
+
+import { useAuth } from '~/lib/useAuth'; // Import the useAuth hook
 
 import type { SharedPageProps } from '~/pages/_app';
 
@@ -42,6 +44,7 @@ export const getStaticProps: GetStaticProps<
 export default function IndexPage(
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) {
+  const session = useAuth(); // Check if the user is authenticated
   const [posts] = useLiveQuery<Post[]>(props.posts, postsQuery);
   const [resources] = useLiveQuery<Resource[]>(props.resources, resourcesQuery);
   const { favorites, clearFavorites } = useFavorites();
@@ -50,10 +53,8 @@ export default function IndexPage(
 
   const favoriteResources = resources.filter((resource) => favorites.includes(resource._id));
 
-  // Get all unique tags from resources
   const allTags = Array.from(new Set(resources.flatMap((resource) => resource.tags?.map(tag => tag.title) || [])));
 
-  // Filter resources based on selected tags
   const filteredResources = selectedTags.length
     ? resources.filter(resource =>
         resource.tags?.some(tag => selectedTags.includes(tag.title))
@@ -65,6 +66,8 @@ export default function IndexPage(
       prevTags.includes(tag) ? prevTags.filter((t) => t !== tag) : [...prevTags, tag]
     );
   };
+
+  if (!session) return <div>Loading...</div>;
 
   return (
     <Container>
