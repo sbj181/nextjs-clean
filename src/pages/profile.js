@@ -4,16 +4,25 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Container from '~/components/Container';
 import { useSidebar } from '~/contexts/SidebarContext';
+import { getClient } from '~/lib/sanity.client';
+import { getResourceByIds } from '~/lib/sanity.queries'; // Import the function
+import Link from 'next/link'; // Import Link component
 
 const Profile = () => {
   const [profile, setProfile] = useState({ email: '', display_name: '', phone_number: '' });
+  const [favorites, setFavorites] = useState([]);
   const [editing, setEditing] = useState(false);
   const router = useRouter();
   const { isSidebarOpen } = useSidebar();
 
   useEffect(() => {
     const getProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+      if (sessionError) {
+        console.error('Error getting session:', sessionError);
+        router.push('/sign-in');
+      }
+      
       if (!user) {
         router.push('/sign-in');
       } else {
@@ -26,6 +35,22 @@ const Profile = () => {
           console.error('Error fetching profile:', error);
         } else {
           setProfile(data);
+        }
+
+        // Fetch favorite resource IDs
+        const { data: favoritesData, error: favoritesError } = await supabase
+          .from('favorites')
+          .select('resource_id')
+          .eq('user_id', user.id);
+
+        if (favoritesError) {
+          console.error('Error fetching favorites:', favoritesError);
+        } else {
+          const resourceIds = favoritesData.map(fav => fav.resource_id);
+          // Fetch resource details from Sanity
+          const client = getClient();
+          const resources = await getResourceByIds(client, resourceIds);
+          setFavorites(resources);
         }
       }
     };
@@ -51,6 +76,21 @@ const Profile = () => {
     }
   };
 
+  const handleRemoveFavorite = async (resourceId) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from('favorites')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('resource_id', resourceId);
+
+    if (error) {
+      console.error('Error removing favorite:', error);
+    } else {
+      setFavorites(favorites.filter(resource => resource._id !== resourceId));
+    }
+  };
+
   return (
     <Container>
       <Head>
@@ -59,15 +99,15 @@ const Profile = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex items-center justify-center h-[calc(100vh-13em)]">
-        <div className="min-w-xl w-[400px] p-6 bg-white shadow-md rounded-lg">
+      <div className="flex items-center justify-center h-[calc(100vh-13rem)]"> {/* Adjust height to account for footer */}
+        <div className="min-w-xl w-[400px] p-6 bg-slate-50 dark:bg-slate-950 shadow-md rounded-lg">
           <h1 className="text-2xl font-bold mb-4">Profile</h1>
           <div className="mb-4">
-            <label className="block text-gray-700">Email</label>
-            <p>{profile.email}</p>
+            <label className="block opacity-50">Email</label>
+            <p>{profile.email || 'None listed'}</p>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Display Name</label>
+            <label className="block opacity-50">Display Name</label>
             {editing ? (
               <input
                 type="text"
@@ -76,11 +116,11 @@ const Profile = () => {
                 className="p-2 border border-gray-300 rounded w-full"
               />
             ) : (
-              <p>{profile.display_name}</p>
+              <p>{profile.display_name || 'None listed'}</p>
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Phone Number</label>
+            <label className="block opacity-50">Phone Number</label>
             {editing ? (
               <input
                 type="text"
@@ -89,7 +129,7 @@ const Profile = () => {
                 className="p-2 border border-gray-300 rounded w-full"
               />
             ) : (
-              <p>{profile.phone_number}</p>
+              <p>{profile.phone_number || 'None listed'}</p>
             )}
           </div>
           {editing ? (
@@ -113,6 +153,30 @@ const Profile = () => {
           >
             Sign Out
           </button>
+
+          {/* Display Favorites */}
+          <div className="mt-8">
+            <h2 className="text-xl font-bold mb-4">Favorite Resources</h2>
+            {favorites.length > 0 ? (
+              <ul className="list-disc">
+                {favorites.map(favorite => (
+                  <li key={favorite._id} className="mb-2 flex justify-between items-center">
+                    <Link href={`/resource/${favorite.slug.current}`}>
+                      <span className="text-blue-500 underline cursor-pointer">{favorite.title}</span>
+                    </Link>
+                    <button
+                      onClick={() => handleRemoveFavorite(favorite._id)}
+                      className="ml-2 text-red-500"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No resources currently favorited.</p>
+            )}
+          </div>
         </div>
       </div>
     </Container>

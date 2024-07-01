@@ -65,6 +65,26 @@ export async function getResources(client: SanityClient): Promise<Resource[]> {
   return await client.fetch(resourcesQuery);
 }
 
+export const getResourceByIds = async (client, ids) => {
+  const query = groq`*[_type == "resource" && _id in $ids]{
+    _id,
+    title,
+    mainImage,
+    slug,
+    description,
+    resourceKind,
+    fileUpload,
+    fileShareURL,
+    BMSResourceLink,
+    _createdAt,
+    tags[]->{
+      _id,
+      title
+    }
+  }`;
+  return await client.fetch(query, { ids });
+};
+
 export const resourceBySlugQuery = groq`*[_type == "resource" && slug.current == $slug][0]{
   _id,
   _createdAt,

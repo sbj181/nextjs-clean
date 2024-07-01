@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useRouter } from 'next/router';
+import Loading from '~/components/Loading';
 
 const ProtectedPage = () => {
   const [session, setSession] = useState(null);
@@ -24,10 +25,14 @@ const ProtectedPage = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
+  }, [router]);
 
-  if (!session) return <div>Loading...</div>;
+  if (!session) return <Loading />;
 
   return <div>Protected content</div>;
 };

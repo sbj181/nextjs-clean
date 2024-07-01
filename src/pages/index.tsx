@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { GetStaticProps, InferGetStaticPropsType } from 'next';
 import { useLiveQuery } from 'next-sanity/preview';
 import Head from 'next/head';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Card from '~/components/Card';
 import ResourceCard from '~/components/ResourceCard';
@@ -15,8 +15,10 @@ import { getResources, type Resource, resourcesQuery } from '~/lib/sanity.querie
 import { useFavorites } from '~/contexts/FavoritesContext';
 import { useSidebar } from '~/contexts/SidebarContext';
 import TagFilter from '~/components/TagFilter'; // Import the TagFilter component
+import Loading from '~/components/Loading'; // Import the Loading component
 
 import { useAuth } from '~/lib/useAuth'; // Import the useAuth hook
+import { supabase } from '~/lib/supabaseClient'; // Import supabase client
 
 import type { SharedPageProps } from '~/pages/_app';
 
@@ -50,6 +52,26 @@ export default function IndexPage(
   const { favorites, clearFavorites } = useFavorites();
   const { isSidebarOpen } = useSidebar();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [displayName, setDisplayName] = useState<string>('');
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('users')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+        if (error) {
+          console.error('Error fetching profile:', error);
+        } else {
+          setDisplayName(data.display_name);
+        }
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const favoriteResources = resources.filter((resource) => favorites.includes(resource._id));
 
@@ -67,7 +89,7 @@ export default function IndexPage(
     );
   };
 
-  if (!session) return <div>Loading...</div>;
+  if (!session) return <Loading />;
 
   return (
     <Container>
@@ -78,7 +100,7 @@ export default function IndexPage(
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Welcome 
-        title='Welcome to CORE RMS + CMS'       
+        title={`🤙 Hey ${displayName}, Welcome to CORE CMS!`}       
         subtitle={<span>Visit the <Link href="/studio"><span className="text-blue-500 underline">CMS Studio</span></Link> to manage content and add your own resources.</span>}
       />
       
@@ -86,7 +108,7 @@ export default function IndexPage(
         <section className='border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-50 p-6 rounded-2xl mb-6'>
           <div className='mb-6 flex justify-between items-center'>
             <div>
-            <h2 className='text-3xl font-bold'>Favorite Resources</h2>
+            <h2 className='text-3xl font-bold'>{displayName}s Favorites</h2>
             <p>Resources you have favorited will appear here!</p>
             </div>
             <button

@@ -1,11 +1,13 @@
 import '~/styles/global.css';
 import type { AppProps } from 'next/app';
 import { IBM_Plex_Mono, Inter, PT_Serif } from 'next/font/google';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { SidebarProvider } from '../contexts/SidebarContext';
 import Head from 'next/head';
-import { supabase } from '../lib/supabaseClient';
+import Loading from '~/components/Loading';
+import { useRouter } from 'next/router';
+import { supabase } from '~/lib/supabaseClient';
 
 export interface SharedPageProps {
   draftMode: boolean;
@@ -33,6 +35,7 @@ const serif = PT_Serif({
   weight: ['400', '700'],
 });
 
+// Hidden helper component to ensure classes are included
 const ClassHelper = () => (
   <div className="hidden">
     <div className="grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5"></div>
@@ -41,22 +44,24 @@ const ClassHelper = () => (
 
 export default function App({ Component, pageProps }: AppProps<SharedPageProps>) {
   const { draftMode, token } = pageProps;
-  const [session, setSession] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
+    const handleRedirect = async () => {
+      const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+
+      if (error) {
+        console.error('Error handling auth redirect:', error.message);
+        router.push('/error');
+      } else {
+        router.push('/profile');
+      }
     };
 
-    getSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+      handleRedirect();
+    }
+  }, [router]);
 
   return (
     <>
@@ -64,14 +69,14 @@ export default function App({ Component, pageProps }: AppProps<SharedPageProps>)
         <Head>
           <link rel='icon' href='/core.png' />
         </Head>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<Loading />}>
           <SidebarProvider>
             {draftMode ? (
               <PreviewProvider token={token}>
-                <Component {...pageProps} session={session} />
+                <Component {...pageProps} />
               </PreviewProvider>
             ) : (
-              <Component {...pageProps} session={session} />
+              <Component {...pageProps} />
             )}
           </SidebarProvider>
         </Suspense>
