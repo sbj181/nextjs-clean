@@ -142,7 +142,7 @@ const Profile = () => {
                 type="text"
                 value={profile.display_name}
                 onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
-                className="p-2 border border-gray-300 rounded w-full"
+                className="p-2 border dark:bg-slate-950 border-gray-300 rounded w-full"
               />
             ) : (
               <p>{profile.display_name || 'None listed'}</p>
@@ -155,7 +155,7 @@ const Profile = () => {
                 type="text"
                 value={profile.phone_number}
                 onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
-                className="p-2 border border-gray-300 rounded w-full"
+                className="p-2 border border-gray-300 dark:bg-slate-950 rounded w-full"
               />
             ) : (
               <p>{profile.phone_number || 'None listed'}</p>

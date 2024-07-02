@@ -78,11 +78,11 @@ const TrainingStep: React.FC<TrainingStepProps> = ({ step, isCompleted, onComple
           <h3 className="text-xl font-semibold mb-4">Related Resources</h3>
           <div className="cardWrap grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 my-2">
             {step.relatedResources.map((resource) => (
-              <div key={resource._id} className="bg-slate-50 rounded-lg p-4 shadow-md">
+              <div key={resource._id} className="card border-[4px] border-slate-50 flex flex-col w-full bg-slate-100 dark:bg-slate-950 h-full p-4">
                 <Link href={`/resource/${resource.slug.current}`}>
                   <div className="cursor-pointer transition hover:underline text-lg font-semibold">{resource.title}</div>
                 </Link>
-                {resource.mainImage && (
+               {/*  {resource.mainImage && (
                   <Image
                     src={urlForImage(resource.mainImage)}
                     alt={resource.title}
@@ -90,7 +90,7 @@ const TrainingStep: React.FC<TrainingStepProps> = ({ step, isCompleted, onComple
                     height={120}
                     className="object-cover w-full h-auto rounded-lg mt-2"
                   />
-                )}
+                )} */}
               </div>
             ))}
           </div>

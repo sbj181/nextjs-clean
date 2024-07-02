@@ -52,7 +52,7 @@ export default function IndexPage(
   const { favorites, clearFavorites } = useFavorites();
   const { isSidebarOpen } = useSidebar();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [displayName, setDisplayName] = useState<string>('');
+  const [displayName, setDisplayName] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -66,7 +66,7 @@ export default function IndexPage(
         if (error) {
           console.error('Error fetching profile:', error);
         } else {
-          setDisplayName(data.display_name);
+          setDisplayName(data.display_name || null);
         }
       }
     };
@@ -100,7 +100,7 @@ export default function IndexPage(
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Welcome 
-        title={`🤙 Hey ${displayName}, Welcome to CORE CMS!`}       
+        title={`🤙 Hey ${displayName ? displayName : 'There'}, Welcome to CORE CMS!`}       
         subtitle={<span>Visit the <Link href="/studio"><span className="text-blue-500 underline">CMS Studio</span></Link> to manage content and add your own resources. Visit the <Link href="/profile"><span className="text-blue-500 underline">Profile</span></Link> page to access user details.</span>}
       />
       
@@ -108,7 +108,7 @@ export default function IndexPage(
         <section className='border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-50 p-6 rounded-2xl mb-6'>
           <div className='mb-6 flex justify-between items-center'>
             <div>
-            <h2 className='text-3xl font-bold'>{displayName}s Favorites</h2>
+            <h2 className='text-3xl font-bold'>{displayName ? displayName : 'User'}&apos;s Favorites</h2>
             <p>Resources you have favorited will appear here!</p>
             </div>
             <button
