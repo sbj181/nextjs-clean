@@ -101,7 +101,7 @@ export default function IndexPage(
       </Head>
       <Welcome 
         title={`🤙 Hey ${displayName}, Welcome to CORE CMS!`}       
-        subtitle={<span>Visit the <Link href="/studio"><span className="text-blue-500 underline">CMS Studio</span></Link> to manage content and add your own resources.</span>}
+        subtitle={<span>Visit the <Link href="/studio"><span className="text-blue-500 underline">CMS Studio</span></Link> to manage content and add your own resources. Visit the <Link href="/profile"><span className="text-blue-500 underline">Profile</span></Link> page to access user details.</span>}
       />
       
       {favoriteResources.length > 0 ? (

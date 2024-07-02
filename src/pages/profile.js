@@ -99,8 +99,8 @@ const Profile = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex items-center justify-center h-[calc(100vh-13rem)]"> {/* Adjust height to account for footer */}
-        <div className="min-w-xl w-[400px] p-6 bg-slate-50 dark:bg-slate-950 shadow-md rounded-lg">
+      <div className="flex items-center justify-center "> {/* Adjust height to account for footer */}
+        <div className="min-w-xl mb-8 w-[400px] p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-50 rounded-2xl">
           <h1 className="text-2xl font-bold mb-4">Profile</h1>
           <div className="mb-4">
             <label className="block opacity-50">Email</label>

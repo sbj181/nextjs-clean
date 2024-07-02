@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useRouter } from 'next/router';
-import Logo from '../components/CoreLogo'
+import Logo from '../components/CoreLogo';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -25,10 +25,12 @@ const SignIn = () => {
     if (signUpError) {
       alert(signUpError.message);
     } else {
+      // Insert user data into custom users table
+      const { user } = signUpData;
       const { error: userError } = await supabase.from('users').insert([
         {
-          id: signUpData.user.id,
-          email: signUpData.user.email,
+          id: user.id,
+          email: user.email,
           display_name: displayName,
           phone_number: phoneNumber,
         },
@@ -38,6 +40,7 @@ const SignIn = () => {
       } else {
         alert('Account created successfully!');
         setIsSignUp(false); // Switch back to sign-in mode after successful sign-up
+        router.push('/profile');
       }
     }
   };
@@ -47,9 +50,9 @@ const SignIn = () => {
       <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-br from-slate-800 to-slate-950">
         {/* Left Column */}
       </div>
-      <div className="flex flex-col justify-center items-center w-1/2 p-8">
+      <div className="flex flex-col justify-center items-center w-full md:w-1/2 p-8">
         {/* Right Column */}
-        <div className='w-1/3 mb-10'><Logo /></div>
+        <div className="w-1/3 mb-10"><Logo /></div>
         <h1 className="text-2xl mb-6 transition-all duration-300 ease-in-out">
           {isSignUp ? 'Sign Up' : 'Sign In'}
         </h1>
