@@ -1,5 +1,5 @@
 import { GetStaticProps, InferGetStaticPropsType } from 'next';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLiveQuery } from 'next-sanity/preview';
 import Container from '~/components/Container';
 import { FiBookOpen } from "react-icons/fi";
@@ -9,7 +9,9 @@ import { getClient } from '~/lib/sanity.client';
 import { getTrainings, type Training, trainingsQuery } from '~/lib/sanity.queries';
 import Head from 'next/head';
 import Welcome from '~/components/Welcome';
-import Link from 'next/link';
+import TrainingStep from '~/components/TrainingStep';
+import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '~/lib/useAuth';
 
 export const getStaticProps: GetStaticProps<{
   trainings: Training[];
@@ -33,7 +35,32 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
   const { trainings } = props;
   const [trainingData] = useLiveQuery<Training[]>(props.trainings, trainingsQuery);
   const [selectedTrainingIndex, setSelectedTrainingIndex] = useState<number>(0);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const session = useAuth();
+
+  useEffect(() => {
+    if (session && trainingData) {
+      fetchProgress();
+    }
+  }, [session, trainingData, selectedTrainingIndex]);
+
   const selectedTraining = trainingData ? trainingData[selectedTrainingIndex] : undefined;
+
+  const fetchProgress = async () => {
+    if (!selectedTraining) return;
+    const { data, error } = await supabase
+      .from('training_progress')
+      .select('completed_steps')
+      .eq('user_id', session.user.id)
+      .eq('training_id', selectedTraining._id);
+
+    if (error) {
+      console.error('Error fetching progress:', error);
+    } else if (data) {
+      const allCompletedSteps = data.map(row => row.completed_steps).flat();
+      setCompletedSteps([...new Set(allCompletedSteps)]);
+    }
+  };
 
   const handlePrevious = () => {
     if (selectedTrainingIndex > 0) {
@@ -44,6 +71,34 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
   const handleNext = () => {
     if (trainingData && selectedTrainingIndex < trainingData.length - 1) {
       setSelectedTrainingIndex(selectedTrainingIndex + 1);
+    }
+  };
+
+  const handleCompleteStep = async (stepNumber: number) => {
+    let updatedSteps: number[];
+    if (completedSteps.includes(stepNumber)) {
+      updatedSteps = completedSteps.filter(step => step !== stepNumber);
+    } else {
+      updatedSteps = [...completedSteps, stepNumber];
+    }
+    setCompletedSteps(updatedSteps);
+    await saveProgress(updatedSteps);
+    fetchProgress();  // Refresh the progress state after saving
+  };
+
+  const saveProgress = async (steps: number[]) => {
+    const { error } = await supabase
+      .from('training_progress')
+      .upsert({
+        user_id: session.user.id,
+        training_id: selectedTraining?._id,
+        completed_steps: steps,
+      }, {
+        onConflict: ['user_id', 'training_id']  // Ensure no duplicate rows
+      });
+
+    if (error) {
+      console.error('Error saving progress:', error);
     }
   };
 
@@ -100,7 +155,22 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
 
           {selectedTraining ? (
             <>
-              <ProgressTracker steps={selectedTraining.steps} trainingId={selectedTraining._id} />
+              <ProgressTracker
+                steps={selectedTraining.steps}
+                trainingId={selectedTraining._id}
+                completedSteps={completedSteps}
+                onComplete={handleCompleteStep}
+              />
+              <div>
+                {selectedTraining.steps.map((step) => (
+                  <TrainingStep
+                    key={step._id}
+                    step={step}
+                    isCompleted={completedSteps.includes(step.stepNumber)}
+                    onComplete={() => handleCompleteStep(step.stepNumber)}
+                  />
+                ))}
+              </div>
               <div className="flex justify-between mt-8">
                 <button
                   onClick={handlePrevious}
