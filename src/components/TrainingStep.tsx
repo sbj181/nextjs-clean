@@ -5,30 +5,33 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { urlForImage } from '~/lib/sanity.image'; // Import the urlForImage function
 import { urlForFile } from '~/lib/sanity.file'; // Import the urlForFile function
+import { FileAsset, ImageAsset } from '@sanity/types';
+
 
 interface TrainingStepProps {
-  step: {
-    _id: string;
-    title: string;
-    description: any[];
-    stepNumber: number;
-    slug: { current: string };
-    requiresMedia?: boolean;
-    mediaType?: 'video' | 'image';
-    TrainingVideoFile?: { asset: { _ref: string } };
-    TrainingImageUrl?: { asset: { _ref: string } };
-    mediaTitle?: string;
-    mediaCaption?: string;
-    relatedResources?: {
+    step: {
       _id: string;
       title: string;
+      description: any[];
+      stepNumber: number;
       slug: { current: string };
-      mainImage?: { asset: { _ref: string } };
-    }[];
-  };
-  isCompleted: boolean;
-  onComplete: () => void;
-}
+      requiresMedia?: boolean;
+      mediaType?: 'video' | 'image';
+      TrainingVideoFile?: FileAsset;
+      TrainingImageUrl?: ImageAsset;
+      mediaTitle?: string;
+      mediaCaption?: string;
+      relatedResources?: {
+        _id: string;
+        title: string;
+        slug: { current: string };
+        mainImage?: ImageAsset;
+      }[];
+    };
+    isCompleted: boolean;
+    onComplete: () => void;
+  }
+  
 
 const TrainingStep: React.FC<TrainingStepProps> = ({ step, isCompleted, onComplete }) => {
   const imageUrl = step.mediaType === 'image' && step.TrainingImageUrl ? urlForImage(step.TrainingImageUrl) : null;

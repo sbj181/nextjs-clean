@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -18,63 +18,68 @@ const Profile = () => {
   const router = useRouter();
   const { isSidebarOpen } = useSidebar();
 
+  const fetchProgress = useCallback(async (userId) => {
+    const { data: trainingProgressData, error: trainingProgressError } = await supabase
+      .from('training_progress')
+      .select('training_id, completed_steps')
+      .eq('user_id', userId);
+
+    if (trainingProgressError) {
+      console.error('Error fetching training progress:', trainingProgressError);
+    } else {
+      setTrainingProgress(trainingProgressData);
+    }
+  }, []);
+
   useEffect(() => {
     const getProfile = async () => {
       const { data: { user }, error: sessionError } = await supabase.auth.getUser();
       if (sessionError) {
         console.error('Error getting session:', sessionError);
         router.push('/sign-in');
+        return;
       }
-      
+
       if (!user) {
         router.push('/sign-in');
-      } else {
-        const { data, error } = await supabase
-          .from('users')
-          .select('email, display_name, phone_number')
-          .eq('id', user.id)
-          .single();
-        if (error) {
-          console.error('Error fetching profile:', error);
-        } else {
-          setProfile(data);
-        }
-
-        // Fetch favorite resource IDs
-        const { data: favoritesData, error: favoritesError } = await supabase
-          .from('favorites')
-          .select('resource_id')
-          .eq('user_id', user.id);
-
-        if (favoritesError) {
-          console.error('Error fetching favorites:', favoritesError);
-        } else {
-          const resourceIds = favoritesData.map(fav => fav.resource_id);
-          const client = getClient();
-          const resources = await getResourceByIds(client, resourceIds);
-          setFavorites(resources);
-        }
-
-        // Fetch training progress
-        const { data: trainingProgressData, error: trainingProgressError } = await supabase
-          .from('training_progress')
-          .select('training_id, completed_steps')
-          .eq('user_id', user.id);
-
-        if (trainingProgressError) {
-          console.error('Error fetching training progress:', trainingProgressError);
-        } else {
-          setTrainingProgress(trainingProgressData);
-        }
-
-        // Fetch all trainings from Sanity
-        const client = getClient();
-        const trainings = await getTrainings(client);
-        setTrainings(trainings);
+        return;
       }
+
+      const { data, error } = await supabase
+        .from('users')
+        .select('email, display_name, phone_number')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+      } else {
+        setProfile(data);
+      }
+
+      const { data: favoritesData, error: favoritesError } = await supabase
+        .from('favorites')
+        .select('resource_id')
+        .eq('user_id', user.id);
+
+      if (favoritesError) {
+        console.error('Error fetching favorites:', favoritesError);
+      } else {
+        const resourceIds = favoritesData.map(fav => fav.resource_id);
+        const client = getClient();
+        const resources = await getResourceByIds(client, resourceIds);
+        setFavorites(resources);
+      }
+
+      await fetchProgress(user.id);
+
+      const client = getClient();
+      const trainings = await getTrainings(client);
+      setTrainings(trainings);
     };
+
     getProfile();
-  }, [router]);
+  }, [router, fetchProgress]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -87,6 +92,7 @@ const Profile = () => {
       .from('users')
       .update({ display_name: profile.display_name, phone_number: profile.phone_number })
       .eq('id', user.id);
+
     if (error) {
       console.error('Error updating profile:', error);
     } else {
@@ -122,7 +128,7 @@ const Profile = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex items-center justify-center"> {/* Adjust height to account for footer */}
+      <div className="flex items-center justify-center">
         <div className="min-w-xl mb-8 w-[400px] p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-50 rounded-2xl">
           <h1 className="text-2xl font-bold mb-4">Profile</h1>
           <div className="mb-4">
@@ -177,7 +183,6 @@ const Profile = () => {
             Sign Out
           </button>
 
-          {/* Display Favorites */}
           <div className="mt-8">
             <h2 className="text-xl font-bold mb-4">Favorite Resources</h2>
             {favorites.length > 0 ? (
@@ -201,7 +206,6 @@ const Profile = () => {
             )}
           </div>
 
-          {/* Display Training Progress */}
           <div className="mt-8">
             <h2 className="text-xl font-bold mb-4">Training Progress</h2>
             {trainingProgress.length > 0 ? (

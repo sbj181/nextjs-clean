@@ -1,8 +1,8 @@
 import { GetStaticProps, InferGetStaticPropsType } from 'next';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLiveQuery } from 'next-sanity/preview';
 import Container from '~/components/Container';
-import { FiBookOpen } from "react-icons/fi";
+import { FiBookOpen } from 'react-icons/fi';
 import ProgressTracker from '~/components/ProgressTracker';
 import { readToken } from '~/lib/sanity.api';
 import { getClient } from '~/lib/sanity.client';
@@ -38,16 +38,9 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const session = useAuth();
 
-  useEffect(() => {
-    if (session && trainingData) {
-      fetchProgress();
-    }
-  }, [session, trainingData, selectedTrainingIndex]);
-
-  const selectedTraining = trainingData ? trainingData[selectedTrainingIndex] : undefined;
-
-  const fetchProgress = async () => {
-    if (!selectedTraining) return;
+  const fetchProgress = useCallback(async () => {
+    const selectedTraining = trainingData ? trainingData[selectedTrainingIndex] : undefined;
+    if (!selectedTraining || !session) return;
     const { data, error } = await supabase
       .from('training_progress')
       .select('completed_steps')
@@ -60,7 +53,15 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
       const allCompletedSteps = data.map(row => row.completed_steps).flat();
       setCompletedSteps([...new Set(allCompletedSteps)]);
     }
-  };
+  }, [session, selectedTrainingIndex, trainingData]);
+
+  useEffect(() => {
+    if (session && trainingData) {
+      fetchProgress();
+    }
+  }, [session, trainingData, selectedTrainingIndex, fetchProgress]);
+
+  const selectedTraining = trainingData ? trainingData[selectedTrainingIndex] : undefined;
 
   const handlePrevious = () => {
     if (selectedTrainingIndex > 0) {
@@ -83,30 +84,38 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
     }
     setCompletedSteps(updatedSteps);
     await saveProgress(updatedSteps);
-    fetchProgress();  // Refresh the progress state after saving
+    fetchProgress(); // Refresh the progress state after saving
   };
 
   const saveProgress = async (steps: number[]) => {
     const { error } = await supabase
       .from('training_progress')
-      .upsert({
-        user_id: session.user.id,
-        training_id: selectedTraining?._id,
-        completed_steps: steps,
-      }, {
-        onConflict: ['user_id', 'training_id']  // Ensure no duplicate rows
-      });
-
+      .upsert(
+        {
+          user_id: session.user.id,
+          training_id: selectedTraining?._id,
+          completed_steps: steps,
+        },
+        {
+          onConflict: 'user_id, training_id', // Provide as a single string
+        }
+      );
+  
     if (error) {
       console.error('Error saving progress:', error);
     }
   };
+  
+  
 
   return (
     <Container>
       <Head>
         <title>Training | CORE RMS by The Grovery</title>
-        <meta name="description" content="Welcome to CORE RMS, your source for the latest blog posts and resources." />
+        <meta
+          name="description"
+          content="Welcome to CORE RMS, your source for the latest blog posts and resources."
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -121,10 +130,17 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
                   {trainingData.map((training, index) => (
                     <li key={training._id}>
                       <button
-                        className={`py-4 pl-5 pr-7 bg-opacity-100 hover:bg-opacity-90 shadow-sm flex items-center rounded-xl ${selectedTraining?._id === training._id ? 'bg-blue-500 text-white' : 'bg-slate-300 dark:bg-slate-700 bg-opacity-50'}`}
+                        className={`py-4 pl-5 pr-7 bg-opacity-100 hover:bg-opacity-90 shadow-sm flex items-center rounded-xl ${
+                          selectedTraining?._id === training._id
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-slate-300 dark:bg-slate-700 bg-opacity-50'
+                        }`}
                         onClick={() => setSelectedTrainingIndex(index)}
                       >
-                        <span className='mr-3 bg-slate-50 w-8 h-8 flex items-center justify-center rounded-xl bg-opacity-30 border-1 border-slate-50'><FiBookOpen /></span>  {training.title}
+                        <span className="mr-3 bg-slate-50 w-8 h-8 flex items-center justify-center rounded-xl bg-opacity-30 border-1 border-slate-50">
+                          <FiBookOpen />
+                        </span>{' '}
+                        {training.title}
                       </button>
                     </li>
                   ))}
@@ -136,14 +152,18 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
                 className="py-4 px-8 rounded-xl bg-slate-300 bg-opacity-50"
                 onChange={(e) => {
                   const selectedId = e.target.value;
-                  const trainingIndex = trainingData?.findIndex((training) => training._id === selectedId);
+                  const trainingIndex = trainingData?.findIndex(
+                    (training) => training._id === selectedId
+                  );
                   if (trainingIndex !== undefined && trainingIndex >= 0) {
                     setSelectedTrainingIndex(trainingIndex);
                   }
                 }}
                 value={selectedTraining?._id || ''}
               >
-                <option value="" disabled>Select a training module</option>
+                <option value="" disabled>
+                  Select a training module
+                </option>
                 {trainingData?.map((training) => (
                   <option key={training._id} value={training._id}>
                     {training.title}
@@ -162,14 +182,15 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
                 onComplete={handleCompleteStep}
               />
               <div>
-                {selectedTraining.steps.map((step) => (
-                  <TrainingStep
-                    key={step._id}
-                    step={step}
-                    isCompleted={completedSteps.includes(step.stepNumber)}
-                    onComplete={() => handleCompleteStep(step.stepNumber)}
-                  />
-                ))}
+              {selectedTraining.steps.map((step) => (
+                <TrainingStep
+                  key={step._id}
+                  step={step}
+                  isCompleted={completedSteps.includes(step.stepNumber)}
+                  onComplete={() => handleCompleteStep(step.stepNumber)}
+                />
+              ))}
+
               </div>
               <div className="flex justify-between mt-8">
                 <button
@@ -190,7 +211,10 @@ export default function TrainingPage(props: InferGetStaticPropsType<typeof getSt
             </>
           ) : (
             <div className="text-center py-10 rounded-xl bg-green-500 bg-opacity-15 px-8">
-              <p className="text-xl">Welcome to the Training section. Please select a training module from the dropdown above to begin.</p>
+              <p className="text-xl">
+                Welcome to the Training section. Please select a training module from the dropdown
+                above to begin.
+              </p>
             </div>
           )}
         </div>
