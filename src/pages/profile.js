@@ -5,12 +5,15 @@ import Head from 'next/head';
 import Container from '~/components/Container';
 import { useSidebar } from '~/contexts/SidebarContext';
 import { getClient } from '~/lib/sanity.client';
-import { getResourceByIds } from '~/lib/sanity.queries'; // Import the function
-import Link from 'next/link'; // Import Link component
+import { getResourceByIds, getTrainings } from '~/lib/sanity.queries';
+import Link from 'next/link';
+import ProgressBar from '~/components/ProgressBar';
 
 const Profile = () => {
   const [profile, setProfile] = useState({ email: '', display_name: '', phone_number: '' });
   const [favorites, setFavorites] = useState([]);
+  const [trainingProgress, setTrainingProgress] = useState([]);
+  const [trainings, setTrainings] = useState([]);
   const [editing, setEditing] = useState(false);
   const router = useRouter();
   const { isSidebarOpen } = useSidebar();
@@ -47,11 +50,27 @@ const Profile = () => {
           console.error('Error fetching favorites:', favoritesError);
         } else {
           const resourceIds = favoritesData.map(fav => fav.resource_id);
-          // Fetch resource details from Sanity
           const client = getClient();
           const resources = await getResourceByIds(client, resourceIds);
           setFavorites(resources);
         }
+
+        // Fetch training progress
+        const { data: trainingProgressData, error: trainingProgressError } = await supabase
+          .from('training_progress')
+          .select('training_id, completed_steps')
+          .eq('user_id', user.id);
+
+        if (trainingProgressError) {
+          console.error('Error fetching training progress:', trainingProgressError);
+        } else {
+          setTrainingProgress(trainingProgressData);
+        }
+
+        // Fetch all trainings from Sanity
+        const client = getClient();
+        const trainings = await getTrainings(client);
+        setTrainings(trainings);
       }
     };
     getProfile();
@@ -91,6 +110,10 @@ const Profile = () => {
     }
   };
 
+  const calculateProgress = (completedSteps, totalSteps) => {
+    return (completedSteps.length / totalSteps) * 100;
+  };
+
   return (
     <Container>
       <Head>
@@ -99,7 +122,7 @@ const Profile = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex items-center justify-center "> {/* Adjust height to account for footer */}
+      <div className="flex items-center justify-center"> {/* Adjust height to account for footer */}
         <div className="min-w-xl mb-8 w-[400px] p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-50 rounded-2xl">
           <h1 className="text-2xl font-bold mb-4">Profile</h1>
           <div className="mb-4">
@@ -175,6 +198,31 @@ const Profile = () => {
               </ul>
             ) : (
               <p>No resources currently favorited.</p>
+            )}
+          </div>
+
+          {/* Display Training Progress */}
+          <div className="mt-8">
+            <h2 className="text-xl font-bold mb-4">Training Progress</h2>
+            {trainingProgress.length > 0 ? (
+              <div>
+                {trainings.map(training => {
+                  const progress = trainingProgress.find(progress => progress.training_id === training._id);
+                  const completedSteps = progress ? progress.completed_steps : [];
+                  const totalSteps = training.steps.length;
+                  const progressPercentage = calculateProgress(completedSteps, totalSteps);
+
+                  return (
+                    <div key={training._id} className="mb-4">
+                      <h3 className="text-lg font-semibold">{training.title}</h3>
+                      <ProgressBar percentage={progressPercentage} />
+                      <p>{completedSteps.length} out of {totalSteps} steps completed</p>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p>No training progress recorded.</p>
             )}
           </div>
         </div>
