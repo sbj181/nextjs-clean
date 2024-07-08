@@ -32,7 +32,7 @@ export default function Header() {
             
             className="p-2 ml-2 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center"
           >
-            <span className="hidden md:inline-block"><FiUser className="h-6 w-6" /></span>
+            <span className="inline-block"><FiUser className="h-6 w-6" /></span>
           </Link>
           <button
             onClick={toggleSidebar}
