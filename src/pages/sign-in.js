@@ -14,8 +14,9 @@ const SignIn = () => {
   const handleSignIn = async (e) => {
     e.preventDefault();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) alert(error.message);
-    else {
+    if (error) {
+      alert(error.message);
+    } else {
       alert('Signed in successfully!');
       router.push('/profile');
     }
@@ -48,10 +49,11 @@ const SignIn = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-br from-slate-800 to-slate-950">
-      </div>
+      <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-br from-slate-800 to-slate-950"></div>
       <div className="flex flex-col justify-center items-center w-full md:w-1/2 p-8">
-        <div className="w-1/3 mb-10"><Logo /></div>
+        <div className="w-1/3 mb-10">
+          <Logo />
+        </div>
         <h1 className="text-2xl mb-6 transition-all duration-300 ease-in-out">
           {isSignUp ? 'Sign Up' : 'Sign In'}
         </h1>
@@ -87,10 +89,7 @@ const SignIn = () => {
               />
             </>
           )}
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition w-full"
-          >
+          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition w-full">
             {isSignUp ? 'Sign Up' : 'Sign In'}
           </button>
         </form>
@@ -98,7 +97,7 @@ const SignIn = () => {
           onClick={() => setIsSignUp(!isSignUp)}
           className="mt-4 text-blue-500 underline transition-all duration-300 ease-in-out"
         >
-          {isSignUp ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up'}
+          {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
         </button>
       </div>
     </div>

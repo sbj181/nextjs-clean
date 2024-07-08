@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useRouter } from 'next/router';
 import Loading from '~/components/Loading';
@@ -6,12 +6,14 @@ import Loading from '~/components/Loading';
 const ProtectedPage = () => {
   const [session, setSession] = useState(null);
   const router = useRouter();
+  const redirectHandled = useRef(false);
 
   useEffect(() => {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
-      if (!session) {
+      if (!session && !redirectHandled.current) {
+        redirectHandled.current = true;
         router.push('/sign-in');
       }
     };
@@ -20,7 +22,8 @@ const ProtectedPage = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      if (!session) {
+      if (!session && !redirectHandled.current) {
+        redirectHandled.current = true;
         router.push('/sign-in');
       }
     });

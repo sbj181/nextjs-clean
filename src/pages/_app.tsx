@@ -1,7 +1,7 @@
 import '~/styles/global.css';
 import type { AppProps } from 'next/app';
 import { IBM_Plex_Mono, Inter, PT_Serif } from 'next/font/google';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { SidebarProvider } from '../contexts/SidebarContext';
 import Head from 'next/head';
@@ -45,6 +45,7 @@ const ClassHelper = () => (
 export default function App({ Component, pageProps }: AppProps<SharedPageProps>) {
   const { draftMode, token } = pageProps;
   const router = useRouter();
+  const redirectHandled = useRef(false);
 
   useEffect(() => {
     const handleRedirect = async () => {
@@ -58,7 +59,8 @@ export default function App({ Component, pageProps }: AppProps<SharedPageProps>)
       }
     };
 
-    if (window.location.hash && window.location.hash.includes('access_token')) {
+    if (window.location.hash && window.location.hash.includes('access_token') && !redirectHandled.current) {
+      redirectHandled.current = true; // Set the flag to prevent multiple redirects
       handleRedirect();
     }
   }, [router]);
