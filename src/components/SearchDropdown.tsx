@@ -25,7 +25,7 @@ const SearchDropdown = () => {
         placeholder="Start typing to search..."
         value={initialQuery}
         onChange={handleInputChange}
-        className="w-full p-2 border border-slate-50 rounded-lg dark:bg-slate-900 dark:border-opacity-50"
+        className="w-full py-2 px-4 min-w-[320px] border border-slate-50 rounded-lg dark:bg-slate-900 dark:border-opacity-50"
       />
       {isModalOpen && <SearchModal initialQuery={initialQuery} onClose={handleCloseModal} />}
     </div>

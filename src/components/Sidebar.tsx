@@ -79,7 +79,7 @@ export default function Sidebar() {
       <div className='mt-auto'>
         <div className="mb-4">
           <a target='_blank' href="/studio/structure/resource" className="flex !bg-green-500 !bg-opacity-50 sidebar-link items-center w-full font- font-normal">
-            <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiEdit /></span> Add & Edit Resources
+            <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiEdit /></span> Add & Edit Content
           </a>
         </div>
         <CallToAction title='Want a CORE&trade; for your Team or Project?' subtitle='Use the link below to get in touch with us' />

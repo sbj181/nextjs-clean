@@ -23,7 +23,7 @@ const ThemeToggle = () => {
 
     return (
         <div className="flex items-center">
-            <span className="mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{darkMode ? <FiMoon /> : <FiSun />}</span>
+            <span className="mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{darkMode ? <FiMoon className="h-5 w-5" /> : <FiSun className="h-5 w-5" />}</span>
             <button
                 onClick={toggleTheme}
                 type="button"
@@ -32,7 +32,7 @@ const ThemeToggle = () => {
                 aria-checked={darkMode}
             >
                 <span
-                    className={`transform transition ease-in-out duration-200 inline-block w-4 h-4 transform bg-slate-100 dark:bg-slate-300 rounded-full ${darkMode ? 'translate-x-6' : 'translate-x-1'}`}
+                    className={`transform transition ease-in-out duration-200 inline-block w-4 h-4 bg-slate-100 dark:bg-slate-300 rounded-full ${darkMode ? 'translate-x-6' : 'translate-x-1'}`}
                 />
             </button>
         </div>

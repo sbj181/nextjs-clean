@@ -2,7 +2,7 @@ import Link from 'next/link';
 import CoreLogo from './CoreLogo';
 import { useSidebar } from '../contexts/SidebarContext';
 import ThemeToggle from './ThemeToggler';
-import { FiMenu, FiX } from 'react-icons/fi';
+import { FiMenu, FiUser, FiX } from 'react-icons/fi';
 import SearchDropdown from './SearchDropdown';
 import SearchButton from './SearchButton';
 
@@ -17,16 +17,23 @@ export default function Header() {
             <CoreLogo />
           </div>
         </Link>
-        <div className="flex items-center">
-          <div className="hidden md:block">
+        <div className="flex items-center w-full justify-between">
+          <div className="hidden md:block mx-auto">
             <SearchDropdown />
           </div>
-          <div className="md:hidden mr-2">
+          <div className="md:hidden mr-2 ml-auto">
             <SearchButton />
           </div>
           <div className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg">
             <ThemeToggle />
           </div>
+          
+          <Link href="/profile" passHref
+            
+            className="p-2 ml-2 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center"
+          >
+            <span className="hidden md:inline-block"><FiUser className="h-6 w-6" /></span>
+          </Link>
           <button
             onClick={toggleSidebar}
             className="p-2 ml-2 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center"
