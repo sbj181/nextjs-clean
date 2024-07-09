@@ -16,7 +16,7 @@ const SearchButton = () => {
   return (
     <>
       <button onClick={handleOpenModal} className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg md:hidden">
-        <FiSearch className="xs:h-5 xs:h-5 sm:h-6 sm:w-6" />
+        <FiSearch className="h-6 w-6" />
       </button>
       {isModalOpen && <SearchModal initialQuery="" onClose={handleCloseModal} />}
     </>

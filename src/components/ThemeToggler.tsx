@@ -23,11 +23,11 @@ const ThemeToggle = () => {
 
     return (
         <div className="flex items-center">
-            <span className="mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{darkMode ? <FiMoon className="xs:h-4 xs:h-4 sm:h-5 sm:w-5" /> : <FiSun className="xs:h-4 xs:h-4 sm:h-5 sm:w-5" />}</span>
+            <span className="mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{darkMode ? <FiMoon className="h-5 w-5" /> : <FiSun className="h-5 w-5" />}</span>
             <button
                 onClick={toggleTheme}
                 type="button"
-                className={`relative inline-flex items-center h-6 rounded-full w-10 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${darkMode ? 'bg-slate-800' : 'bg-gray-400'}`}
+                className={`relative inline-flex items-center h-6 rounded-full w-10 transition-colors focus:outline-none bg-opacity-90 focus:ring-2 focus:ring-offset-2 ${darkMode ? 'bg-slate-800' : 'bg-gray-400'}`}
                 role="switch"
                 aria-checked={darkMode}
             >

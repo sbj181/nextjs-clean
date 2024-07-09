@@ -17,29 +17,29 @@ export default function Header() {
             <CoreLogo />
           </div>
         </Link>
-        <div className="flex items-center w-full justify-between">
+        <div className="flex gap-1 items-center w-full justify-between">
           <div className="hidden md:block mx-auto">
             <SearchDropdown />
           </div>
-          <div className="md:hidden mr-2 ml-auto">
+          <div className="md:hidden ml-auto">
             <SearchButton />
           </div>
-          <div className="p-1 sm:p-2 bg-slate-50 dark:bg-slate-700 rounded-lg">
+          <div className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg">
             <ThemeToggle />
           </div>
           
           <Link href="/profile" passHref
             
-            className="p-2 ml-2 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center"
+            className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center"
           >
-            <span className="inline-block"><FiUser className="xs:h-5 xs:h-5 sm:h-6 sm:w-6" /></span>
+            <span className="inline-block"><FiUser className="h-6 w-6" /></span>
           </Link>
           <button
             onClick={toggleSidebar}
-            className="p-2 ml-2 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center"
+            className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center"
           >
-            {isSidebarOpen ? <FiX className="xs:h-5 xs:h-5 sm:h-6 sm:w-6" /> : <FiMenu className="xs:h-5 xs:h-5 sm:h-6 sm:w-6" />}
-            <span className="hidden md:inline-block ml-2">Menu</span>
+            {isSidebarOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
+            <span className="hidden md:inline-block ml-1 text-sm">Menu</span>
           </button>
         </div>
       </header>
