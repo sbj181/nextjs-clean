@@ -182,7 +182,7 @@ const Profile = () => {
             )}
             <button
                 onClick={handleSignOut}
-                className="w-full mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                className="w-full mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
             >
                 Sign Out
             </button>
@@ -236,9 +236,9 @@ const Profile = () => {
                 ) : (
                 <p>No training progress recorded.</p>
                 )}
-                <div>
-                    <Link href="/training" className="flex items-center font-normal">
-                        <button className="w-full px-4 py-2 bg-green-500 bg-opacity-80 text-white rounded-lg hover:bg-green-600 transition">
+                <div className='mt-6'>
+                    <Link href="/training" className="flex items-center">
+                        <button className="px-10 py-4 bg-slate-500 bg-opacity-80 font-bold text-sm text-white rounded-xl hover:bg-slate-600 transition">
                             Return to training
                         </button>
                     </Link>
