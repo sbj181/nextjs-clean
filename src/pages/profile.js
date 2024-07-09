@@ -124,124 +124,132 @@ const Profile = () => {
   return (
     <Container>
     <Head>
-      <title>Profile | CORE RMS by The Grovery</title>
-      <meta name="description" content="Manage your profile information." />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="icon" href="/favicon.ico" />
+        <title>User Profile | CORE RMS by The Grovery</title>
+        <meta name="description" content="Manage your profile information." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
     </Head>
     <Welcome title="Profile" subtitle="Manage your profile information, favorite resources, and track your training progress efficiently." />
     <section className="border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-100 p-6 rounded-2xl mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="col-span-1 mb-8 md:mb-0">
-          <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl">
+            <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
             <h1 className="text-xl font-bold mb-4">User Details</h1>
             <div className="mb-4">
-              <label className="block opacity-50">Email</label>
-              <p>{profile.email || 'None listed'}</p>
+                <label className="block opacity-50">Email</label>
+                <p>{profile.email || 'None listed'}</p>
             </div>
             <div className="mb-4">
-              <label className="block opacity-50">Display Name</label>
-              {editing ? (
+                <label className="block opacity-50">Display Name</label>
+                {editing ? (
                 <input
-                  type="text"
-                  value={profile.display_name}
-                  onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
-                  className="p-2 border dark:bg-slate-950 border-gray-300 rounded w-full"
+                    type="text"
+                    value={profile.display_name}
+                    onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
+                    className="p-2 border dark:bg-slate-950 border-gray-300 rounded w-full"
                 />
-              ) : (
+                ) : (
                 <p>{profile.display_name || 'None listed'}</p>
-              )}
+                )}
             </div>
             <div className="mb-4">
-              <label className="block opacity-50">Phone Number</label>
-              {editing ? (
+                <label className="block opacity-50">Phone Number</label>
+                {editing ? (
                 <input
-                  type="text"
-                  value={profile.phone_number}
-                  onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
-                  className="p-2 border border-gray-300 dark:bg-slate-950 rounded w-full"
+                    type="text"
+                    value={profile.phone_number}
+                    onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
+                    className="p-2 border border-gray-300 dark:bg-slate-950 rounded w-full"
                 />
-              ) : (
+                ) : (
                 <p>{profile.phone_number || 'None listed'}</p>
-              )}
+                )}
             </div>
             {editing ? (
-              <button
+                <button
                 onClick={handleUpdate}
-                className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-              >
+                className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                >
                 Save
-              </button>
+                </button>
             ) : (
-              <button
+                <button
                 onClick={() => setEditing(true)}
-                className="w-full px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
-              >
+                className="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+                >
                 Edit
-              </button>
+                </button>
             )}
             <button
-              onClick={handleSignOut}
-              className="w-full mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                onClick={handleSignOut}
+                className="w-full mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
             >
-              Sign Out
+                Sign Out
             </button>
-          </div>
+            </div>
         </div>
-        <div className="col-span-2">
-          <div className="mb-8">
-            <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl">
-              <h2 className="text-xl font-bold mb-4">Favorite Resources</h2>
-              {favorites.length > 0 ? (
+        <div className="col-span-1 md:col-span-2">
+            <div className="mb-8">
+            <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
+                <h2 className="text-xl font-bold mb-4">Favorite Resources</h2>
+                {favorites.length > 0 ? (
                 <ul className="list-disc">
-                  {favorites.map(favorite => (
+                    {favorites.map(favorite => (
                     <li key={favorite._id} className="mb-2 flex justify-between items-center">
-                      <Link href={`/resource/${favorite.slug.current}`}>
+                        <Link href={`/resource/${favorite.slug.current}`}>
                         <span className="text-blue-500 underline cursor-pointer">{favorite.title}</span>
-                      </Link>
-                      <button
+                        </Link>
+                        <button
                         onClick={() => handleRemoveFavorite(favorite._id)}
                         className="ml-2 text-red-500"
-                      >
+                        >
                         Remove
-                      </button>
+                        </button>
                     </li>
-                  ))}
+                    ))}
                 </ul>
-              ) : (
+                ) : (
                 <p>No resources currently favorited.</p>
-              )}
+                )}
             </div>
-          </div>
-          <div>
-            <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl">
-              <h2 className="text-xl font-bold mb-4">Training Progress</h2>
-              {trainingProgress.length > 0 ? (
+            </div>
+            <div>
+            <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
+                <h2 className="text-xl font-bold mb-4">Training Progress</h2>
+                {trainingProgress.length > 0 ? (
                 <div>
-                  {trainings.map(training => {
+                    {trainings.map(training => {
                     const progress = trainingProgress.find(progress => progress.training_id === training._id);
                     const completedSteps = progress ? progress.completed_steps : [];
                     const totalSteps = training.steps.length;
                     const progressPercentage = calculateProgress(completedSteps, totalSteps);
-  
+
                     return (
-                      <div key={training._id} className="mb-4">
+                        <div key={training._id} className="mb-4">
                         <h3 className="text-lg font-semibold">{training.title}</h3>
                         <ProgressBar percentage={progressPercentage} />
                         <p>{completedSteps.length} out of {totalSteps} steps completed</p>
-                      </div>
+                        </div>
                     );
-                  })}
+                    })}
                 </div>
-              ) : (
+                ) : (
                 <p>No training progress recorded.</p>
-              )}
+                )}
+                <div>
+                    <Link href="/training" className="flex items-center font-normal">
+                        <button className="w-full px-4 py-2 bg-green-500 bg-opacity-80 text-white rounded-lg hover:bg-green-600 transition">
+                            Return to training
+                        </button>
+                    </Link>
+                </div>
             </div>
-          </div>
+            </div>
         </div>
-      </div>
+        </div>
     </section>
-  </Container>
+</Container>
+
   
   );
 };
