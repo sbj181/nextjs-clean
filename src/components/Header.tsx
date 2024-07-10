@@ -39,7 +39,7 @@ export default function Header() {
             className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center"
           >
             {isSidebarOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
-            <span className="hidden md:inline-block ml-1 text-sm">Menu</span>
+            <span className="hidden md:inline-block w-10 ml-1 text-sm relative transition-all duration-200 ease-in">{isSidebarOpen ? 'Close' : 'Menu'}</span>
           </button>
         </div>
       </header>
