@@ -1,9 +1,10 @@
-import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
 import { PortableText } from '@portabletext/react';
+import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next';
+import Head from 'next/head';
+
+import Container from '~/components/Container';
 import { getClient } from '~/lib/sanity.client';
 import { getResource, getTrainingStep, resourceSlugsQuery, trainingStepBySlugQuery } from '~/lib/sanity.queries';
-import Container from '~/components/Container';
-import Head from 'next/head';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const client = getClient();

@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
+
 import Logo from '../components/CoreLogo';
+import { supabase } from '../lib/supabaseClient';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');

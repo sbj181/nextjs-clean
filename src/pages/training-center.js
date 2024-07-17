@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import Link from 'next/link';
 import Head from 'next/head';
+import Link from 'next/link';
+import { useEffect,useState } from 'react';
+
 import Container from '~/components/Container';
+
+import { supabase } from '../lib/supabaseClient';
 
 const TrainingManager = () => {
   const [trainings, setTrainings] = useState([]);

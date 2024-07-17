@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../lib/supabaseClient';
 import { uploadImage } from '../../utils';
@@ -6,7 +6,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Container from '~/components/Container';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus } from 'react-icons/fi';  // Import the Feather icons
+import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus } from 'react-icons/fi';
+import Image from 'next/image'; // Import next/image
 
 const TrainingDetail = () => {
   const [training, setTraining] = useState(null);
@@ -26,7 +27,7 @@ const TrainingDetail = () => {
   const router = useRouter();
   const { slug } = router.query;
 
-  const fetchTraining = async () => {
+  const fetchTraining = useCallback(async () => {
     if (!slug) return;
     const { data, error } = await supabase.from('trainings').select('*').eq('slug', slug).single();
     if (error) console.error('Error fetching training:', error);
@@ -35,24 +36,24 @@ const TrainingDetail = () => {
       setEditTitle(data.title);
       setEditDescription(data.description);
     }
-  };
+  }, [slug]);
 
-  const fetchSteps = async () => {
+  const fetchSteps = useCallback(async () => {
     if (!training) return;
     const { data, error } = await supabase.from('training_steps').select('*').eq('training_id', training.id);
     if (error) console.error('Error fetching steps:', error);
     else setSteps(data);
-  };
+  }, [training]);
 
   useEffect(() => {
     fetchTraining();
-  }, [slug]);
+  }, [fetchTraining]);
 
   useEffect(() => {
     if (training) {
       fetchSteps();
     }
-  }, [training]);
+  }, [fetchSteps, training]);
 
   const handleAddStep = async () => {
     if (!stepTitle || !stepDescription || !stepImage) return;
@@ -86,6 +87,7 @@ const TrainingDetail = () => {
       imageUrl = await uploadImage(editStepImage);
       if (!imageUrl) return;
     }
+
     const { data, error } = await supabase
       .from('training_steps')
       .update({ title: editStepTitle, description: editStepDescription, image_url: imageUrl })
@@ -256,7 +258,13 @@ const TrainingDetail = () => {
                                 className="p-2 border border-gray-300 rounded w-full mb-2"
                               />
                               {step.image_url && (
-                                <img src={step.image_url} alt={step.title} className="mb-2" />
+                                <Image
+                                  src={step.image_url}
+                                  alt={step.title}
+                                  className="mb-2 md:w-1/4"
+                                  width={500}
+                                  height={300}
+                                />
                               )}
                               <div className="flex gap-2 justify-end">
                                 <button
@@ -301,7 +309,13 @@ const TrainingDetail = () => {
                                 </div>
                                 <div className='my-4'><p>{step.description}</p></div>
                                 {step.image_url && (
-                                  <img src={step.image_url} alt={step.title} className="mb-2 md:w-1/4" />
+                                  <Image
+                                    src={step.image_url}
+                                    alt={step.title}
+                                    className="mb-2 md:w-1/4"
+                                    width={500}
+                                    height={300}
+                                  />
                                 )}
                               </div>
                               

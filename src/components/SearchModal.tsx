@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { FiX, FiBookOpen, FiFileText } from 'react-icons/fi';
-import Link from 'next/link';
 import Image from 'next/image';
-import { SearchItem, searchItems } from '~/lib/sanity.queries';
+import Link from 'next/link';
+import React, { useEffect, useRef,useState } from 'react';
+import { FiBookOpen, FiFileText,FiX } from 'react-icons/fi';
+
 import { getClient } from '~/lib/sanity.client';
 import { urlForImage } from '~/lib/sanity.image';
+import { SearchItem, searchItems } from '~/lib/sanity.queries';
 
 interface SearchModalProps {
   initialQuery: string;

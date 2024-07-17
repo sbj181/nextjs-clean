@@ -1,5 +1,6 @@
 import React from 'react';
 import { HiOutlineX } from 'react-icons/hi';
+
 import { type Post, type Resource } from '~/lib/sanity.queries';
 
 interface ShareModalProps {

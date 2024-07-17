@@ -1,16 +1,18 @@
 import { PortableText } from '@portabletext/react';
 import type { GetStaticProps, InferGetStaticPropsType } from 'next';
-import Image from 'next/image';
-import { useState } from 'react';
-import { HiOutlineDownload, HiOutlineExternalLink, HiOutlineShare, HiHeart, HiOutlineHeart } from 'react-icons/hi';
-import { useLiveQuery } from 'next-sanity/preview';
 import Head from 'next/head';
+import Image from 'next/image';
+import { useLiveQuery } from 'next-sanity/preview';
+import { useState } from 'react';
+import { HiHeart, HiOutlineDownload, HiOutlineExternalLink, HiOutlineHeart,HiOutlineShare } from 'react-icons/hi';
+
 import Container from '~/components/Container';
 import ShareModal from '~/components/ShareModal';
+import { useFavorites } from '~/contexts/FavoritesContext'; // Import the useFavorites hook
 import { readToken } from '~/lib/sanity.api';
 import { getClient } from '~/lib/sanity.client';
-import { urlForImage } from '~/lib/sanity.image';
 import { urlForFile } from '~/lib/sanity.file';
+import { urlForImage } from '~/lib/sanity.image';
 import {
   getResource,
   type Resource,
@@ -19,7 +21,6 @@ import {
 } from '~/lib/sanity.queries';
 import type { SharedPageProps } from '~/pages/_app';
 import { formatDate } from '~/utils';
-import { useFavorites } from '~/contexts/FavoritesContext'; // Import the useFavorites hook
 
 interface Query {
   [key: string]: string;

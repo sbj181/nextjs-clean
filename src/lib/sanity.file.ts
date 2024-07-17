@@ -1,4 +1,5 @@
 import { SanityDocument } from '@sanity/types';
+
 import { dataset, projectId } from '~/lib/sanity.api';
 
 // Define the type for the file asset

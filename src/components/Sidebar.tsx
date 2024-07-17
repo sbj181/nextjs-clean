@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSidebar } from '../contexts/SidebarContext';
-import { FiChevronDown, FiChevronUp, FiHome, FiBook, FiLayers, FiEdit, FiUser } from 'react-icons/fi';
-import { getResources, type Resource } from '~/lib/sanity.queries';
+import { useEffect,useState } from 'react';
+import { FiBook, FiChevronDown, FiChevronUp, FiEdit, FiHome, FiLayers, FiUser } from 'react-icons/fi';
+
 import { getClient } from '~/lib/sanity.client';
+import { getResources, type Resource } from '~/lib/sanity.queries';
+
+import { useSidebar } from '../contexts/SidebarContext';
 import CallToAction from './CallToAction';
 
 export default function Sidebar() {

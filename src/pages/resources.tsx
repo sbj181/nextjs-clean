@@ -1,17 +1,16 @@
 import type { GetStaticProps, InferGetStaticPropsType } from 'next';
-import { useLiveQuery } from 'next-sanity/preview';
 import Head from 'next/head';
-import { useState, useMemo } from 'react';
+import { useLiveQuery } from 'next-sanity/preview';
+import { useMemo,useState } from 'react';
 
-import TagFilter from '~/components/TagFilter';
-import ResourceCard from '~/components/ResourceCard';
 import Container from '~/components/Container';
+import ResourceCard from '~/components/ResourceCard';
+import TagFilter from '~/components/TagFilter';
 import Welcome from '~/components/Welcome';
+import { useSidebar } from '~/contexts/SidebarContext'; // Import the Sidebar context
 import { readToken } from '~/lib/sanity.api';
 import { getClient } from '~/lib/sanity.client';
 import { getResources, type Resource, resourcesQuery } from '~/lib/sanity.queries';
-import { useSidebar } from '~/contexts/SidebarContext'; // Import the Sidebar context
-
 import type { SharedPageProps } from '~/pages/_app';
 
 export const getStaticProps: GetStaticProps<

@@ -1,13 +1,16 @@
 import '~/styles/global.css';
+
 import type { AppProps } from 'next/app';
 import { IBM_Plex_Mono, Inter, PT_Serif } from 'next/font/google';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { lazy, Suspense, useEffect, useRef } from 'react';
+
+import Loading from '~/components/Loading';
+import { supabase } from '~/lib/supabaseClient';
+
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { SidebarProvider } from '../contexts/SidebarContext';
-import Head from 'next/head';
-import Loading from '~/components/Loading';
-import { useRouter } from 'next/router';
-import { supabase } from '~/lib/supabaseClient';
 
 export interface SharedPageProps {
   draftMode: boolean;

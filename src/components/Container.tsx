@@ -1,6 +1,6 @@
+import { useSidebar } from './../contexts/SidebarContext';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import { useSidebar } from './../contexts/SidebarContext';
 
 export default function Container({ children }: { children: React.ReactNode }) {
   const { isSidebarOpen } = useSidebar();

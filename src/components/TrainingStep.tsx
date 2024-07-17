@@ -1,11 +1,12 @@
-import React from 'react';
 import { PortableText } from '@portabletext/react';
-import { FiCheck } from "react-icons/fi";
+import { FileAsset, ImageAsset } from '@sanity/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { urlForImage } from '~/lib/sanity.image'; // Import the urlForImage function
+import React from 'react';
+import { FiCheck } from "react-icons/fi";
+
 import { urlForFile } from '~/lib/sanity.file'; // Import the urlForFile function
-import { FileAsset, ImageAsset } from '@sanity/types';
+import { urlForImage } from '~/lib/sanity.image'; // Import the urlForImage function
 
 
 interface TrainingStepProps {

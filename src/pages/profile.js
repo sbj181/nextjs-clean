@@ -1,14 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useCallback,useEffect, useState } from 'react';
+
 import Container from '~/components/Container';
+import ProgressBar from '~/components/ProgressBar';
 import Welcome from '~/components/Welcome'
 import { useSidebar } from '~/contexts/SidebarContext';
 import { getClient } from '~/lib/sanity.client';
 import { getResourceByIds, getTrainings } from '~/lib/sanity.queries';
-import Link from 'next/link';
-import ProgressBar from '~/components/ProgressBar';
+
+import { supabase } from '../lib/supabaseClient';
 
 const Profile = () => {
   const [profile, setProfile] = useState({ email: '', display_name: '', phone_number: '' });

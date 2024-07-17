@@ -1,6 +1,6 @@
+import Image from 'next/image';
 import React from 'react';
 import { HiOutlineX } from 'react-icons/hi';
-import Image from 'next/image';
 
 interface ImageZoomModalProps {
   imageUrl: string;

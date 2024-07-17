@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import CoreLogo from './CoreLogo';
-import { useSidebar } from '../contexts/SidebarContext';
-import ThemeToggle from './ThemeToggler';
 import { FiMenu, FiUser, FiX } from 'react-icons/fi';
-import SearchDropdown from './SearchDropdown';
+
+import { useSidebar } from '../contexts/SidebarContext';
+import CoreLogo from './CoreLogo';
 import SearchButton from './SearchButton';
+import SearchDropdown from './SearchDropdown';
+import ThemeToggle from './ThemeToggler';
 
 export default function Header() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();

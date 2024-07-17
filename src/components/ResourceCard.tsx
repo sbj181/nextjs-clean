@@ -1,15 +1,15 @@
-import Link from 'next/link';
 import Image from 'next/image';
-import { HiOutlineDownload, HiOutlineExternalLink, HiOutlineShare, HiHeart, HiOutlineHeart } from 'react-icons/hi';
+import Link from 'next/link';
 import { useState } from 'react';
+import { HiHeart, HiOutlineDownload, HiOutlineExternalLink, HiOutlineHeart,HiOutlineShare } from 'react-icons/hi';
 
-import { urlForImage } from '~/lib/sanity.image';
+import { useFavorites } from '~/contexts/FavoritesContext'; // Import the useFavorites hook
 import { urlForFile } from '~/lib/sanity.file';
+import { urlForImage } from '~/lib/sanity.image';
 import { type Resource } from '~/lib/sanity.queries';
 import { formatDate } from '~/utils';
 
 import ShareModal from './ShareModal';
-import { useFavorites } from '~/contexts/FavoritesContext'; // Import the useFavorites hook
 
 export default function ResourceCard({ resource }: { resource: Resource }) {
   const [isShareOpen, setShareOpen] = useState(false);

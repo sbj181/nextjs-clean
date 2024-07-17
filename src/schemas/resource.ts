@@ -1,5 +1,5 @@
+import { FiBook,FiFileText, FiLayers, FiTag } from 'react-icons/fi';
 import { defineField, defineType } from 'sanity'
-import { FiLayers, FiFileText, FiTag, FiBook } from 'react-icons/fi';
 
 import tag from './tag'; // Import the tag schema
 

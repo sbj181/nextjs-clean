@@ -1,17 +1,19 @@
 import { GetStaticProps, InferGetStaticPropsType } from 'next';
-import { useState, useEffect, useCallback } from 'react';
+import Head from 'next/head';
 import { useLiveQuery } from 'next-sanity/preview';
-import Container from '~/components/Container';
+import { useCallback,useEffect, useState } from 'react';
 import { FiBookOpen } from 'react-icons/fi';
+
+import Container from '~/components/Container';
 import ProgressTracker from '~/components/ProgressTracker';
+import TrainingStep from '~/components/TrainingStep';
+import Welcome from '~/components/Welcome';
 import { readToken } from '~/lib/sanity.api';
 import { getClient } from '~/lib/sanity.client';
 import { getTrainings, type Training, trainingsQuery } from '~/lib/sanity.queries';
-import Head from 'next/head';
-import Welcome from '~/components/Welcome';
-import TrainingStep from '~/components/TrainingStep';
-import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '~/lib/useAuth';
+
+import { supabase } from '../lib/supabaseClient';
 
 export const getStaticProps: GetStaticProps<{
   trainings: Training[];

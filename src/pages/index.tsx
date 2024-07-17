@@ -1,25 +1,23 @@
-import Link from 'next/link';
 import { GetStaticProps, InferGetStaticPropsType } from 'next';
-import { useLiveQuery } from 'next-sanity/preview';
 import Head from 'next/head';
-import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useLiveQuery } from 'next-sanity/preview';
+import { useEffect,useState } from 'react';
 
 import Card from '~/components/Card';
-import ResourceCard from '~/components/ResourceCard';
 import Container from '~/components/Container';
+import Loading from '~/components/Loading'; // Import the Loading component
+import ResourceCard from '~/components/ResourceCard';
+import TagFilter from '~/components/TagFilter'; // Import the TagFilter component
 import Welcome from '~/components/Welcome';
+import { useFavorites } from '~/contexts/FavoritesContext';
+import { useSidebar } from '~/contexts/SidebarContext';
 import { readToken } from '~/lib/sanity.api';
 import { getClient } from '~/lib/sanity.client';
 import { getPosts, type Post, postsQuery } from '~/lib/sanity.queries';
 import { getResources, type Resource, resourcesQuery } from '~/lib/sanity.queries';
-import { useFavorites } from '~/contexts/FavoritesContext';
-import { useSidebar } from '~/contexts/SidebarContext';
-import TagFilter from '~/components/TagFilter'; // Import the TagFilter component
-import Loading from '~/components/Loading'; // Import the Loading component
-
-import { useAuth } from '~/lib/useAuth'; // Import the useAuth hook
 import { supabase } from '~/lib/supabaseClient'; // Import supabase client
-
+import { useAuth } from '~/lib/useAuth'; // Import the useAuth hook
 import type { SharedPageProps } from '~/pages/_app';
 
 export const getStaticProps: GetStaticProps<

@@ -1,12 +1,13 @@
-import Link from 'next/link';
 import Image from 'next/image';
-import { HiOutlineShare } from 'react-icons/hi';
+import Link from 'next/link';
 import { useState } from 'react';
-import ShareModal from './ShareModal'; // Import the ShareModal component
+import { HiOutlineShare } from 'react-icons/hi';
 
 import { urlForImage } from '~/lib/sanity.image';
 import { type Post } from '~/lib/sanity.queries';
 import { formatDate } from '~/utils';
+
+import ShareModal from './ShareModal'; // Import the ShareModal component
 
 export default function Card({ post }: { post: Post }) {
   const [isShareOpen, setShareOpen] = useState(false);

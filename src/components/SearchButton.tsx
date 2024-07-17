@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FiSearch } from 'react-icons/fi';
+
 import SearchModal from './SearchModal';
 
 const SearchButton = () => {

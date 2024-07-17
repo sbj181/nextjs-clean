@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FiSun, FiMoon } from 'react-icons/fi';
+import { FiMoon,FiSun } from 'react-icons/fi';
 
 const ThemeToggle = () => {
     const [darkMode, setDarkMode] = useState(false);
