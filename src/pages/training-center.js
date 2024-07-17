@@ -83,10 +83,10 @@ const TrainingManager = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
         {trainings.map((training) => (
           training && (
-            <div key={training.id} className="bg-white p-4 rounded-lg shadow-md items-start min-h-52 justify-between flex-col relative">
-              <div>
-                <h2 className="text-xl font-semibold">{training.title}</h2>
-                <p>{training.description}</p>
+            <div key={training.id} className="bg-slate-50 dark:bg-slate-700 px-4 py-8 rounded-lg shadow-md items-start min-h-[320px] overflow-auto justify-between flex-col relative">
+              <div className='overflow-auto'>
+                <h2 className="text-xl capitalize font-semibold">{training.title}</h2>
+                <p className='opacity-65'>{training.description}</p>
               </div>
               <div className="flex gap-2 mt-8 absolute bottom-4">
                 <Link href={`/training/${training.slug}`} passHref>

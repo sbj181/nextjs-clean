@@ -1,17 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../lib/supabaseClient';
+import { uploadImage } from '../../utils';
 import Head from 'next/head';
+import Link from 'next/link';
 import Container from '~/components/Container';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus } from 'react-icons/fi';  // Import the Feather icons
 
 const TrainingDetail = () => {
   const [training, setTraining] = useState(null);
   const [steps, setSteps] = useState([]);
   const [stepTitle, setStepTitle] = useState('');
   const [stepDescription, setStepDescription] = useState('');
+  const [stepImage, setStepImage] = useState(null);
   const [editStepId, setEditStepId] = useState(null);
   const [editStepTitle, setEditStepTitle] = useState('');
   const [editStepDescription, setEditStepDescription] = useState('');
+  const [editStepImage, setEditStepImage] = useState(null);
   const [isAddingStep, setIsAddingStep] = useState(false);
   const [message, setMessage] = useState('');
   const [editTitle, setEditTitle] = useState('');
@@ -49,84 +55,51 @@ const TrainingDetail = () => {
   }, [training]);
 
   const handleAddStep = async () => {
-    if (!stepTitle || !stepDescription) return;
+    if (!stepTitle || !stepDescription || !stepImage) return;
     const stepNumber = steps.length + 1;
+    const imageUrl = await uploadImage(stepImage);
+    if (!imageUrl) return;
+
     const { data, error } = await supabase
       .from('training_steps')
-      .insert([{ training_id: training.id, step_number: stepNumber, title: stepTitle, description: stepDescription }])
-      .select() // Ensure complete data is returned
+      .insert([{ training_id: training.id, step_number: stepNumber, title: stepTitle, description: stepDescription, image_url: imageUrl }])
+      .select()
       .single();
-
-    console.log('Add step response:', data, error); // Log response
 
     if (error) {
       console.error('Error adding step:', error);
       alert('Error adding step.');
     } else {
-      if (data) {
-        setSteps([...steps, data]);
-        setStepTitle('');
-        setStepDescription('');
-        setIsAddingStep(false);
-        alert('Step added successfully!');
-      } else {
-        console.error('No data returned from add step, fetching manually');
-        // Fetch the steps manually
-        const { data: fetchData, error: fetchError } = await supabase
-          .from('training_steps')
-          .select('*')
-          .eq('training_id', training.id);
-
-        if (fetchError) {
-          console.error('Error fetching steps:', fetchError);
-          alert('Error fetching steps.');
-        } else {
-          setSteps(fetchData);
-          setStepTitle('');
-          setStepDescription('');
-          setIsAddingStep(false);
-          alert('Step added successfully!');
-        }
-      }
+      setSteps([...steps, data]);
+      setStepTitle('');
+      setStepDescription('');
+      setStepImage(null);
+      setIsAddingStep(false);
+      alert('Step added successfully!');
     }
   };
 
   const handleUpdateStep = async (stepId) => {
     if (!editStepTitle || !editStepDescription) return;
+    let imageUrl = editStepImage;
+    if (editStepImage && typeof editStepImage !== 'string') {
+      imageUrl = await uploadImage(editStepImage);
+      if (!imageUrl) return;
+    }
     const { data, error } = await supabase
       .from('training_steps')
-      .update({ title: editStepTitle, description: editStepDescription }, { returning: 'representation' }) // Ensure returning option
+      .update({ title: editStepTitle, description: editStepDescription, image_url: imageUrl })
       .eq('id', stepId)
-      .select(); // Explicitly select the columns to return
-
-    console.log('Update step response:', data, error); // Log response
+      .select();
 
     if (error) {
       console.error('Error updating step:', error);
       alert('Error updating step.');
     } else {
-      if (data) {
-        const updatedSteps = steps.map(step => step.id === stepId ? data[0] : step);
-        setSteps(updatedSteps);
-        setEditStepId(null);
-        alert('Step updated successfully!');
-      } else {
-        console.error('No data returned from update, fetching manually');
-        // Fetch the steps manually
-        const { data: fetchData, error: fetchError } = await supabase
-          .from('training_steps')
-          .select('*')
-          .eq('training_id', training.id);
-
-        if (fetchError) {
-          console.error('Error fetching steps:', fetchError);
-          alert('Error fetching steps.');
-        } else {
-          setSteps(fetchData);
-          setEditStepId(null);
-          alert('Step updated successfully!');
-        }
-      }
+      const updatedSteps = steps.map(step => step.id === stepId ? data[0] : step);
+      setSteps(updatedSteps);
+      setEditStepId(null);
+      alert('Step updated successfully!');
     }
   };
 
@@ -134,39 +107,57 @@ const TrainingDetail = () => {
     if (!editTitle || !editDescription) return;
     const { data, error } = await supabase
       .from('trainings')
-      .update({ title: editTitle, description: editDescription }, { returning: 'representation' }) // Ensure returning option
+      .update({ title: editTitle, description: editDescription })
       .eq('id', training.id)
-      .select(); // Explicitly select the columns to return
-
-    console.log('Update response:', data, error); // Log response
+      .select();
 
     if (error) {
       console.error('Error updating training:', error);
       alert('Error updating training.');
     } else {
-      if (data) {
-        setTraining(data[0]);
-        setIsEditing(false);
-        alert('Training updated successfully!');
-      } else {
-        console.error('No data returned from update, fetching manually');
-        // Fetch the updated data manually
-        const { data: fetchData, error: fetchError } = await supabase
-          .from('trainings')
-          .select('*')
-          .eq('id', training.id)
-          .single();
-
-        if (fetchError) {
-          console.error('Error fetching updated training:', fetchError);
-          alert('Error fetching updated training.');
-        } else {
-          setTraining(fetchData);
-          setIsEditing(false);
-          alert('Training updated successfully!');
-        }
-      }
+      setTraining(data[0]);
+      setIsEditing(false);
+      alert('Training updated successfully!');
     }
+  };
+
+  const handleDeleteStep = async (stepId) => {
+    const { error } = await supabase
+      .from('training_steps')
+      .delete()
+      .eq('id', stepId);
+
+    if (error) {
+      console.error('Error deleting step:', error);
+      alert('Error deleting step.');
+    } else {
+      setSteps(steps.filter(step => step.id !== stepId));
+      alert('Step deleted successfully!');
+    }
+  };
+
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const reorderedSteps = Array.from(steps);
+    const [movedStep] = reorderedSteps.splice(result.source.index, 1);
+    reorderedSteps.splice(result.destination.index, 0, movedStep);
+
+    // Update the step numbers to reflect the new order
+    const updatedSteps = reorderedSteps.map((step, index) => ({
+      ...step,
+      step_number: index + 1,
+    }));
+
+    setSteps(updatedSteps);
+
+    // Optionally, update the steps order in the database
+    updatedSteps.forEach(async (step) => {
+      await supabase
+        .from('training_steps')
+        .update({ step_number: step.step_number })
+        .eq('id', step.id);
+    });
   };
 
   return (
@@ -185,152 +176,200 @@ const TrainingDetail = () => {
               onClick={() => setIsEditing(!isEditing)}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
             >
-              {isEditing ? 'Cancel' : 'Edit'}
+              {isEditing ? 'Cancel' : 'Edit Training'}
             </button>
           </div>
           {isEditing ? (
-            <>
-              <div className="mb-4">
-                <input
-                  type="text"
-                  placeholder="Title"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full mb-2"
-                />
-                <textarea
-                  placeholder="Description"
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full mb-2"
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleUpdateTraining}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                  >
-                    Update Training
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditTitle(training.title);
-                      setEditDescription(training.description);
-                      setIsEditing(false);
-                    }}
-                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-                  >
-                    Cancel
-                  </button>
-                </div>
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Title"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="p-2 border border-gray-300 rounded w-full mb-2"
+              />
+              <textarea
+                placeholder="Description"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="p-2 border border-gray-300 rounded w-full mb-2"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleUpdateTraining}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                >
+                  Update Training
+                </button>
+                <button
+                  onClick={() => {
+                    setEditTitle(training.title);
+                    setEditDescription(training.description);
+                    setIsEditing(false);
+                  }}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
               </div>
-            </>
+            </div>
           ) : (
-            <>
-              <p className="mb-4">{training.description}</p>
-            </>
+            <p className="mb-4">{training.description}</p>
           )}
           
           <h2 className="text-xl font-bold mb-4">Steps</h2>
-          <ul className="list-none">
-            {steps.map((step) => (
-              <li key={step.id} className="flex justify-between items-center mb-4 p-4 border rounded-lg">
-                {editStepId === step.id ? (
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      placeholder="Step Title"
-                      value={editStepTitle}
-                      onChange={(e) => setEditStepTitle(e.target.value)}
-                      className="p-2 border border-gray-300 rounded w-full mb-2"
-                    />
-                    <textarea
-                      placeholder="Step Description"
-                      value={editStepDescription}
-                      onChange={(e) => setEditStepDescription(e.target.value)}
-                      className="p-2 border border-gray-300 rounded w-full mb-2"
-                    />
-                    <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={() => handleUpdateStep(step.id)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                      >
-                        Update Step
-                      </button>
-                      <button
-                        onClick={() => setEditStepId(null)}
-                        className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div>
-                      <h3 className="font-bold">{step.step_number} . {step.title}</h3>
-                      <p>{step.description}</p>
-                    </div>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="steps">
+              {(provided) => (
+                <ul
+                  className="list-none"
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  {steps.map((step, index) => (
+                    <Draggable key={step.id} draggableId={step.id.toString()} index={index}>
+                      {(provided) => (
+                        <li
+                          className="block mb-4 p-4 border rounded-lg items-start"
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          {editStepId === step.id ? (
+                            <div className="w-full">
+                              <input
+                                type="text"
+                                placeholder="Step Title"
+                                value={editStepTitle}
+                                onChange={(e) => setEditStepTitle(e.target.value)}
+                                className="p-2 border border-gray-300 rounded w-full mb-2"
+                              />
+                              <textarea
+                                placeholder="Step Description"
+                                value={editStepDescription}
+                                onChange={(e) => setEditStepDescription(e.target.value)}
+                                className="p-2 border border-gray-300 rounded w-full mb-2"
+                              />
+                              <input
+                                type="file"
+                                onChange={(e) => setEditStepImage(e.target.files[0])}
+                                className="p-2 border border-gray-300 rounded w-full mb-2"
+                              />
+                              {step.image_url && (
+                                <img src={step.image_url} alt={step.title} className="mb-2" />
+                              )}
+                              <div className="flex gap-2 justify-end">
+                                <button
+                                  onClick={() => handleUpdateStep(step.id)}
+                                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                                >
+                                  Update Step
+                                </button>
+                                <button
+                                  onClick={() => setEditStepId(null)}
+                                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div>
+                                <div className='flex items-center gap-4 pb-4 border-b mb-6'>
+                                  <div className='bg-slate-500 bg-opacity-50 h-10 w-10 flex items-center justify-center font-bold text-sm text-slate-50 rounded-full p-4'>{step.step_number}</div>
+                                  <h3 className="font-bold text-xl">{step.title}</h3>
+                                  <div className='ml-auto flex gap-2'>
+                                    <button
+                                      onClick={() => {
+                                        setEditStepId(step.id);
+                                        setEditStepTitle(step.title);
+                                        setEditStepDescription(step.description);
+                                        setEditStepImage(step.image_url);
+                                      }}
+                                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                                    >
+                                      <FiEdit2 />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteStep(step.id)}
+                                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                                    >
+                                      <FiTrash2 />
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className='my-4'><p>{step.description}</p></div>
+                                {step.image_url && (
+                                  <img src={step.image_url} alt={step.title} className="mb-2 md:w-1/4" />
+                                )}
+                              </div>
+                              
+                            </>
+                          )}
+                        </li>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </ul>
+              )}
+            </Droppable>
+          </DragDropContext>
+          <section className='addnewstep mb-8'>
+            <Link href="/training-center"><button className="px-4 py-2 flex items-center gap-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition mt-4 mr-2">
+            <FiArrowLeft />  Back to Training Center</button></Link>
+            {!isAddingStep ? (
+              <button
+                onClick={() => setIsAddingStep(true)}
+                className="px-4 py-2 flex bg-green-500 items-center gap-2 text-white rounded-lg hover:bg-green-600 transition mt-4"
+              >
+                Add New Step <FiPlus />
+              </button>
+            ) : (
+              <>
+                <h2 className="text-xl font-bold mb-4 mt-4">Add New Step</h2>
+                <div className="mb-4">
+                  <input
+                    type="text"
+                    placeholder="Step Title"
+                    value={stepTitle}
+                    onChange={(e) => setStepTitle(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full mb-2"
+                  />
+                  <textarea
+                    placeholder="Step Description"
+                    value={stepDescription}
+                    onChange={(e) => setStepDescription(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full mb-2"
+                  />
+                  <input
+                    type="file"
+                    onChange={(e) => setStepImage(e.target.files[0])}
+                    className="p-2 border border-gray-300 rounded w-full mb-2"
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      onClick={handleAddStep}
+                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+                    >
+                      Add Step
+                    </button>
                     <button
                       onClick={() => {
-                        setEditStepId(step.id);
-                        setEditStepTitle(step.title);
-                        setEditStepDescription(step.description);
+                        setStepTitle('');
+                        setStepDescription('');
+                        setStepImage(null);
+                        setIsAddingStep(false);
                       }}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                      className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
                     >
-                      Edit
+                      Cancel
                     </button>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-          <section className='addnewstep mb-8'>
-          {!isAddingStep ? (
-            <button
-              onClick={() => setIsAddingStep(true)}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition mt-4"
-            >
-              Add New Step
-            </button>
-          ) : (
-            <>
-              <h2 className="text-xl font-bold mb-4 mt-4">Add New Step</h2>
-              <div className="mb-4">
-                <input
-                  type="text"
-                  placeholder="Step Title"
-                  value={stepTitle}
-                  onChange={(e) => setStepTitle(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full mb-2"
-                />
-                <textarea
-                  placeholder="Step Description"
-                  value={stepDescription}
-                  onChange={(e) => setStepDescription(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full mb-2"
-                />
-                <div className="flex gap-2 justify-end">
-                  <button
-                    onClick={handleAddStep}
-                    className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
-                  >
-                    Add Step
-                  </button>
-                  <button
-                    onClick={() => {
-                      setStepTitle('');
-                      setStepDescription('');
-                      setIsAddingStep(false);
-                    }}
-                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-                  >
-                    Cancel
-                  </button>
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
           </section>
         </>
       )}
