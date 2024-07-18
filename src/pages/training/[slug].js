@@ -8,6 +8,7 @@ import Container from '~/components/Container';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus } from 'react-icons/fi';
 import Image from 'next/image'; // Import next/image
+import MediaCenter from '~/components/MediaCenter';
 
 const TrainingDetail = () => {
   const [training, setTraining] = useState(null);
@@ -20,6 +21,7 @@ const TrainingDetail = () => {
   const [editStepDescription, setEditStepDescription] = useState('');
   const [editStepImage, setEditStepImage] = useState(null);
   const [isAddingStep, setIsAddingStep] = useState(false);
+  const [isMediaCenterOpen, setIsMediaCenterOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
@@ -58,8 +60,12 @@ const TrainingDetail = () => {
   const handleAddStep = async () => {
     if (!stepTitle || !stepDescription || !stepImage) return;
     const stepNumber = steps.length + 1;
-    const imageUrl = await uploadImage(stepImage);
-    if (!imageUrl) return;
+    let imageUrl = stepImage;
+
+    if (typeof stepImage !== 'string') {
+      imageUrl = await uploadImage(stepImage);
+      if (!imageUrl) return;
+    }
 
     const { data, error } = await supabase
       .from('training_steps')
@@ -162,6 +168,20 @@ const TrainingDetail = () => {
     });
   };
 
+  const handleImageSelect = (url) => {
+    if (editStepId !== null) {
+      setEditStepImage(url);
+    } else {
+      setStepImage(url);
+    }
+    setIsMediaCenterOpen(false);
+  };
+
+  // Custom loader for next/image
+  const myLoader = ({ src }) => {
+    return src;
+  };
+
   return (
     <Container>
       <Head>
@@ -252,15 +272,21 @@ const TrainingDetail = () => {
                                 onChange={(e) => setEditStepDescription(e.target.value)}
                                 className="p-2 border border-gray-300 rounded w-full mb-2"
                               />
-                              <input
-                                type="file"
-                                onChange={(e) => setEditStepImage(e.target.files[0])}
-                                className="p-2 border border-gray-300 rounded w-full mb-2"
-                              />
-                              {step.image_url && (
+                              <div className="flex gap-2">
+                                <input
+                                  type="file"
+                                  onChange={(e) => setEditStepImage(e.target.files[0])}
+                                  className="p-2 border border-gray-300 rounded w-full mb-2"
+                                />
+                                <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 bg-green-500 text-white text-sm leading-tight rounded-lg hover:bg-green-600 transition">
+                                  Media Center
+                                </button>
+                              </div>
+                              {editStepImage && (
                                 <Image
-                                  src={step.image_url}
-                                  alt={step.title}
+                                  loader={myLoader}
+                                  src={typeof editStepImage === 'string' ? editStepImage : URL.createObjectURL(editStepImage)}
+                                  alt={editStepTitle}
                                   className="mb-2 md:w-1/4"
                                   width={500}
                                   height={300}
@@ -310,6 +336,7 @@ const TrainingDetail = () => {
                                 <div className='my-4'><p>{step.description}</p></div>
                                 {step.image_url && (
                                   <Image
+                                    loader={myLoader}
                                     src={step.image_url}
                                     alt={step.title}
                                     className="mb-2 md:w-1/4"
@@ -318,7 +345,6 @@ const TrainingDetail = () => {
                                   />
                                 )}
                               </div>
-                              
                             </>
                           )}
                         </li>
@@ -357,11 +383,26 @@ const TrainingDetail = () => {
                     onChange={(e) => setStepDescription(e.target.value)}
                     className="p-2 border border-gray-300 rounded w-full mb-2"
                   />
-                  <input
-                    type="file"
-                    onChange={(e) => setStepImage(e.target.files[0])}
-                    className="p-2 border border-gray-300 rounded w-full mb-2"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="file"
+                      onChange={(e) => setStepImage(e.target.files[0])}
+                      className="p-2 border border-gray-300 rounded w-full mb-2"
+                    />
+                    <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                      Open Media Center
+                    </button>
+                  </div>
+                  {stepImage && (
+                    <Image
+                      loader={myLoader}
+                      src={typeof stepImage === 'string' ? stepImage : URL.createObjectURL(stepImage)}
+                      alt={stepTitle}
+                      className="mb-2 md:w-1/4"
+                      width={500}
+                      height={300}
+                    />
+                  )}
                   <div className="flex gap-2 justify-end">
                     <button
                       onClick={handleAddStep}
@@ -385,6 +426,11 @@ const TrainingDetail = () => {
               </>
             )}
           </section>
+          <MediaCenter
+            isOpen={isMediaCenterOpen}
+            onRequestClose={() => setIsMediaCenterOpen(false)}
+            onSelectImage={handleImageSelect}
+          />
         </>
       )}
     </Container>

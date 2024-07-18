@@ -23,17 +23,18 @@ export const uploadImage = async (file: File): Promise<string | null> => {
     return null;
   }
 
-  const { data: urlData, error: urlError } = await supabase.storage
+  // Get the public URL
+  const { data } = supabase.storage
     .from('training-images')
-    .createSignedUrl(filePath, 60 * 60); // 1-hour expiry
+    .getPublicUrl(filePath);
 
-  if (urlError) {
-    console.error('Error getting signed URL:', urlError);
-    alert('Error getting signed URL.');
+  if (!data) {
+    console.error('Error getting public URL');
+    alert('Error getting public URL.');
     return null;
   }
 
-  console.log('Signed URL:', urlData.signedUrl); // Log the signed URL for debugging
+  console.log('Public URL:', data.publicUrl); // Log the public URL for debugging
 
-  return urlData.signedUrl;
+  return data.publicUrl;
 };
