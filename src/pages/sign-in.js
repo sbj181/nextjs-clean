@@ -115,7 +115,7 @@ const SignIn = () => {
           <div className="mt-8 dark:text-slate-50">
             {!isSignUp ? (
               <>
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <button
                   onClick={() => setIsSignUp(true)}
                   className="text-blue-500 underline transition-all duration-300 ease-in-out"
