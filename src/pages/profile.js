@@ -1,11 +1,11 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback,useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import Container from '~/components/Container';
 import ProgressBar from '~/components/ProgressBar';
-import Welcome from '~/components/Welcome'
+import Welcome from '~/components/Welcome';
 import { useSidebar } from '~/contexts/SidebarContext';
 import { getClient } from '~/lib/sanity.client';
 import { getResourceByIds, getTrainings } from '~/lib/sanity.queries';
@@ -13,7 +13,7 @@ import { getResourceByIds, getTrainings } from '~/lib/sanity.queries';
 import { supabase } from '../lib/supabaseClient';
 
 const Profile = () => {
-  const [profile, setProfile] = useState({ email: '', display_name: '', phone_number: '' });
+  const [profile, setProfile] = useState({ email: '', display_name: '', phone_number: '', role: '' });
   const [favorites, setFavorites] = useState([]);
   const [trainingProgress, setTrainingProgress] = useState([]);
   const [trainings, setTrainings] = useState([]);
@@ -50,7 +50,7 @@ const Profile = () => {
 
       const { data, error } = await supabase
         .from('users')
-        .select('email, display_name, phone_number')
+        .select('email, display_name, phone_number, role')
         .eq('id', user.id)
         .single();
 
@@ -125,134 +125,136 @@ const Profile = () => {
 
   return (
     <Container>
-    <Head>
+      <Head>
         <title>User Profile | CORE RMS by The Grovery</title>
         <meta name="description" content="Manage your profile information." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-    </Head>
-    <Welcome title="Profile" subtitle="Manage your profile information, favorite resources, and track your training progress efficiently." />
-    <section className="border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-100 p-6 rounded-2xl mb-6">
+      </Head>
+      <Welcome title="Profile" subtitle="Manage your profile information, favorite resources, and track your training progress efficiently." />
+      <section className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="col-span-1 mb-8 md:mb-0">
+          <div className="col-span-1 mb-8 md:mb-0">
             <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
-            <h1 className="text-xl font-bold mb-4">User Details</h1>
-            <div className="mb-4">
+              <h1 className="text-xl font-bold mb-4">User Details</h1>
+              <div className="mb-4">
                 <label className="block opacity-50">Email</label>
                 <p>{profile.email || 'None listed'}</p>
-            </div>
-            <div className="mb-4">
+              </div>
+              <div className="mb-4">
                 <label className="block opacity-50">Display Name</label>
                 {editing ? (
-                <input
+                  <input
                     type="text"
                     value={profile.display_name}
                     onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
                     className="p-2 border dark:bg-slate-950 border-gray-300 rounded w-full"
-                />
+                  />
                 ) : (
-                <p>{profile.display_name || 'None listed'}</p>
+                  <p>{profile.display_name || 'None listed'}</p>
                 )}
-            </div>
-            <div className="mb-4">
+              </div>
+              <div className="mb-4">
                 <label className="block opacity-50">Phone Number</label>
                 {editing ? (
-                <input
+                  <input
                     type="text"
                     value={profile.phone_number}
                     onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })}
                     className="p-2 border border-gray-300 dark:bg-slate-950 rounded w-full"
-                />
+                  />
                 ) : (
-                <p>{profile.phone_number || 'None listed'}</p>
+                  <p>{profile.phone_number || 'None listed'}</p>
                 )}
-            </div>
-            {editing ? (
+              </div>
+              <div className="mb-4">
+                <label className="block opacity-50">Role</label>
+                <p className='capitalize'>{profile.role || 'None listed'}</p>
+              </div>
+              {editing ? (
                 <button
-                onClick={handleUpdate}
-                className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                  onClick={handleUpdate}
+                  className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
                 >
-                Save
+                  Save
                 </button>
-            ) : (
+              ) : (
                 <button
-                onClick={() => setEditing(true)}
-                className="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+                  onClick={() => setEditing(true)}
+                  className="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
                 >
-                Edit
+                  Edit
                 </button>
-            )}
-            <button
+              )}
+              <button
                 onClick={handleSignOut}
                 className="w-full mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-            >
+              >
                 Sign Out
-            </button>
+              </button>
             </div>
-        </div>
-        <div className="col-span-1 md:col-span-2">
+          </div>
+          <div className="col-span-1 md:col-span-2">
             <div className="mb-8">
-            <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
+              <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
                 <h2 className="text-xl font-bold mb-4">Favorite Resources</h2>
                 {favorites.length > 0 ? (
-                <ul className="list-disc">
+                  <ul className="list-disc">
                     {favorites.map(favorite => (
-                    <li key={favorite._id} className="mb-2 flex justify-between items-center">
+                      <li key={favorite._id} className="mb-2 flex justify-between items-center">
                         <Link href={`/resource/${favorite.slug.current}`}>
-                        <span className="text-blue-500 underline cursor-pointer">{favorite.title}</span>
+                          <span className="text-blue-500 underline cursor-pointer">{favorite.title}</span>
                         </Link>
                         <button
-                        onClick={() => handleRemoveFavorite(favorite._id)}
-                        className="ml-2 text-red-500"
+                          onClick={() => handleRemoveFavorite(favorite._id)}
+                          className="ml-2 text-red-500"
                         >
-                        Remove
+                          Remove
                         </button>
-                    </li>
+                      </li>
                     ))}
-                </ul>
+                  </ul>
                 ) : (
-                <p>No resources currently favorited.</p>
+                  <p>No resources currently favorited.</p>
                 )}
-            </div>
+              </div>
             </div>
             <div>
-            <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
+              <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
                 <h2 className="text-xl font-bold mb-4">Training Progress</h2>
                 {trainingProgress.length > 0 ? (
-                <div>
+                  <div>
                     {trainings.map(training => {
-                    const progress = trainingProgress.find(progress => progress.training_id === training._id);
-                    const completedSteps = progress ? progress.completed_steps : [];
-                    const totalSteps = training.steps.length;
-                    const progressPercentage = calculateProgress(completedSteps, totalSteps);
+                      const progress = trainingProgress.find(progress => progress.training_id === training._id);
+                      const completedSteps = progress ? progress.completed_steps : [];
+                      const totalSteps = training.steps.length;
+                      const progressPercentage = calculateProgress(completedSteps, totalSteps);
 
-                    return (
+                      return (
                         <div key={training._id} className="mb-4">
-                        <h3 className="text-lg font-semibold">{training.title}</h3>
-                        <ProgressBar percentage={progressPercentage} />
-                        <p>{completedSteps.length} out of {totalSteps} steps completed</p>
+                          <h3 className="text-lg font-semibold">{training.title}</h3>
+                          <ProgressBar percentage={progressPercentage} />
+                          <p>{completedSteps.length} out of {totalSteps} steps completed</p>
                         </div>
-                    );
+                      );
                     })}
-                </div>
+                  </div>
                 ) : (
-                <p>No training progress recorded.</p>
+                  <p>No training progress recorded.</p>
                 )}
                 <div className='mt-6'>
-                    <Link href="/training" className="flex items-center">
-                        <button className="px-10 py-4 bg-slate-500 bg-opacity-80 font-bold text-sm text-white rounded-xl hover:bg-slate-600 transition">
-                            Return to training
-                        </button>
-                    </Link>
+                  <Link href="/training" className="flex items-center">
+                    <button className="px-10 py-4 bg-slate-500 bg-opacity-80 font-bold text-sm text-white rounded-xl hover:bg-slate-600 transition">
+                      Return to training
+                    </button>
+                  </Link>
                 </div>
+              </div>
             </div>
-            </div>
+          </div>
         </div>
-        </div>
-    </section>
-</Container>
-
-  
+      </section>
+    </Container>
   );
 };
 

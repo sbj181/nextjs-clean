@@ -1,10 +1,9 @@
-// src/hoc/withAuthorization.js
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../lib/supabaseClient';
 
 const withAuthorization = (Component, requiredRole) => {
-  return (props) => {
+  const WithAuthorization = (props) => {
     const [role, setRole] = useState(null);
     const router = useRouter();
 
@@ -40,6 +39,10 @@ const withAuthorization = (Component, requiredRole) => {
 
     return <Component {...props} />;
   };
+
+  WithAuthorization.displayName = `WithAuthorization(${Component.displayName || Component.name || 'Component'})`;
+
+  return WithAuthorization;
 };
 
 export default withAuthorization;
