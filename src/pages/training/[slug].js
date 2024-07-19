@@ -252,7 +252,7 @@ const TrainingDetail = () => {
                     <Draggable key={step.id} draggableId={step.id.toString()} index={index}>
                       {(provided) => (
                         <li
-                          className="block mb-4 p-4 border rounded-lg items-start"
+                          className="block mb-4 p-4 border border-opacity-25 rounded-lg items-start bg-slate-50 dark:bg-slate-800 "
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
@@ -264,7 +264,7 @@ const TrainingDetail = () => {
                                 placeholder="Step Title"
                                 value={editStepTitle}
                                 onChange={(e) => setEditStepTitle(e.target.value)}
-                                className="p-2 border border-gray-300 rounded w-full mb-2"
+                                className="p-2 border border-opacity-25 border-gray-300 rounded w-full mb-2"
                               />
                               <textarea
                                 placeholder="Step Description"

@@ -31,7 +31,7 @@ export default function Header() {
           
           <Link href="/profile" passHref
             
-            className="p-2 ml-2 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center"
+            className="hidden p-2 ml-2 bg-slate-50 dark:bg-slate-700 rounded-lg sm:flex items-center"
           >
             <span className="inline-block"><FiUser className="h-6 w-6" /></span>
           </Link>
