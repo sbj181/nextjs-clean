@@ -1,9 +1,8 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Container from '~/components/Container';
-
 import { supabase } from '../lib/supabaseClient';
 
 const TrainingManager = () => {
@@ -50,7 +49,6 @@ const TrainingManager = () => {
       console.error('Error adding training:', error);
       alert('Error adding training.');
     } else {
-      // No need to update state here as real-time subscription will handle it
       setTitle('');
       setDescription('');
       setIsAddingTraining(false);
@@ -67,7 +65,6 @@ const TrainingManager = () => {
       console.error('Error deleting training:', error);
       alert('Error deleting training.');
     } else {
-      // No need to update state here as real-time subscription will handle it
       alert('Training deleted successfully!');
     }
   };
@@ -108,52 +105,49 @@ const TrainingManager = () => {
         ))}
       </div>
       <section className='my-8'>
-      {!isAddingTraining ? (
-        <button
-          onClick={() => setIsAddingTraining(true)}
-          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-        >
-          Add New Training
-        </button>
-      ) : (
-        <div className="mb-4">
-          <h2 className="text-xl font-bold mb-4 mt-4">Add New Training</h2>
-          <input
-            type="text"
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="p-2 border border-gray-300 rounded w-full mb-2"
-          />
-          <textarea
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="p-2 border border-gray-300 rounded w-full mb-2"
-          />
-          <div className="flex gap-2">
-            <button
-              onClick={handleAddTraining}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-            >
-              Add Training
-            </button>
-            <button
-              onClick={() => {
-                setTitle('');
-                setDescription('');
-                setIsAddingTraining(false);
-              }}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-            >
-              Cancel
-            </button>
-            
+        {!isAddingTraining ? (
+          <button
+            onClick={() => setIsAddingTraining(true)}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+          >
+            Add New Training
+          </button>
+        ) : (
+          <div className="mb-4">
+            <h2 className="text-xl font-bold mb-4 mt-4">Add New Training</h2>
+            <input
+              type="text"
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="p-2 border border-gray-300 rounded w-full mb-2"
+            />
+            <textarea
+              placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="p-2 border border-gray-300 rounded w-full mb-2"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={handleAddTraining}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+              >
+                Add Training
+              </button>
+              <button
+                onClick={() => {
+                  setTitle('');
+                  setDescription('');
+                  setIsAddingTraining(false);
+                }}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
-        
-        </div>
-        
-      )}
+        )}
       </section>
     </Container>
   );

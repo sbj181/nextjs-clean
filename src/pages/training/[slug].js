@@ -6,9 +6,10 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Container from '~/components/Container';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus } from 'react-icons/fi';
-import Image from 'next/image'; // Import next/image
+import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus, FiCheck } from 'react-icons/fi';
+import Image from 'next/image';
 import MediaCenter from '~/components/MediaCenter';
+import ProgressTrackerNew from '~/components/ProgressTrackerNew';
 
 const TrainingDetail = () => {
   const [training, setTraining] = useState(null);
@@ -26,6 +27,7 @@ const TrainingDetail = () => {
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState([]);
   const router = useRouter();
   const { slug } = router.query;
 
@@ -47,6 +49,24 @@ const TrainingDetail = () => {
     else setSteps(data);
   }, [training]);
 
+  const fetchCompletedSteps = useCallback(async () => {
+    if (!training) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('training_step_completion')
+      .select('step_id')
+      .eq('training_id', training.id)
+      .eq('user_id', user.id)
+      .eq('is_completed', true);
+
+    if (error) {
+      console.error('Error fetching completed steps:', error);
+    } else {
+      setCompletedSteps(data.map(item => item.step_id));
+    }
+  }, [training]);
+
   useEffect(() => {
     fetchTraining();
   }, [fetchTraining]);
@@ -54,22 +74,23 @@ const TrainingDetail = () => {
   useEffect(() => {
     if (training) {
       fetchSteps();
+      fetchCompletedSteps();
     }
-  }, [fetchSteps, training]);
+  }, [fetchSteps, fetchCompletedSteps, training]);
 
   const handleAddStep = async () => {
-    if (!stepTitle || !stepDescription || !stepImage) return;
+    if (!stepTitle || !stepDescription) return;
     const stepNumber = steps.length + 1;
     let imageUrl = stepImage;
 
-    if (typeof stepImage !== 'string') {
+    if (stepImage && typeof stepImage !== 'string') {
       imageUrl = await uploadImage(stepImage);
       if (!imageUrl) return;
     }
 
     const { data, error } = await supabase
       .from('training_steps')
-      .insert([{ training_id: training.id, step_number: stepNumber, title: stepTitle, description: stepDescription, image_url: imageUrl }])
+      .insert([{ training_id: training.id, step_number: stepNumber, title: stepTitle, description: stepDescription, image_url: imageUrl || null }])
       .select()
       .single();
 
@@ -96,7 +117,7 @@ const TrainingDetail = () => {
 
     const { data, error } = await supabase
       .from('training_steps')
-      .update({ title: editStepTitle, description: editStepDescription, image_url: imageUrl })
+      .update({ title: editStepTitle, description: editStepDescription, image_url: imageUrl || null })
       .eq('id', stepId)
       .select();
 
@@ -177,6 +198,35 @@ const TrainingDetail = () => {
     setIsMediaCenterOpen(false);
   };
 
+  const toggleStepCompletion = async (stepId) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const isCompleted = completedSteps.includes(stepId);
+
+    const { error } = await supabase
+      .from('training_step_completion')
+      .upsert({
+        training_id: training.id,
+        user_id: user.id,
+        step_id: stepId,
+        is_completed: !isCompleted,
+      }, {
+        onConflict: ['user_id', 'training_id', 'step_id']
+      });
+
+    if (error) {
+      console.error('Error updating step completion:', error);
+      alert('Error updating step completion.');
+    } else {
+      if (isCompleted) {
+        setCompletedSteps(completedSteps.filter(step => step !== stepId));
+      } else {
+        setCompletedSteps([...completedSteps, stepId]);
+      }
+    }
+  };
+
   // Custom loader for next/image
   const myLoader = ({ src }) => {
     return src;
@@ -238,7 +288,9 @@ const TrainingDetail = () => {
           ) : (
             <p className="mb-4">{training.description}</p>
           )}
-          
+
+          <ProgressTrackerNew trainingId={training.id} steps={steps} />
+
           <h2 className="text-xl font-bold mb-4">Steps</h2>
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="steps">
@@ -252,7 +304,7 @@ const TrainingDetail = () => {
                     <Draggable key={step.id} draggableId={step.id.toString()} index={index}>
                       {(provided) => (
                         <li
-                          className="block mb-4 p-4 border border-opacity-25 rounded-lg items-start bg-slate-50 dark:bg-slate-800 "
+                          className="block mb-4 p-4 border border-opacity-25 rounded-lg items-start bg-slate-50 dark:bg-slate-800"
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
@@ -311,7 +363,9 @@ const TrainingDetail = () => {
                             <>
                               <div>
                                 <div className='flex items-center gap-4 pb-4 border-b mb-6'>
-                                  <div className='bg-slate-500 bg-opacity-50 h-10 w-10 flex items-center justify-center font-bold text-sm text-slate-50 rounded-full p-4'>{step.step_number}</div>
+                                  <div className={`bg-opacity-50 h-10 w-10 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-slate-500'}`}>
+                                    {completedSteps.includes(step.id) ? <FiCheck className='stroke-slate-50' size={24} /> : step.step_number}
+                                  </div>
                                   <h3 className="font-bold text-xl">{step.title}</h3>
                                   <div className='ml-auto flex gap-2'>
                                     <button
@@ -344,6 +398,12 @@ const TrainingDetail = () => {
                                     height={300}
                                   />
                                 )}
+                                <button
+                                  onClick={() => toggleStepCompletion(step.id)}
+                                  className={`mt-2 px-4 py-2 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-gray-500'} text-white rounded-lg`}
+                                >
+                                  {completedSteps.includes(step.id) ? 'Completed' : 'Mark as Complete'}
+                                </button>
                               </div>
                             </>
                           )}
