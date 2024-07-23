@@ -79,7 +79,7 @@ const ProgressTrackerNew = ({ trainingId, steps }) => {
   return (
     <div className="mb-8">
       <div className="flex items-center mb-4">
-        {steps.map(step => (
+        {steps.sort((a, b) => a.step_number - b.step_number).map(step => (
           <div key={step.id} className="flex items-center">
             <div className={`border-2 w-20 h-20 mx-4 first:ml-0 flex font-bold text-xl justify-center items-center rounded-full ${completedSteps.includes(step.id) ? 'text-green-500' : 'text-gray-500'}`}>
               {completedSteps.includes(step.id) ? <span className='bg-green-500 w-full h-full flex justify-center items-center rounded-full'><FiCheck size={24} className='stroke-white' /></span> : <span>{step.step_number}</span>}

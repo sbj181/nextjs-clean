@@ -45,10 +45,15 @@ const TrainingDetail = () => {
 
   const fetchSteps = useCallback(async () => {
     if (!training) return;
-    const { data, error } = await supabase.from('training_steps').select('*').eq('training_id', training.id);
+    const { data, error } = await supabase
+      .from('training_steps')
+      .select('*')
+      .eq('training_id', training.id)
+      .order('step_number', { ascending: true }); // Ensure steps are ordered by step_number
     if (error) console.error('Error fetching steps:', error);
     else setSteps(data);
   }, [training]);
+  
 
   const fetchCompletedSteps = useCallback(async () => {
     if (!training) return;
