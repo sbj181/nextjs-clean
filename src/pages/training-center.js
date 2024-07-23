@@ -1,6 +1,8 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { FiBook, FiTrash2 } from 'react-icons/fi';
+import { useEffect, useState, useCallback } from 'react';
 import Welcome from '~/components/Welcome';
 import Container from '~/components/Container';
 import { supabase } from '../lib/supabaseClient';
@@ -12,7 +14,7 @@ const TrainingManager = () => {
   const [message, setMessage] = useState('');
   const [isAddingTraining, setIsAddingTraining] = useState(false);
 
-  const fetchTrainings = async () => {
+  const fetchTrainings = useCallback(async () => {
     const { data, error } = await supabase.from('trainings').select('*');
     if (error) console.error('Error fetching trainings:', error);
     else {
@@ -21,7 +23,7 @@ const TrainingManager = () => {
       const trainingsWithCompletion = await fetchTrainingCompletions(trainingsWithSteps);
       setTrainings(trainingsWithCompletion);
     }
-  };
+  }, []);
 
   const fetchTrainingCompletions = async (trainings) => {
     const { data: completionData, error } = await supabase
@@ -47,15 +49,17 @@ const TrainingManager = () => {
         .from('training_steps')
         .select('*')
         .eq('training_id', training.id);
-
+  
       if (error) {
         console.error('Error fetching steps:', error);
-        return { ...training, steps: [] };
+        return { ...training, steps: [], firstStepImage: null };
       }
-
-      return { ...training, steps };
+  
+      const firstStepImage = steps.length > 0 ? steps[0].image_url : null;
+  
+      return { ...training, steps, firstStepImage };
     }));
-
+  
     return updatedTrainings;
   };
 
@@ -77,7 +81,7 @@ const TrainingManager = () => {
     return () => {
       supabase.removeChannel(subscription);
     };
-  }, []);
+  }, [fetchTrainings]); // Include fetchTrainings in the dependency array
 
   const handleAddTraining = async () => {
     if (!title || !description) return;
@@ -124,7 +128,20 @@ const TrainingManager = () => {
         {trainings.map((training) => (
           training && (
             <div key={training.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[360px] overflow-auto flex-col relative">
-              <div className='trainingImage h-20 rounded-lg bg-slate-300 opacity-25 mb-4 w-full'></div>
+              {training.firstStepImage ? (
+              <div className='trainingImage h-20 w-full rounded-lg bg-slate-300 mb-4 overflow-hidden relative'>
+                <Image
+                  src={training.firstStepImage}
+                  alt={`Image for ${training.title}`}
+                  layout="fill"
+                  objectFit="cover"
+                />
+              </div>
+            ) : (
+              <div className='trainingImage h-20 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-4 w-full'>
+                <FiBook size={32} />
+              </div>
+            )}
               <h2 className="text-xl capitalize font-semibold">{training.title}</h2>
               <div className='overflow-auto'>
                 
@@ -133,14 +150,14 @@ const TrainingManager = () => {
               <div className="flex gap-2 mt-8 absolute bottom-4">
                 <Link href={`/training/${training.slug}`} passHref>
                   <button className="px-4 py-2 text-sm bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
-                    View Details
+                    View Training
                   </button>
                 </Link>
                 <button
                   onClick={() => handleDeleteTraining(training.id)}
                   className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
                 >
-                  Delete
+                  <FiTrash2 />
                 </button>
               </div>
               <div className="absolute bottom-4 right-4 text-sm">
