@@ -21,18 +21,44 @@ const Profile = () => {
   const router = useRouter();
   const { isSidebarOpen } = useSidebar();
 
+  const slugify = (text) => {
+    return text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  };
+
   const fetchProgress = useCallback(async (userId) => {
     const { data: trainingProgressData, error: trainingProgressError } = await supabase
-      .from('training_progress')
-      .select('training_id, completed_steps')
-      .eq('user_id', userId);
-
+      .from('training_step_completion')
+      .select('training_id, step_id, is_completed')
+      .eq('user_id', userId)
+      .eq('is_completed', true);
+  
     if (trainingProgressError) {
       console.error('Error fetching training progress:', trainingProgressError);
     } else {
-      setTrainingProgress(trainingProgressData);
+      const progress = trainingProgressData.reduce((acc, item) => {
+        if (!acc[item.training_id]) {
+          acc[item.training_id] = [];
+        }
+        acc[item.training_id].push(item.step_id);
+        return acc;
+      }, {});
+      setTrainingProgress(progress);
     }
   }, []);
+
+  const fetchTrainings = useCallback(async () => {
+    const { data: trainingsData, error: trainingsError } = await supabase
+      .from('trainings')
+      .select('*, training_steps(*)'); // Fetch trainings along with their steps
+  
+    if (trainingsError) {
+      console.error('Error fetching trainings:', trainingsError);
+    } else {
+      setTrainings(trainingsData);
+    }
+  }, []);
+  
+  
 
   useEffect(() => {
     const getProfile = async () => {
@@ -42,29 +68,29 @@ const Profile = () => {
         router.push('/sign-in');
         return;
       }
-
+  
       if (!user) {
         router.push('/sign-in');
         return;
       }
-
+  
       const { data, error } = await supabase
         .from('users')
         .select('email, display_name, phone_number, role')
         .eq('id', user.id)
         .single();
-
+  
       if (error) {
         console.error('Error fetching profile:', error);
       } else {
         setProfile(data);
       }
-
+  
       const { data: favoritesData, error: favoritesError } = await supabase
         .from('favorites')
         .select('resource_id')
         .eq('user_id', user.id);
-
+  
       if (favoritesError) {
         console.error('Error fetching favorites:', favoritesError);
       } else {
@@ -73,16 +99,14 @@ const Profile = () => {
         const resources = await getResourceByIds(client, resourceIds);
         setFavorites(resources);
       }
-
+  
       await fetchProgress(user.id);
-
-      const client = getClient();
-      const trainings = await getTrainings(client);
-      setTrainings(trainings);
+      await fetchTrainings();
     };
-
+  
     getProfile();
-  }, [router, fetchProgress]);
+  }, [router, fetchProgress, fetchTrainings]);
+  
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -222,19 +246,24 @@ const Profile = () => {
             <div>
               <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
                 <h2 className="text-xl font-bold mb-4">Training Progress</h2>
-                {trainingProgress.length > 0 ? (
+                {trainings.length > 0 ? (
                   <div>
                     {trainings.map(training => {
-                      const progress = trainingProgress.find(progress => progress.training_id === training._id);
-                      const completedSteps = progress ? progress.completed_steps : [];
-                      const totalSteps = training.steps.length;
+                      const completedSteps = trainingProgress[training.id] || [];
+                      const totalSteps = training.training_steps ? training.training_steps.length : 0;
                       const progressPercentage = calculateProgress(completedSteps, totalSteps);
+                      const trainingSlug = slugify(training.title);
 
                       return (
-                        <div key={training._id} className="mb-4">
-                          <h3 className="text-lg font-semibold">{training.title}</h3>
+                        <div key={training.id} className="mb-4">
+                            <div className='flex items-center gap-4 justify-between mb-1'>
+                              <h3 className="text-lg capitalize font-semibold">
+                                {training.title}
+                              </h3>
+                              <Link href={`/training/${trainingSlug}`} passHref> <span className='text-blue-500 cursor-pointer'>Return to Training</span></Link>
+                            </div>
                           <ProgressBar percentage={progressPercentage} />
-                          <p>{completedSteps.length} out of {totalSteps} steps completed</p>
+                          <div className='mt-2 text-sm'><p>{completedSteps.length} out of {totalSteps} steps completed</p></div>
                         </div>
                       );
                     })}

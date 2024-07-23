@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
+import Welcome from '~/components/Welcome';
 import Container from '~/components/Container';
 import { supabase } from '../lib/supabaseClient';
 
@@ -15,7 +15,48 @@ const TrainingManager = () => {
   const fetchTrainings = async () => {
     const { data, error } = await supabase.from('trainings').select('*');
     if (error) console.error('Error fetching trainings:', error);
-    else setTrainings(data.filter(training => training !== null));
+    else {
+      const filteredTrainings = data.filter(training => training !== null);
+      const trainingsWithSteps = await fetchStepsForTrainings(filteredTrainings);
+      const trainingsWithCompletion = await fetchTrainingCompletions(trainingsWithSteps);
+      setTrainings(trainingsWithCompletion);
+    }
+  };
+
+  const fetchTrainingCompletions = async (trainings) => {
+    const { data: completionData, error } = await supabase
+      .from('training_step_completion')
+      .select('training_id, step_id, is_completed');
+
+    if (error) {
+      console.error('Error fetching completion data:', error);
+      return trainings;
+    }
+
+    const updatedTrainings = trainings.map(training => {
+      const completedSteps = completionData.filter(completion => completion.training_id === training.id && completion.is_completed).length;
+      return { ...training, completedSteps };
+    });
+
+    return updatedTrainings;
+  };
+
+  const fetchStepsForTrainings = async (trainings) => {
+    const updatedTrainings = await Promise.all(trainings.map(async (training) => {
+      const { data: steps, error } = await supabase
+        .from('training_steps')
+        .select('*')
+        .eq('training_id', training.id);
+
+      if (error) {
+        console.error('Error fetching steps:', error);
+        return { ...training, steps: [] };
+      }
+
+      return { ...training, steps };
+    }));
+
+    return updatedTrainings;
   };
 
   useEffect(() => {
@@ -77,14 +118,16 @@ const TrainingManager = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1 className="text-2xl font-bold mb-4">Training Manager</h1>
+      <Welcome title="Training Center" subtitle="Visit training modules below. Admins may add new trainings." />
       {message && <p className="mb-4 text-green-500">{message}</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
         {trainings.map((training) => (
           training && (
-            <div key={training.id} className="bg-slate-50 dark:bg-slate-700 px-4 py-8 rounded-lg shadow-md items-start min-h-[320px] overflow-auto justify-between flex-col relative">
+            <div key={training.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[360px] overflow-auto flex-col relative">
+              <div className='trainingImage h-20 rounded-lg bg-slate-300 opacity-25 mb-4 w-full'></div>
+              <h2 className="text-xl capitalize font-semibold">{training.title}</h2>
               <div className='overflow-auto'>
-                <h2 className="text-xl capitalize font-semibold">{training.title}</h2>
+                
                 <p className='opacity-65'>{training.description}</p>
               </div>
               <div className="flex gap-2 mt-8 absolute bottom-4">
@@ -100,10 +143,14 @@ const TrainingManager = () => {
                   Delete
                 </button>
               </div>
+              <div className="absolute bottom-4 right-4 text-sm">
+                {training.completedSteps || 0}/{training.steps?.length || 0} steps
+              </div>
             </div>
           )
         ))}
       </div>
+
       <section className='my-8'>
         {!isAddingTraining ? (
           <button

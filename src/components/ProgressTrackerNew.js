@@ -81,10 +81,11 @@ const ProgressTrackerNew = ({ trainingId, steps }) => {
       <div className="flex items-center mb-4">
         {steps.map(step => (
           <div key={step.id} className="flex items-center">
-            <div className={`p-2 rounded-full ${completedSteps.includes(step.id) ? 'text-green-500' : 'text-gray-500'}`}>
-              {completedSteps.includes(step.id) ? <FiCheck size={24} /> : <span>{step.step_number}</span>}
+            <div className={`border-2 w-20 h-20 mx-4 first:ml-0 flex font-bold text-xl justify-center items-center rounded-full ${completedSteps.includes(step.id) ? 'text-green-500' : 'text-gray-500'}`}>
+              {completedSteps.includes(step.id) ? <span className='bg-green-500 w-full h-full flex justify-center items-center rounded-full'><FiCheck size={24} className='stroke-white' /></span> : <span>{step.step_number}</span>}
             </div>
-            {step.step_number < steps.length && <div className="h-1 w-8 bg-gray-300 mx-2"></div>}
+            {/* Step Line */}
+            {/* {step.step_number < steps.length && <div className="h-1 w-8 bg-gray-300 mx-2"></div>} */}
           </div>
         ))}
       </div>

@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { uploadImage } from '../../utils';
 import Head from 'next/head';
 import Link from 'next/link';
+import Welcome from '~/components/Welcome';
 import Container from '~/components/Container';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus, FiCheck } from 'react-icons/fi';
@@ -241,53 +242,51 @@ const TrainingDetail = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {training && (
-        <>
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold">{isEditing ? 'Edit Training' : training.title}</h1>
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-            >
-              {isEditing ? 'Cancel' : 'Edit Training'}
-            </button>
-          </div>
-          {isEditing ? (
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Title"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                className="p-2 border border-gray-300 rounded w-full mb-2"
-              />
-              <textarea
-                placeholder="Description"
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                className="p-2 border border-gray-300 rounded w-full mb-2"
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={handleUpdateTraining}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                >
-                  Update Training
-                </button>
-                <button
-                  onClick={() => {
-                    setEditTitle(training.title);
-                    setEditDescription(training.description);
-                    setIsEditing(false);
-                  }}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-                >
-                  Cancel
-                </button>
-              </div>
+      <>
+        <Welcome title={isEditing ? 'Edit Training' : training.title} subtitle={isEditing ? '' : training.description} />
+        <div className="flex justify-between items-center mb-4">
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+          >
+            {isEditing ? 'Cancel' : 'Edit Training'}
+          </button>
+        </div>
+        {isEditing && (
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Title"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              className="p-2 border border-gray-300 rounded w-full mb-2"
+            />
+            <textarea
+              placeholder="Description"
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              className="p-2 border border-gray-300 rounded w-full mb-2"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={handleUpdateTraining}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+              >
+                Update Training
+              </button>
+              <button
+                onClick={() => {
+                  setEditTitle(training.title);
+                  setEditDescription(training.description);
+                  setIsEditing(false);
+                }}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+              >
+                Cancel
+              </button>
             </div>
-          ) : (
-            <p className="mb-4">{training.description}</p>
-          )}
+          </div>
+        )}
 
           <ProgressTrackerNew trainingId={training.id} steps={steps} />
 
@@ -363,7 +362,7 @@ const TrainingDetail = () => {
                             <>
                               <div>
                                 <div className='flex items-center gap-4 pb-4 border-b mb-6'>
-                                  <div className={`bg-opacity-50 h-10 w-10 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-slate-500'}`}>
+                                  <div className={`h-10 w-10 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-slate-200'}`}>
                                     {completedSteps.includes(step.id) ? <FiCheck className='stroke-slate-50' size={24} /> : step.step_number}
                                   </div>
                                   <h3 className="font-bold text-xl">{step.title}</h3>
@@ -416,7 +415,7 @@ const TrainingDetail = () => {
               )}
             </Droppable>
           </DragDropContext>
-          <section className='addnewstep mb-8'>
+          <section className='addnewstep mb-8 flex justify-between p-2'>
             <Link href="/training-center"><button className="px-4 py-2 flex items-center gap-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition mt-4 mr-2">
             <FiArrowLeft />  Back to Training Center</button></Link>
             {!isAddingStep ? (
