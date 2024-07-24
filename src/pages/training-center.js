@@ -138,14 +138,18 @@ const TrainingManager = () => {
                 />
               </div>
             ) : (
-              <div className='trainingImage h-20 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-4 w-full'>
+              <div className='trainingImage h-20 text-slate-600 dark:text-slate-950 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-2 w-full'>
                 <FiBook size={32} />
               </div>
             )}
+              <div className="text-sm mb-2">
+                {training.completedSteps || 0}/{training.steps?.length || 0} steps
+              </div>
               <h2 className="text-xl capitalize font-semibold">{training.title}</h2>
-              <div className='overflow-auto'>
+              <div className=''>
                 
-                <p className='opacity-65'>{training.description}</p>
+                <p className='opacity-65 min-h-32 text-sm'>{training.description}</p>
+                
               </div>
               <div className="flex gap-2 mt-8 absolute bottom-4">
                 <Link href={`/training/${training.slug}`} passHref>
@@ -160,9 +164,7 @@ const TrainingManager = () => {
                   <FiTrash2 />
                 </button>
               </div>
-              <div className="absolute bottom-4 right-4 text-sm">
-                {training.completedSteps || 0}/{training.steps?.length || 0} steps
-              </div>
+        
             </div>
           )
         ))}

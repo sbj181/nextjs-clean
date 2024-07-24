@@ -308,7 +308,7 @@ const TrainingDetail = () => {
                     <Draggable key={step.id} draggableId={step.id.toString()} index={index}>
                       {(provided) => (
                         <li
-                          className="block mb-4 p-4 border border-opacity-25 rounded-lg items-start bg-slate-50 dark:bg-slate-800"
+                          className="block mb-4 p-4 border border-slate-300 border-opacity-50 rounded-lg items-start bg-slate-50 dark:bg-slate-800"
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
@@ -366,8 +366,8 @@ const TrainingDetail = () => {
                           ) : (
                             <>
                               <div>
-                                <div className='flex items-center gap-4 pb-4 border-b mb-6'>
-                                  <div className={`h-10 w-10 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-slate-200'}`}>
+                                <div className='flex items-center gap-4 pb-4 border-b border-slate-300 border-opacity-25 mb-6'>
+                                  <div className={`h-10 w-10 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-slate-200 dark:bg-slate-950'}`}>
                                     {completedSteps.includes(step.id) ? <FiCheck className='stroke-slate-50' size={24} /> : step.step_number}
                                   </div>
                                   <h3 className="font-bold text-xl">{step.title}</h3>
