@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -17,8 +17,8 @@
   --space-8: 136px;
   --space-9: 220px;
 
-  --font-family-sans: Inter;
-  --font-family-serif: Inter;
+  --font-family-sans: 'Kumbh Sans';
+  --font-family-serif: 'Kumbh Sans';
   /* --font-family-serif: PT Serif; */
   --font-family-mono: IMB Plex Mono;
 
@@ -49,7 +49,7 @@
   --line-height-12: 128px;
 
   --white: #fff;
-  --black: #101112;
+  --black: #777;
   --gray-200: #ced2d9;
   --gray-600: #6e7683;
   --blue-600: #1e61cd;
@@ -71,7 +71,7 @@ h2 {
 }
 
 body, button, input, textarea {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Kumbh Sans', sans-serif;
 }
 
 /* Light mode styles */
