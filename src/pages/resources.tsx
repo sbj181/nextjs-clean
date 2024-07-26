@@ -66,7 +66,7 @@ export default function ResourcesPage(
       </Head>
       <Welcome title="Resources" subtitle="Explore our collection of resources." />
       
-      <section className='border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-100 p-6 rounded-2xl mb-6'>
+      <section className='mb-6'>
         <TagFilter
           tags={allTags}
           selectedTags={selectedTags}

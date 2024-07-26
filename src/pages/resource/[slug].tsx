@@ -116,7 +116,7 @@ export default function ResourceSlugRoute(
             {resourceLink && (
               <a
                 href={resourceLink}
-                className="cardDownloadBtn !bg-blue-500 !text-white !rounded-xl !px-8 !w-auto !flex gap-2"
+                className="cardDownloadBtn transition !bg-custom-blue hover:!bg-custom-blue-dark !text-white !rounded-xl !px-8 !w-auto !flex gap-2"
                 target="_blank"
                 rel="noopener noreferrer"
               >

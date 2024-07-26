@@ -7,7 +7,7 @@ interface CTAProps {
 
 export default function CallToAction({ title, subtitle }: CTAProps) {
   return (
-    <div className="ctaWrap border-2 rounded-xl bg-slate-50 dark:bg-slate-950 border-opacity-50 border-slate-50 bg-opacity-50 p-6 mt-auto">
+    <div className="ctaWrap border-2 rounded-xl bg-slate-50 dark:bg-slate-950 border-opacity-50 border-slate-250 bg-opacity-50 p-6 mt-auto">
       
       <div className='flex gap-4 items-center'>
         <div className='text-3xl mb-4'>👋</div>

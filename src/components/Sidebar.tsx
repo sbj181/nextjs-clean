@@ -33,7 +33,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={`fixed rounded-br-xl overflow-scroll inset-y-0 left-0 z-40 pt-32 flex flex-col bg-slate-200 dark:bg-slate-700 w-96 p-5 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+    <aside className={`fixed rounded-br-xl overflow-scroll no-scrollbar inset-y-0 left-0 z-40 pt-32 flex flex-col bg-slate-100 dark:bg-gradient-to-b dark:from-slate-950 dark:to-slate-800 w-80 p-5 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <ul className="w-full">
         <div className="bg-slate-300 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between cursor-pointer">
@@ -80,11 +80,11 @@ export default function Sidebar() {
       </ul>
       <div className='mt-auto'>
         <div className="mb-4">
-          <a target='_blank' href="/studio/structure/resource" className="flex !bg-green-500 !bg-opacity-50 sidebar-link items-center w-full font- font-normal">
+          <a target='_blank' href="/studio/structure/resource" className="flex !bg-custom-green !bg-opacity-50 sidebar-link items-center w-full font- font-normal">
             <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiEdit /></span> Add & Edit Content
           </a>
         </div>
-        <CallToAction title='Want a CORE&trade; for your Team or Project?' subtitle='Use the link below to get in touch with us' />
+        <CallToAction title='Want your own CORE&trade; LMS?' subtitle='Get in touch with us' />
       </div>
     </aside>
   );

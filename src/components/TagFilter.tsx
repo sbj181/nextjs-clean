@@ -17,7 +17,7 @@ const TagFilter: React.FC<TagFilterProps> = ({ tags, selectedTags, onTagClick })
         <button
           key={tag}
           className={`py-1 px-3 rounded-md flex text-sm items-center gap-2 ${
-            selectedTags.includes(tag) ? 'bg-slate-700 text-white' : 'bg-slate-500 text-white'
+            selectedTags.includes(tag) ? 'bg-custom-blue text-white' : 'bg-custom-teal-dark text-white'
           }`}
           onClick={() => onTagClick(tag)}
         >

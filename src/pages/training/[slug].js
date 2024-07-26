@@ -12,6 +12,8 @@ import Image from 'next/image';
 import MediaCenter from '~/components/MediaCenter';
 import ProgressTrackerNew from '~/components/ProgressTrackerNew';
 import { useAuth } from '../../lib/useAuth';
+import ImageModal from '~/components/ImageModal';
+
 
 const TrainingDetail = () => {
   const session = useAuth();
@@ -32,6 +34,9 @@ const TrainingDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([]);
   const [role, setRole] = useState(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [modalImageSrc, setModalImageSrc] = useState('');
+  const [modalImageAlt, setModalImageAlt] = useState('');
   const router = useRouter();
   const { slug } = router.query;
 
@@ -266,6 +271,19 @@ const TrainingDetail = () => {
     }
   };
 
+
+  const openImageModal = (src, alt) => {
+    setModalImageSrc(src);
+    setModalImageAlt(alt);
+    setIsImageModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    setModalImageSrc('');
+    setModalImageAlt('');
+  };
+
   const myLoader = ({ src }) => {
     return src;
   };
@@ -432,6 +450,7 @@ const TrainingDetail = () => {
                                     className="mb-2 md:w-1/4"
                                     width={500}
                                     height={300}
+                                    onClick={() => openImageModal(step.image_url, step.title)}
                                   />
                                 )}
                                 <button
@@ -531,6 +550,12 @@ const TrainingDetail = () => {
           />
         </>
       )}
+      <ImageModal
+        isOpen={isImageModalOpen}
+        onRequestClose={closeImageModal}
+        src={modalImageSrc}
+        alt={modalImageAlt}
+      />
     </Container>
   );
 };

@@ -154,7 +154,7 @@ const TrainingManager = () => {
               </div>
               <div className="flex gap-2 mt-8 absolute bottom-4">
                 <Link href={`/training/${training.slug}`} passHref>
-                  <button className="px-4 py-2 text-sm bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
+                  <button className="px-4 py-2 text-sm bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
                     View Training
                   </button>
                 </Link>

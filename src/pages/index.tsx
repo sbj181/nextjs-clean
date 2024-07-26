@@ -98,8 +98,8 @@ export default function IndexPage(
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Welcome 
-        title={`🤙 Hey ${displayName ? displayName : 'There'}, Welcome to CORE CMS!`}       
-        subtitle={<span>Visit the <Link href="/studio"><span className="text-blue-500 underline">CMS Studio</span></Link> to manage content and add your own resources. Visit the <Link href="/profile"><span className="text-blue-500 underline">Profile</span></Link> page to access user details.</span>}
+        title={`Hey ${displayName ? displayName : 'There'}, Welcome to Core!`}       
+        subtitle={<span>Visit the <Link href="/studio"><span className="text-custom-teal hover:text-custom-teal-dark underline">CMS Studio</span></Link> to manage content and add your own resources. Visit the <Link href="/profile"><span className="text-custom-teal hover:text-custom-teal-dark underline">Profile</span></Link> page to access user details.</span>}
       />
       
       {favoriteResources.length > 0 ? (
@@ -125,7 +125,7 @@ export default function IndexPage(
       ) : (
         <div></div>
       )}
-      <section className='border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-100 p-6 rounded-2xl mb-6'>
+      <section className='mt-10 mb-6'>
         <div className='mb-6'>
           <h2 className='text-3xl font-bold'>Brand Resources</h2>
           <p>Use the heart button to save your most used resources!</p>
