@@ -11,8 +11,10 @@ import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus, FiCheck } from 'react-icons/fi'
 import Image from 'next/image';
 import MediaCenter from '~/components/MediaCenter';
 import ProgressTrackerNew from '~/components/ProgressTrackerNew';
+import { useAuth } from '../../lib/useAuth';
 
 const TrainingDetail = () => {
+  const session = useAuth();
   const [training, setTraining] = useState(null);
   const [steps, setSteps] = useState([]);
   const [stepTitle, setStepTitle] = useState('');
@@ -29,49 +31,78 @@ const TrainingDetail = () => {
   const [editDescription, setEditDescription] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([]);
+  const [role, setRole] = useState(null);
   const router = useRouter();
   const { slug } = router.query;
 
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (session?.user) {
+        const { data, error } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user role:', error);
+        } else {
+          console.log('User role:', data.role); // Debug log
+          setRole(data.role);
+        }
+      }
+    };
+
+    if (session) {
+      fetchUserRole();
+    }
+  }, [session]);
+
   const fetchTraining = useCallback(async () => {
-    if (!slug) return;
+    if (!slug || !role) return;
     const { data, error } = await supabase.from('trainings').select('*').eq('slug', slug).single();
-    if (error) console.error('Error fetching training:', error);
-    else {
+    if (error) {
+      console.error('Error fetching training:', error);
+    } else {
+      console.log('Training data:', data); // Debug log
       setTraining(data);
       setEditTitle(data.title);
       setEditDescription(data.description);
     }
-  }, [slug]);
+  }, [slug, role]);
 
   const fetchSteps = useCallback(async () => {
-    if (!training) return;
+    if (!training || !role) return;
     const { data, error } = await supabase
       .from('training_steps')
       .select('*')
       .eq('training_id', training.id)
-      .order('step_number', { ascending: true }); // Ensure steps are ordered by step_number
-    if (error) console.error('Error fetching steps:', error);
-    else setSteps(data);
-  }, [training]);
-  
+      .order('step_number', { ascending: true });
+    if (error) {
+      console.error('Error fetching steps:', error);
+    } else {
+      console.log('Steps data:', data); // Debug log
+      setSteps(data);
+    }
+  }, [training, role]);
 
   const fetchCompletedSteps = useCallback(async () => {
-    if (!training) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!training || !role) return;
+    if (!session?.user) return;
     const { data, error } = await supabase
       .from('training_step_completion')
       .select('step_id')
       .eq('training_id', training.id)
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .eq('is_completed', true);
 
     if (error) {
       console.error('Error fetching completed steps:', error);
     } else {
+      console.log('Completed steps data:', data); // Debug log
       setCompletedSteps(data.map(item => item.step_id));
     }
-  }, [training]);
+  }, [training, role, session]);
 
   useEffect(() => {
     fetchTraining();
@@ -104,6 +135,7 @@ const TrainingDetail = () => {
       console.error('Error adding step:', error);
       alert('Error adding step.');
     } else {
+      console.log('Added step:', data); // Debug log
       setSteps([...steps, data]);
       setStepTitle('');
       setStepDescription('');
@@ -131,6 +163,7 @@ const TrainingDetail = () => {
       console.error('Error updating step:', error);
       alert('Error updating step.');
     } else {
+      console.log('Updated step:', data); // Debug log
       const updatedSteps = steps.map(step => step.id === stepId ? data[0] : step);
       setSteps(updatedSteps);
       setEditStepId(null);
@@ -150,6 +183,7 @@ const TrainingDetail = () => {
       console.error('Error updating training:', error);
       alert('Error updating training.');
     } else {
+      console.log('Updated training:', data); // Debug log
       setTraining(data[0]);
       setIsEditing(false);
       alert('Training updated successfully!');
@@ -166,6 +200,7 @@ const TrainingDetail = () => {
       console.error('Error deleting step:', error);
       alert('Error deleting step.');
     } else {
+      console.log('Deleted step:', stepId); // Debug log
       setSteps(steps.filter(step => step.id !== stepId));
       alert('Step deleted successfully!');
     }
@@ -178,7 +213,6 @@ const TrainingDetail = () => {
     const [movedStep] = reorderedSteps.splice(result.source.index, 1);
     reorderedSteps.splice(result.destination.index, 0, movedStep);
 
-    // Update the step numbers to reflect the new order
     const updatedSteps = reorderedSteps.map((step, index) => ({
       ...step,
       step_number: index + 1,
@@ -186,7 +220,6 @@ const TrainingDetail = () => {
 
     setSteps(updatedSteps);
 
-    // Optionally, update the steps order in the database
     updatedSteps.forEach(async (step) => {
       await supabase
         .from('training_steps')
@@ -205,8 +238,7 @@ const TrainingDetail = () => {
   };
 
   const toggleStepCompletion = async (stepId) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!session?.user) return;
 
     const isCompleted = completedSteps.includes(stepId);
 
@@ -214,7 +246,7 @@ const TrainingDetail = () => {
       .from('training_step_completion')
       .upsert({
         training_id: training.id,
-        user_id: user.id,
+        user_id: session.user.id,
         step_id: stepId,
         is_completed: !isCompleted,
       }, {
@@ -225,6 +257,7 @@ const TrainingDetail = () => {
       console.error('Error updating step completion:', error);
       alert('Error updating step completion.');
     } else {
+      console.log('Toggled step completion:', stepId); // Debug log
       if (isCompleted) {
         setCompletedSteps(completedSteps.filter(step => step !== stepId));
       } else {
@@ -233,7 +266,6 @@ const TrainingDetail = () => {
     }
   };
 
-  // Custom loader for next/image
   const myLoader = ({ src }) => {
     return src;
   };
@@ -420,7 +452,7 @@ const TrainingDetail = () => {
               )}
             </Droppable>
           </DragDropContext>
-          <section className='addnewstep mb-8 flex justify-between p-2'>
+          <section className='addnewstep -scroll-mt-8 mb-8 block justify-between p-2'>
             <Link href="/training-center"><button className="px-4 py-2 flex items-center gap-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition mt-4 mr-2">
             <FiArrowLeft />  Back to Training Center</button></Link>
             {!isAddingStep ? (
@@ -447,13 +479,13 @@ const TrainingDetail = () => {
                     onChange={(e) => setStepDescription(e.target.value)}
                     className="p-2 border border-gray-300 rounded w-full mb-2"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
                     <input
                       type="file"
                       onChange={(e) => setStepImage(e.target.files[0])}
-                      className="p-2 border border-gray-300 rounded w-full mb-2"
+                      className="p-2 border border-gray-300 rounded w-full"
                     />
-                    <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                    <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 leading-tight bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
                       Open Media Center
                     </button>
                   </div>
@@ -467,7 +499,8 @@ const TrainingDetail = () => {
                       height={300}
                     />
                   )}
-                  <div className="flex gap-2 justify-end">
+                  <div className="block my-4">
+                    <div className='gap-2 justify-start flex'>
                     <button
                       onClick={handleAddStep}
                       className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
@@ -485,6 +518,7 @@ const TrainingDetail = () => {
                     >
                       Cancel
                     </button>
+                    </div>
                   </div>
                 </div>
               </>

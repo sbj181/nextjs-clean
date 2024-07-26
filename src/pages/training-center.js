@@ -28,7 +28,7 @@ const TrainingManager = () => {
   const fetchTrainingCompletions = async (trainings) => {
     const { data: completionData, error } = await supabase
       .from('training_step_completion')
-      .select('training_id, step_id, is_completed');
+      .select('training_id, step_id, is_completed')
 
     if (error) {
       console.error('Error fetching completion data:', error);
@@ -143,7 +143,8 @@ const TrainingManager = () => {
               </div>
             )}
               <div className="text-sm mb-2">
-                {training.completedSteps || 0}/{training.steps?.length || 0} steps
+               {/*  {training.completedSteps || 0}/{training.steps?.length || 0} steps */}
+                {training.steps?.length} {training.steps?.length === 1 ? 'Step' : 'Steps'}
               </div>
               <h2 className="text-xl capitalize font-semibold">{training.title}</h2>
               <div className=''>
