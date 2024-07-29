@@ -2,7 +2,7 @@ import { GetStaticProps, InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useLiveQuery } from 'next-sanity/preview';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Card from '~/components/Card';
 import Container from '~/components/Container';
@@ -51,6 +51,8 @@ export default function IndexPage(
   const { isSidebarOpen } = useSidebar();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [displayName, setDisplayName] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const [initials, setInitials] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -65,11 +67,27 @@ export default function IndexPage(
           console.error('Error fetching profile:', error);
         } else {
           setDisplayName(data.display_name || null);
+          setFirstName(extractFirstName(data.display_name));
+          setInitials(extractInitials(data.display_name));
         }
       }
     };
     fetchProfile();
   }, []);
+
+  const extractFirstName = (name: string | null) => {
+    if (!name) return null;
+    return name.split(' ')[0];
+  };
+
+  const extractInitials = (name: string | null) => {
+    if (!name) return null;
+    const nameParts = name.split(' ');
+    if (nameParts.length === 1) {
+      return nameParts[0].charAt(0).toUpperCase();
+    }
+    return nameParts[0].charAt(0).toUpperCase() + nameParts[1].charAt(0).toUpperCase();
+  };
 
   const favoriteResources = resources.filter((resource) => favorites.includes(resource._id));
 
@@ -97,16 +115,23 @@ export default function IndexPage(
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Welcome 
-        title={`Hey ${displayName ? displayName : 'There'}, Welcome to Core!`}       
-        subtitle={<span>Visit the <Link href="/studio"><span className="text-custom-teal hover:text-custom-teal-dark underline">CMS Studio</span></Link> to manage content and add your own resources. Visit the <Link href="/profile"><span className="text-custom-teal hover:text-custom-teal-dark underline">Profile</span></Link> page to access user details.</span>}
-      />
+      <div className='flex items-center gap-4'>
+        {initials && (
+          <div className='w-20 h-20 min-w-20 text-3xl flex items-center justify-center rounded-full bg-custom-teal-dark bg-opacity-25 border-4 border-custom-teal text-custom-teal-dark font-bold'>
+            {initials}
+          </div>
+        )}
+        <Welcome 
+          title={`Welcome to Core${firstName ? `, ${firstName}` : ''}!`}       
+          subtitle={<span>Visit the <Link href="/studio"><span className="text-custom-teal hover:text-custom-teal-dark underline">CMS Studio</span></Link> to manage content and add your own resources. Visit the <Link href="/profile"><span className="text-custom-teal hover:text-custom-teal-dark underline">Profile</span></Link> page to access user details.</span>}
+        />
+      </div>
       
       {favoriteResources.length > 0 ? (
         <section className='border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 bg-opacity-50 p-6 rounded-2xl mb-6'>
           <div className='mb-6 flex justify-between items-center'>
             <div>
-            <h2 className='text-3xl font-bold'>{displayName ? displayName : 'User'}&apos;s Favorites</h2>
+            <h2 className='text-3xl font-bold'>{firstName ? firstName : 'User'}&apos;s Favorites</h2>
             <p>Resources you have favorited will appear here!</p>
             </div>
             <button
