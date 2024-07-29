@@ -15,7 +15,10 @@ const TrainingManager = () => {
   const [isAddingTraining, setIsAddingTraining] = useState(false);
 
   const fetchTrainings = useCallback(async () => {
-    const { data, error } = await supabase.from('trainings').select('*');
+    const { data, error } = await supabase
+      .from('trainings')
+      .select('*')
+      .order('created_at', { ascending: false }); // Order by creation date, newest first
     if (error) console.error('Error fetching trainings:', error);
     else {
       const filteredTrainings = data.filter(training => training !== null);
@@ -24,6 +27,7 @@ const TrainingManager = () => {
       setTrainings(trainingsWithCompletion);
     }
   }, []);
+  
 
   const fetchTrainingCompletions = async (trainings) => {
     const { data: completionData, error } = await supabase
