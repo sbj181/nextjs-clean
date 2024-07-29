@@ -7,13 +7,12 @@ import Link from 'next/link';
 import Welcome from '~/components/Welcome';
 import Container from '~/components/Container';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus, FiCheck } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiArrowLeft, FiPlus, FiCheck, FiZoomIn } from 'react-icons/fi';
 import Image from 'next/image';
 import MediaCenter from '~/components/MediaCenter';
 import ProgressTrackerNew from '~/components/ProgressTrackerNew';
 import { useAuth } from '../../lib/useAuth';
 import ImageModal from '~/components/ImageModal';
-
 
 const TrainingDetail = () => {
   const session = useAuth();
@@ -22,10 +21,12 @@ const TrainingDetail = () => {
   const [stepTitle, setStepTitle] = useState('');
   const [stepDescription, setStepDescription] = useState('');
   const [stepImage, setStepImage] = useState(null);
+  const [stepVideoUrl, setStepVideoUrl] = useState(''); // Add state for step video URL
   const [editStepId, setEditStepId] = useState(null);
   const [editStepTitle, setEditStepTitle] = useState('');
   const [editStepDescription, setEditStepDescription] = useState('');
   const [editStepImage, setEditStepImage] = useState(null);
+  const [editStepVideoUrl, setEditStepVideoUrl] = useState(''); // Add state for editing step video URL
   const [isAddingStep, setIsAddingStep] = useState(false);
   const [isMediaCenterOpen, setIsMediaCenterOpen] = useState(false);
   const [message, setMessage] = useState('');
@@ -132,7 +133,7 @@ const TrainingDetail = () => {
 
     const { data, error } = await supabase
       .from('training_steps')
-      .insert([{ training_id: training.id, step_number: stepNumber, title: stepTitle, description: stepDescription, image_url: imageUrl || null }])
+      .insert([{ training_id: training.id, step_number: stepNumber, title: stepTitle, description: stepDescription, image_url: imageUrl || null, video_url: stepVideoUrl || null }])
       .select()
       .single();
 
@@ -145,6 +146,7 @@ const TrainingDetail = () => {
       setStepTitle('');
       setStepDescription('');
       setStepImage(null);
+      setStepVideoUrl('');
       setIsAddingStep(false);
       alert('Step added successfully!');
     }
@@ -160,7 +162,7 @@ const TrainingDetail = () => {
 
     const { data, error } = await supabase
       .from('training_steps')
-      .update({ title: editStepTitle, description: editStepDescription, image_url: imageUrl || null })
+      .update({ title: editStepTitle, description: editStepDescription, image_url: imageUrl || null, video_url: editStepVideoUrl || null })
       .eq('id', stepId)
       .select();
 
@@ -271,7 +273,6 @@ const TrainingDetail = () => {
     }
   };
 
-
   const openImageModal = (src, alt) => {
     setModalImageSrc(src);
     setModalImageAlt(alt);
@@ -343,221 +344,254 @@ const TrainingDetail = () => {
           </div>
         )}
 
-          <ProgressTrackerNew trainingId={training.id} steps={steps} />
+        <ProgressTrackerNew trainingId={training.id} steps={steps} />
 
-          <h2 className="text-xl font-bold mb-4">Steps</h2>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="steps">
-              {(provided) => (
-                <ul
-                  className="list-none"
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                >
-                  {steps.map((step, index) => (
-                    <Draggable key={step.id} draggableId={step.id.toString()} index={index}>
-                      {(provided) => (
-                        <li
-                          className="block mb-4 p-4 border border-slate-300 border-opacity-50 rounded-lg items-start bg-slate-50 dark:bg-slate-800"
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          {editStepId === step.id ? (
-                            <div className="w-full">
+        <h2 className="text-xl font-bold mb-4">Steps</h2>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="steps">
+            {(provided) => (
+              <ul
+                className="list-none"
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+                {steps.map((step, index) => (
+                  <Draggable key={step.id} draggableId={step.id.toString()} index={index}>
+                    {(provided) => (
+                      <li
+                        className="block mb-4 p-4 border border-slate-300 border-opacity-50 rounded-lg items-start bg-slate-50 dark:bg-slate-800"
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        {editStepId === step.id ? (
+                          <div className="w-full">
+                            <input
+                              type="text"
+                              placeholder="Step Title"
+                              value={editStepTitle}
+                              onChange={(e) => setEditStepTitle(e.target.value)}
+                              className="p-2 border border-opacity-25 border-gray-300 rounded w-full mb-2"
+                            />
+                            <textarea
+                              placeholder="Step Description"
+                              value={editStepDescription}
+                              onChange={(e) => setEditStepDescription(e.target.value)}
+                              className="p-2 border border-gray-300 rounded w-full mb-2"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Video URL"
+                              value={editStepVideoUrl}
+                              onChange={(e) => setEditStepVideoUrl(e.target.value)}
+                              className="p-2 border border-gray-300 rounded w-full mb-2"
+                            />
+                            <div className="flex items-center mb-2 gap-2">
                               <input
-                                type="text"
-                                placeholder="Step Title"
-                                value={editStepTitle}
-                                onChange={(e) => setEditStepTitle(e.target.value)}
-                                className="p-2 border border-opacity-25 border-gray-300 rounded w-full mb-2"
+                                type="file"
+                                onChange={(e) => setEditStepImage(e.target.files[0])}
+                                className="p-2 border border-gray-300 rounded w-full"
                               />
-                              <textarea
-                                placeholder="Step Description"
-                                value={editStepDescription}
-                                onChange={(e) => setEditStepDescription(e.target.value)}
-                                className="p-2 border border-gray-300 rounded w-full mb-2"
-                              />
-                              <div className="flex gap-2">
-                                <input
-                                  type="file"
-                                  onChange={(e) => setEditStepImage(e.target.files[0])}
-                                  className="p-2 border border-gray-300 rounded w-full mb-2"
-                                />
-                                <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 bg-green-500 text-white text-sm leading-tight rounded-lg hover:bg-green-600 transition">
-                                  Media Center
-                                </button>
-                              </div>
-                              {editStepImage && (
-                                <Image
-                                  loader={myLoader}
-                                  src={typeof editStepImage === 'string' ? editStepImage : URL.createObjectURL(editStepImage)}
-                                  alt={editStepTitle}
-                                  className="mb-2 md:w-1/4"
-                                  width={500}
-                                  height={300}
-                                />
-                              )}
-                              <div className="flex gap-2 justify-end">
-                                <button
-                                  onClick={() => handleUpdateStep(step.id)}
-                                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                                >
-                                  Update Step
-                                </button>
-                                <button
-                                  onClick={() => setEditStepId(null)}
-                                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
+                              <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 bg-green-500 text-white text-sm leading-tight rounded-lg hover:bg-green-600 transition">
+                                Media Center
+                              </button>
                             </div>
-                          ) : (
-                            <>
-                              <div>
-                                <div className='flex items-center gap-4 pb-4 border-b border-slate-300 border-opacity-25 mb-6'>
-                                  <div className={`h-10 w-10 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-slate-200 dark:bg-slate-950'}`}>
-                                    {completedSteps.includes(step.id) ? <FiCheck className='stroke-slate-50' size={24} /> : step.step_number}
-                                  </div>
-                                  <h3 className="font-bold text-xl">{step.title}</h3>
-                                  <div className='ml-auto flex gap-2'>
-                                    <button
-                                      onClick={() => {
-                                        setEditStepId(step.id);
-                                        setEditStepTitle(step.title);
-                                        setEditStepDescription(step.description);
-                                        setEditStepImage(step.image_url);
-                                      }}
-                                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                                    >
-                                      <FiEdit2 />
-                                    </button>
-                                    <button
-                                      onClick={() => handleDeleteStep(step.id)}
-                                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                                    >
-                                      <FiTrash2 />
-                                    </button>
-                                  </div>
+                            {editStepImage && (
+                              <Image
+                                loader={myLoader}
+                                src={typeof editStepImage === 'string' ? editStepImage : URL.createObjectURL(editStepImage)}
+                                alt={editStepTitle}
+                                className="mb-2 md:w-1/4"
+                                width={500}
+                                height={300}
+                              />
+                            )}
+                            <div className="flex gap-2 justify-end">
+                              <button
+                                onClick={() => handleUpdateStep(step.id)}
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                              >
+                                Update Step
+                              </button>
+                              <button
+                                onClick={() => setEditStepId(null)}
+                                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div>
+                              <div className='flex items-center gap-4 pb-4 border-b border-slate-300 border-opacity-25 mb-6'>
+                                <div className={`h-10 w-10 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-slate-200 dark:bg-slate-950'}`}>
+                                  {completedSteps.includes(step.id) ? <FiCheck className='stroke-slate-50' size={24} /> : step.step_number}
                                 </div>
-                                <div className='my-4'><p>{step.description}</p></div>
-                                {step.image_url && (
+                                <h3 className="font-bold text-xl">{step.title}</h3>
+                                <div className='ml-auto flex gap-2'>
+                                  <button
+                                    onClick={() => {
+                                      setEditStepId(step.id);
+                                      setEditStepTitle(step.title);
+                                      setEditStepDescription(step.description);
+                                      setEditStepImage(step.image_url);
+                                      setEditStepVideoUrl(step.video_url || '');
+                                    }}
+                                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                                  >
+                                    <FiEdit2 />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteStep(step.id)}
+                                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                                  >
+                                    <FiTrash2 />
+                                  </button>
+                                </div>
+                              </div>
+                              <div className='my-4'><p>{step.description}</p></div>
+                              {step.image_url && (
+                                <div className="relative group w-full md:w-1/4" onClick={() => openImageModal(step.image_url, step.title)}>
                                   <Image
                                     loader={myLoader}
                                     src={step.image_url}
                                     alt={step.title}
-                                    className="mb-2 md:w-1/4"
+                                    className="mb-2 transition cursor-pointer"
                                     width={500}
                                     height={300}
-                                    onClick={() => openImageModal(step.image_url, step.title)}
                                   />
-                                )}
-                                <button
-                                  onClick={() => toggleStepCompletion(step.id)}
-                                  className={`mt-2 px-4 py-2 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-gray-500'} text-white rounded-lg`}
-                                >
-                                  {completedSteps.includes(step.id) ? 'Completed' : 'Mark as Complete'}
-                                </button>
-                              </div>
-                            </>
-                          )}
-                        </li>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </ul>
-              )}
-            </Droppable>
-          </DragDropContext>
-          <section className='addnewstep -scroll-mt-8 mb-8 block justify-between p-2'>
-            <Link href="/training-center"><button className="px-4 py-2 flex items-center gap-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition mt-4 mr-2">
-            <FiArrowLeft />  Back to Training Center</button></Link>
-            {!isAddingStep ? (
-              <button
-                onClick={() => setIsAddingStep(true)}
-                className="px-4 py-2 flex bg-green-500 items-center gap-2 text-white rounded-lg hover:bg-green-600 transition mt-4"
-              >
-                Add New Step <FiPlus />
-              </button>
-            ) : (
-              <>
-                <h2 className="text-xl font-bold mb-4 mt-4">Add New Step</h2>
-                <div className="mb-4">
+                                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-25 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                    <FiZoomIn className="text-white text-3xl" />
+                                  </div>
+                                </div>
+                              )}
+                              {step.video_url && (
+                                <div className='my-4'>
+                                  <iframe
+                                    width="560"
+                                    height="315"
+                                    src={step.video_url.replace("watch?v=", "embed/")}
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    title={step.title}
+                                  ></iframe>
+                                </div>
+                              )}
+                              <button
+                                onClick={() => toggleStepCompletion(step.id)}
+                                className={`mt-2 px-4 py-2 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-gray-500'} text-white rounded-lg`}
+                              >
+                                {completedSteps.includes(step.id) ? 'Completed' : 'Mark as Complete'}
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </li>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </ul>
+            )}
+          </Droppable>
+        </DragDropContext>
+        <section className='addnewstep -scroll-mt-8 mb-8 block justify-between p-2'>
+          <Link href="/training-center"><button className="px-4 py-2 flex items-center gap-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition mt-4 mr-2">
+          <FiArrowLeft />  Back to Training Center</button></Link>
+          {!isAddingStep ? (
+            <button
+              onClick={() => setIsAddingStep(true)}
+              className="px-4 py-2 flex bg-green-500 items-center gap-2 text-white rounded-lg hover:bg-green-600 transition mt-4"
+            >
+              Add New Step <FiPlus />
+            </button>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold mb-4 mt-4">Add New Step</h2>
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="Step Title"
+                  value={stepTitle}
+                  onChange={(e) => setStepTitle(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full mb-2"
+                />
+                <textarea
+                  placeholder="Step Description"
+                  value={stepDescription}
+                  onChange={(e) => setStepDescription(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full mb-2"
+                />
+                <input
+                  type="text"
+                  placeholder="Video URL"
+                  value={stepVideoUrl}
+                  onChange={(e) => setStepVideoUrl(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full mb-2"
+                />
+                <div className="flex items-center gap-2 mb-2">
                   <input
-                    type="text"
-                    placeholder="Step Title"
-                    value={stepTitle}
-                    onChange={(e) => setStepTitle(e.target.value)}
-                    className="p-2 border border-gray-300 rounded w-full mb-2"
+                    type="file"
+                    onChange={(e) => setStepImage(e.target.files[0])}
+                    className="p-2 border border-gray-300 rounded w-full"
                   />
-                  <textarea
-                    placeholder="Step Description"
-                    value={stepDescription}
-                    onChange={(e) => setStepDescription(e.target.value)}
-                    className="p-2 border border-gray-300 rounded w-full mb-2"
+                  <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 text-sm leading-tight bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                    Media Center
+                  </button>
+                </div>
+                {stepImage && (
+                  <Image
+                    loader={myLoader}
+                    src={typeof stepImage === 'string' ? stepImage : URL.createObjectURL(stepImage)}
+                    alt={stepTitle}
+                    className="mb-2 md:w-1/4"
+                    width={500}
+                    height={300}
                   />
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="file"
-                      onChange={(e) => setStepImage(e.target.files[0])}
-                      className="p-2 border border-gray-300 rounded w-full"
-                    />
-                    <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 leading-tight bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
-                      Open Media Center
-                    </button>
-                  </div>
-                  {stepImage && (
-                    <Image
-                      loader={myLoader}
-                      src={typeof stepImage === 'string' ? stepImage : URL.createObjectURL(stepImage)}
-                      alt={stepTitle}
-                      className="mb-2 md:w-1/4"
-                      width={500}
-                      height={300}
-                    />
-                  )}
-                  <div className="block my-4">
-                    <div className='gap-2 justify-start flex'>
-                    <button
-                      onClick={handleAddStep}
-                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
-                    >
-                      Add Step
-                    </button>
-                    <button
-                      onClick={() => {
-                        setStepTitle('');
-                        setStepDescription('');
-                        setStepImage(null);
-                        setIsAddingStep(false);
-                      }}
-                      className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-                    >
-                      Cancel
-                    </button>
-                    </div>
+                )}
+                <div className="block my-4">
+                  <div className='gap-2 justify-start flex'>
+                  <button
+                    onClick={handleAddStep}
+                    className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+                  >
+                    Add Step
+                  </button>
+                  <button
+                    onClick={() => {
+                      setStepTitle('');
+                      setStepDescription('');
+                      setStepImage(null);
+                      setStepVideoUrl('');
+                      setIsAddingStep(false);
+                    }}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                  >
+                    Cancel
+                  </button>
                   </div>
                 </div>
-              </>
-            )}
-          </section>
-          <MediaCenter
-            isOpen={isMediaCenterOpen}
-            onRequestClose={() => setIsMediaCenterOpen(false)}
-            onSelectImage={handleImageSelect}
-          />
-        </>
-      )}
-      <ImageModal
-        isOpen={isImageModalOpen}
-        onRequestClose={closeImageModal}
-        src={modalImageSrc}
-        alt={modalImageAlt}
-      />
-    </Container>
-  );
+              </div>
+            </>
+          )}
+        </section>
+        <MediaCenter
+          isOpen={isMediaCenterOpen}
+          onRequestClose={() => setIsMediaCenterOpen(false)}
+          onSelectImage={handleImageSelect}
+        />
+      </>
+    )}
+    <ImageModal
+      isOpen={isImageModalOpen}
+      onRequestClose={closeImageModal}
+      src={modalImageSrc}
+      alt={modalImageAlt}
+    />
+  </Container>
+);
 };
 
 export default TrainingDetail;
