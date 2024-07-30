@@ -115,7 +115,7 @@ export default function IndexPage(
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className='flex items-center gap-4'>
+      <div className='flex flex-col md:flex-row justify-center md:justify-normal items-center md:gap-4'>
         {initials && (
           <div className='w-20 h-20 min-w-20 text-3xl flex items-center justify-center rounded-full bg-custom-teal-dark bg-opacity-25 border-4 border-custom-teal text-custom-teal-dark font-bold'>
             {initials}

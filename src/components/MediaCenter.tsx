@@ -37,7 +37,7 @@ const MediaCenter = ({ isOpen, onRequestClose, onSelectImage }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed max-h-screen w-screen inset-0 bg-slate-900 bg-opacity-75 z-50 flex justify-center items-start" onClick={onRequestClose}>
+    <div className="fixed max-h-screen w-screen inset-0 bg-slate-900 bg-opacity-75 z-[9999] flex justify-center items-start" onClick={onRequestClose}>
       <div className="bg-white dark:bg-slate-800 p-4 mt-4 rounded-lg w-3/4 h-screen overflow-auto mx-4 max-w-screen" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Media Center</h2>

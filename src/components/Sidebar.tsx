@@ -44,7 +44,7 @@ export default function Sidebar() {
         </div>
         <div className="bg-slate-300 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between">
-            <Link href="/resources" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
+            <Link href="/resource-center" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiLayers /></span> Resources
             </Link>
             <button onClick={() => toggleSection('resources')} className="bg-slate-900 bg-opacity-20 p-2 rounded-xl hover:bg-opacity-50 focus:outline-none">

@@ -8,7 +8,16 @@ export function formatDate(date: string) {
   });
 }
 
-export const uploadImage = async (file: File): Promise<string | null> => {
+export const uploadImage = async (file: File | string): Promise<string | null> => {
+  if (typeof file === 'string') {
+    return file; // If the file is already a URL, just return it.
+  }
+
+  if (!file) {
+    console.error('No file provided for upload.');
+    return null;
+  }
+
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random()}.${fileExt}`;
   const filePath = `${fileName}`;
@@ -37,4 +46,15 @@ export const uploadImage = async (file: File): Promise<string | null> => {
   console.log('Public URL:', data.publicUrl); // Log the public URL for debugging
 
   return data.publicUrl;
+};
+
+export const slugify = (text: string): string => {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+    .replace(/^-+/, '')             // Trim - from start of text
+    .replace(/-+$/, '');            // Trim - from end of text
 };
