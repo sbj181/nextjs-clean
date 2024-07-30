@@ -7,9 +7,6 @@ import Container from '~/components/Container';
 import ProgressBar from '~/components/ProgressBar';
 import Welcome from '~/components/Welcome';
 import { useSidebar } from '~/contexts/SidebarContext';
-import { getClient } from '~/lib/sanity.client';
-import { getResourceByIds, getTrainings } from '~/lib/sanity.queries';
-
 import { supabase } from '../lib/supabaseClient';
 
 const Profile = () => {
@@ -31,7 +28,7 @@ const Profile = () => {
       .select('training_id, step_id, is_completed')
       .eq('user_id', userId)
       .eq('is_completed', true);
-  
+
     if (trainingProgressError) {
       console.error('Error fetching training progress:', trainingProgressError);
     } else {
@@ -50,14 +47,31 @@ const Profile = () => {
     const { data: trainingsData, error: trainingsError } = await supabase
       .from('trainings')
       .select('*, training_steps(*)'); // Fetch trainings along with their steps
-  
+
     if (trainingsError) {
       console.error('Error fetching trainings:', trainingsError);
     } else {
       setTrainings(trainingsData);
     }
   }, []);
+
+  const fetchFavorites = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    console.log('User:', user); // Log the user object
   
+    const { data, error } = await supabase
+      .from('resources')
+      .select('*')
+      .eq('is_favorite', true)
+      .eq('user_id', user.id);
+  
+    if (error) {
+      console.error('Error fetching favorite resources:', error);
+    } else {
+      console.log('Fetched favorites:', data); // Log the fetched favorite resources
+      setFavorites(data);
+    }
+  }, []);
   
 
   useEffect(() => {
@@ -68,45 +82,31 @@ const Profile = () => {
         router.push('/sign-in');
         return;
       }
-  
+
       if (!user) {
         router.push('/sign-in');
         return;
       }
-  
+
       const { data, error } = await supabase
         .from('users')
         .select('email, display_name, phone_number, role')
         .eq('id', user.id)
         .single();
-  
+
       if (error) {
         console.error('Error fetching profile:', error);
       } else {
         setProfile(data);
       }
-  
-      const { data: favoritesData, error: favoritesError } = await supabase
-        .from('favorites')
-        .select('resource_id')
-        .eq('user_id', user.id);
-  
-      if (favoritesError) {
-        console.error('Error fetching favorites:', favoritesError);
-      } else {
-        const resourceIds = favoritesData.map(fav => fav.resource_id);
-        const client = getClient();
-        const resources = await getResourceByIds(client, resourceIds);
-        setFavorites(resources);
-      }
-  
+
+      await fetchFavorites();
       await fetchProgress(user.id);
       await fetchTrainings();
     };
-  
+
     getProfile();
-  }, [router, fetchProgress, fetchTrainings]);
-  
+  }, [router, fetchFavorites, fetchProgress, fetchTrainings]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -131,15 +131,15 @@ const Profile = () => {
   const handleRemoveFavorite = async (resourceId) => {
     const { data: { user } } = await supabase.auth.getUser();
     const { error } = await supabase
-      .from('favorites')
-      .delete()
-      .eq('user_id', user.id)
-      .eq('resource_id', resourceId);
-
+      .from('resources')
+      .update({ is_favorite: false })
+      .eq('id', resourceId)
+      .eq('user_id', user.id);
+  
     if (error) {
       console.error('Error removing favorite:', error);
     } else {
-      setFavorites(favorites.filter(resource => resource._id !== resourceId));
+      setFavorites(favorites.filter(resource => resource.id !== resourceId));
     }
   };
 
@@ -225,12 +225,12 @@ const Profile = () => {
                 {favorites.length > 0 ? (
                   <ul className="list-disc">
                     {favorites.map(favorite => (
-                      <li key={favorite._id} className="mb-2 flex justify-between items-center">
-                        <Link href={`/resource/${favorite.slug.current}`}>
+                      <li key={favorite.id} className="mb-2 flex justify-between items-center">
+                        <Link href={`/resource/${favorite.slug}`}>
                           <span className="text-blue-500 underline cursor-pointer">{favorite.title}</span>
                         </Link>
                         <button
-                          onClick={() => handleRemoveFavorite(favorite._id)}
+                          onClick={() => handleRemoveFavorite(favorite.id)}
                           className="ml-2 text-red-500"
                         >
                           Remove
@@ -256,12 +256,12 @@ const Profile = () => {
 
                       return (
                         <div key={training.id} className="mb-4">
-                            <div className='flex items-center gap-4 justify-between mb-1'>
-                              <h3 className="text-lg capitalize font-semibold">
-                                {training.title}
-                              </h3>
-                              <Link href={`/training/${trainingSlug}`} passHref> <span className='text-blue-500 cursor-pointer'>Return to Training</span></Link>
-                            </div>
+                          <div className='flex items-center gap-4 justify-between mb-1'>
+                            <h3 className="text-lg capitalize font-semibold">
+                              {training.title}
+                            </h3>
+                            <Link href={`/training/${trainingSlug}`} passHref> <span className='text-blue-500 cursor-pointer'>Return to Training</span></Link>
+                          </div>
                           <ProgressBar percentage={progressPercentage} />
                           <div className='mt-2 text-sm'><p>{completedSteps.length} out of {totalSteps} steps completed</p></div>
                         </div>

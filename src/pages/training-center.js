@@ -52,7 +52,8 @@ const TrainingManager = () => {
       const { data: steps, error } = await supabase
         .from('training_steps')
         .select('*')
-        .eq('training_id', training.id);
+        .eq('training_id', training.id)
+        .order('step_number', { ascending: true });
   
       if (error) {
         console.error('Error fetching steps:', error);

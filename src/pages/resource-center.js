@@ -179,24 +179,40 @@ const ResourceCenter = () => {
   };
 
   const handleFavoriteResource = async (id) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      alert('You must be logged in to favorite a resource.');
+      return;
+    }
+  
+    // Find the resource and its current favorite status
     const resource = resources.find(r => r.id === id);
     const isFavorite = !resource.is_favorite;
-
+  
+    // Optimistically update the state
+    const updatedResources = resources.map(r => r.id === id ? { ...r, is_favorite: isFavorite, user_id: user.id } : r);
+    setResources(updatedResources);
+    setFavorites(updatedResources.filter(r => r.is_favorite && r.user_id === user.id));
+  
+    // Perform the API call
     const { error } = await supabase
       .from('resources')
-      .update({ is_favorite: isFavorite })
+      .update({ is_favorite: isFavorite, user_id: user.id })
       .eq('id', id);
-
+  
     if (error) {
       console.error('Error updating favorite status:', error);
       alert('Error updating favorite status.');
+      // Rollback the optimistic update
+      const revertedResources = resources.map(r => r.id === id ? { ...r, is_favorite: !isFavorite, user_id: null } : r);
+      setResources(revertedResources);
+      setFavorites(revertedResources.filter(r => r.is_favorite && r.user_id === user.id));
     } else {
-      const updatedResources = resources.map(r => r.id === id ? { ...r, is_favorite: isFavorite } : r);
-      setResources(updatedResources);
-      const updatedFavorites = updatedResources.filter(r => r.is_favorite);
-      setFavorites(updatedFavorites);
+      // No further action needed since state is already updated optimistically
     }
   };
+  
+  
 
   const handleImageSelect = (url) => {
     setFile(url);
