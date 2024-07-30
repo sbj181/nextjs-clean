@@ -7,7 +7,7 @@ import Container from '~/components/Container';
 import Welcome from '~/components/Welcome';
 import Favorites from '~/components/Favorites';
 import { useAuth } from '~/lib/useAuth';
-import { FiHeart, FiTrash2, FiBook, FiArchive } from 'react-icons/fi';
+import { FiHeart, FiBook, FiArchive } from 'react-icons/fi';
 import Image from 'next/image';
 import Loading from '~/components/Loading';
 
@@ -18,7 +18,7 @@ export const getStaticProps: GetStaticProps = async () => {
     .select('*, categories(name)')
     .order('created_at', { ascending: false })
     .limit(4);
-  
+
   if (resourcesError) {
     console.error('Error fetching resources:', resourcesError);
   }
@@ -29,7 +29,7 @@ export const getStaticProps: GetStaticProps = async () => {
     .select('*')
     .order('created_at', { ascending: false })
     .limit(4);
-  
+
   if (trainingsError) {
     console.error('Error fetching trainings:', trainingsError);
   } else {
@@ -88,7 +88,7 @@ export default function IndexPage(
   const [initials, setInitials] = useState<string | null>(null);
 
   const fetchFavorites = useCallback(async () => {
-    const { data: user } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       // Fetch favorite resources
       const { data: favoriteResources, error: favoritesError } = await supabase
@@ -142,24 +142,43 @@ export default function IndexPage(
   };
 
   const handleFavoriteResource = async (id) => {
-    const resource = resources.find(r => r.id === id);
-    const isFavorite = !resource.is_favorite;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    alert('You must be logged in to favorite a resource.');
+    return;
+  }
 
-    const { error } = await supabase
-      .from('resources')
-      .update({ is_favorite: isFavorite })
-      .eq('id', id);
+  const resource = resources.find(r => r.id === id);
 
-    if (error) {
-      console.error('Error updating favorite status:', error);
-      alert('Error updating favorite status.');
-    } else {
-      const updatedResources = resources.map(r => r.id === id ? { ...r, is_favorite: isFavorite } : r);
-      setResources(updatedResources);
-      const updatedFavorites = updatedResources.filter(r => r.is_favorite);
-      setFavorites(updatedFavorites);
-    }
-  };
+  if (!resource) {
+    console.error(`Resource with id ${id} not found`);
+    return;
+  }
+
+  const isFavorite = !resource.is_favorite;
+
+  // Optimistically update the state
+  const updatedResources = resources.map(r => r.id === id ? { ...r, is_favorite: isFavorite, user_id: user.id } : r);
+  setResources(updatedResources);
+  setFavorites(updatedResources.filter(r => r.is_favorite && r.user_id === user.id));
+
+  // Perform the API call
+  const { error } = await supabase
+    .from('resources')
+    .update({ is_favorite: isFavorite, user_id: user.id })
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error updating favorite status:', error);
+    alert('Error updating favorite status.');
+    // Rollback the optimistic update
+    const revertedResources = resources.map(r => r.id === id ? { ...r, is_favorite: !isFavorite, user_id: null } : r);
+    setResources(revertedResources);
+    setFavorites(revertedResources.filter(r => r.is_favorite && r.user_id === user.id));
+  } else {
+    // No further action needed since state is already updated optimistically
+  }
+};
 
   if (!session) return <Loading />;
 
@@ -186,7 +205,7 @@ export default function IndexPage(
       {favorites.length > 0 ? (
         <Favorites favorites={favorites} onRemoveFavorite={handleFavoriteResource} />
       ) : (
-        <div></div>
+        <div className='hidden'>No resources currently favorited.</div>
       )}
       
       <section className='mt-10 mb-6'>
@@ -238,7 +257,11 @@ export default function IndexPage(
             )
           ))}
         </div>
-        <div className='w-full p-4  bg-opacity-20 rounded-xl flex items-center justify-center'> <Link className='rounded-xl py-4 px-12 bg-slate-200 bg-opacity-50 hover:bg-opacity-100 transition' href={'/resource-center'}>View All Resources</Link> </div>
+        <div className='w-full p-4 bg-opacity-20 rounded-xl flex items-center justify-center'>
+          <Link className='rounded-xl py-4 px-12 bg-slate-200 dark:bg-slate-950 bg-opacity-50 hover:bg-opacity-100 transition' href={'/resource-center'}>
+            View All Resources
+          </Link>
+        </div>
       </section>
       
       <section className='mt-10 mb-6'>
@@ -282,7 +305,11 @@ export default function IndexPage(
             )
           ))}
         </div>
-        <div className='w-full p-4  bg-opacity-20 rounded-xl flex items-center justify-center'> <Link className='rounded-xl py-4 px-12 bg-slate-200 bg-opacity-50 hover:bg-opacity-100 transition' href={'/training-center'}>View All Training Modules</Link> </div>
+        <div className='w-full p-4 bg-opacity-20 rounded-xl flex items-center justify-center'>
+          <Link className='rounded-xl py-4 px-12 bg-slate-200 dark:bg-slate-950 bg-opacity-50 hover:bg-opacity-100 transition' href={'/training-center'}>
+            View All Training Modules
+          </Link>
+        </div>
       </section>
     </Container>
   );
