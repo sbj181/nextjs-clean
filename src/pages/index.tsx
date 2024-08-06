@@ -141,44 +141,55 @@ export default function IndexPage(
     return nameParts[0].charAt(0).toUpperCase() + nameParts[1].charAt(0).toUpperCase();
   };
 
+  const handleDeleteResource = async (id) => {
+    const { error } = await supabase
+      .from('resources')
+      .delete()
+      .eq('id', id);
+    if (error) {
+      console.error('Error deleting resource:', error);
+      alert('Error deleting resource.');
+    } else {
+      alert('Resource deleted successfully!');
+    }
+  };
+
   const handleFavoriteResource = async (id) => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    alert('You must be logged in to favorite a resource.');
-    return;
-  }
-
-  const resource = resources.find(r => r.id === id);
-
-  if (!resource) {
-    console.error(`Resource with id ${id} not found`);
-    return;
-  }
-
-  const isFavorite = !resource.is_favorite;
-
-  // Optimistically update the state
-  const updatedResources = resources.map(r => r.id === id ? { ...r, is_favorite: isFavorite, user_id: user.id } : r);
-  setResources(updatedResources);
-  setFavorites(updatedResources.filter(r => r.is_favorite && r.user_id === user.id));
-
-  // Perform the API call
-  const { error } = await supabase
-    .from('resources')
-    .update({ is_favorite: isFavorite, user_id: user.id })
-    .eq('id', id);
-
-  if (error) {
-    console.error('Error updating favorite status:', error);
-    alert('Error updating favorite status.');
-    // Rollback the optimistic update
-    const revertedResources = resources.map(r => r.id === id ? { ...r, is_favorite: !isFavorite, user_id: null } : r);
-    setResources(revertedResources);
-    setFavorites(revertedResources.filter(r => r.is_favorite && r.user_id === user.id));
-  } else {
-    // No further action needed since state is already updated optimistically
-  }
-};
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      alert('You must be logged in to favorite a resource.');
+      return;
+    }
+  
+    const resource = resources.find(r => r.id === id);
+  
+    if (!resource) {
+      console.error(`Resource with id ${id} not found`);
+      return;
+    }
+  
+    const isFavorite = !resource.is_favorite;
+  
+    // Optimistically update the state
+    const updatedResources = resources.map(r => r.id === id ? { ...r, is_favorite: isFavorite, user_id: user.id } : r);
+    setResources(updatedResources);
+    setFavorites(updatedResources.filter(r => r.is_favorite && r.user_id === user.id));
+  
+    // Perform the API call
+    const { error } = await supabase
+      .from('resources')
+      .update({ is_favorite: isFavorite, user_id: isFavorite ? user.id : null }) // set user_id to null when unfavoriting
+      .eq('id', id);
+  
+    if (error) {
+      console.error('Error updating favorite status:', error);
+      alert('Error updating favorite status.');
+      // Rollback the optimistic update
+      const revertedResources = resources.map(r => r.id === id ? { ...r, is_favorite: !isFavorite, user_id: isFavorite ? user.id : null } : r);
+      setResources(revertedResources);
+      setFavorites(revertedResources.filter(r => r.is_favorite && r.user_id === user.id));
+    }
+  };
 
   if (!session) return <Loading />;
 
@@ -203,8 +214,11 @@ export default function IndexPage(
       </div>
       
       {favorites.length > 0 ? (
-        <Favorites favorites={favorites} onRemoveFavorite={handleFavoriteResource} />
-      ) : (
+        <Favorites 
+  favorites={favorites} 
+  onRemoveFavorite={handleFavoriteResource} 
+  handleDeleteResource={handleDeleteResource} 
+/>      ) : (
         <div className='hidden'>No resources currently favorited.</div>
       )}
       
