@@ -29,7 +29,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ initialQuery, onClose }) => {
       // Fetch resources
       let { data: resources, error: resourcesError } = await supabase
         .from('resources')
-        .select('id, title, slug, image_url') // Removed the 'tags' column
+        .select('id, title, slug, image_url') // No 'tags' column
         .order('created_at', { ascending: false });
   
       if (resourcesError) {
@@ -54,14 +54,14 @@ const SearchModal: React.FC<SearchModalProps> = ({ initialQuery, onClose }) => {
           id: item.id,
           title: item.title,
           slug: item.slug,
-          type: 'resource',
+          type: 'resource' as 'resource',  // Explicitly set the type to 'resource'
           image_url: item.image_url,
         })),
         ...trainings.map(item => ({
           id: item.id,
           title: item.title,
           slug: item.slug,
-          type: 'training',
+          type: 'training' as 'training',  // Explicitly set the type to 'training'
         })),
       ];
   
@@ -71,8 +71,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ initialQuery, onClose }) => {
     fetchItems();
   }, []);
   
-  
-
   useEffect(() => {
     if (searchQuery.trim() === '') {
       setFilteredItems([]);

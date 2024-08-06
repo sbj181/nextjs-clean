@@ -6,12 +6,26 @@ import { supabase } from '~/lib/supabaseClient'; // Import Supabase client
 import { useSidebar } from '../contexts/SidebarContext';
 import CallToAction from './CallToAction';
 
+// Define the Resource type based on your Supabase table structure
+interface Resource {
+  id: string;
+  title: string;
+  slug: string;
+  // Add other fields as necessary
+}
+
+interface Training {
+  id: string;
+  title: string;
+  slug: string;
+  // Add other fields as necessary
+}
+
 export default function Sidebar() {
   const { isSidebarOpen, setSidebarOpen } = useSidebar();
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [resources, setResources] = useState<Resource[]>([]);
-  const [trainings, setTrainings] = useState([]);
-
+  const [trainings, setTrainings] = useState<Training[]>([]);
 
   useEffect(() => {
     const fetchResourcesAndTrainings = async () => {
@@ -24,7 +38,7 @@ export default function Sidebar() {
       if (resourcesError) {
         console.error('Error fetching resources:', resourcesError);
       } else {
-        setResources(resources);
+        setResources(resources || []); // Add a fallback to an empty array
       }
   
       // Fetch trainings from Supabase
@@ -36,7 +50,7 @@ export default function Sidebar() {
       if (trainingsError) {
         console.error('Error fetching trainings:', trainingsError);
       } else {
-        setTrainings(trainings);
+        setTrainings(trainings || []); // Add a fallback to an empty array
       }
     };
   
@@ -53,6 +67,7 @@ export default function Sidebar() {
       setSidebarOpen(false);
     }
   };
+
   return (
     <aside className={`fixed rounded-br-xl overflow-scroll no-scrollbar inset-y-0 left-0 z-40 pt-32 flex flex-col bg-slate-100 dark:bg-gradient-to-b dark:from-slate-950 dark:to-slate-800 w-80 p-5 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <ul className="w-full">
@@ -117,10 +132,8 @@ export default function Sidebar() {
         </div>
       </ul>
       <div className='mt-auto'>
-       
         <CallToAction title='Want your own CORE&trade; LMS?' subtitle='Get in touch with us' />
       </div>
     </aside>
   );
-  
 }
