@@ -1,11 +1,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useEffect, useRef,useState } from 'react';
-import { FiBookOpen, FiFileText,FiX } from 'react-icons/fi';
+import React, { useEffect, useRef, useState } from 'react';
+import { FiBookOpen, FiFileText, FiX } from 'react-icons/fi';
+import { supabase } from '~/lib/supabaseClient'; // Import Supabase client
 
-import { getClient } from '~/lib/sanity.client';
-import { urlForImage } from '~/lib/sanity.image';
-import { SearchItem, searchItems } from '~/lib/sanity.queries';
+interface SearchItem {
+  id: string;
+  title: string;
+  slug: string;
+  type: 'resource' | 'training'; // Indicate whether it's a resource or a training
+  tags?: string[];
+  image_url?: string;
+}
 
 interface SearchModalProps {
   initialQuery: string;
@@ -20,13 +26,52 @@ const SearchModal: React.FC<SearchModalProps> = ({ initialQuery, onClose }) => {
 
   useEffect(() => {
     const fetchItems = async () => {
-      const client = getClient();
-      const items = await searchItems(client);
+      // Fetch resources
+      let { data: resources, error: resourcesError } = await supabase
+        .from('resources')
+        .select('id, title, slug, image_url') // Removed the 'tags' column
+        .order('created_at', { ascending: false });
+  
+      if (resourcesError) {
+        console.error('Error fetching resources:', resourcesError);
+        resources = [];
+      }
+  
+      // Fetch trainings
+      let { data: trainings, error: trainingsError } = await supabase
+        .from('trainings')
+        .select('id, title, slug')
+        .order('created_at', { ascending: false });
+  
+      if (trainingsError) {
+        console.error('Error fetching trainings:', trainingsError);
+        trainings = [];
+      }
+  
+      // Combine resources and trainings into a single list
+      const items: SearchItem[] = [
+        ...resources.map(item => ({
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          type: 'resource',
+          image_url: item.image_url,
+        })),
+        ...trainings.map(item => ({
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          type: 'training',
+        })),
+      ];
+  
       setAllItems(items);
     };
-
+  
     fetchItems();
   }, []);
+  
+  
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -72,13 +117,13 @@ const SearchModal: React.FC<SearchModalProps> = ({ initialQuery, onClose }) => {
         {filteredItems.length > 0 && (
           <ul className="w-full bg-slate-50 dark:bg-slate-950 border border-opacity-25 rounded-lg max-h-[300px] overflow-y-auto">
             {filteredItems.map((item) => (
-              <li key={item._id} className="border-b border-slate-400 border-opacity-25 last:border-b-0">
-                <Link href={`/${item._type === 'resource' ? 'resource' : 'training'}/${item.slug}`}>
+              <li key={item.id} className="border-b border-slate-400 border-opacity-25 last:border-b-0">
+                <Link href={`/${item.type}/${item.slug}`}>
                   <div className="flex items-center px-4 py-2 hover:bg-gray-200 hover:bg-opacity-25">
-                    {item.mainImage ? (
+                    {item.image_url ? (
                       <div className="w-12 h-12 mr-2 flex-shrink-0">
                         <Image
-                          src={urlForImage(item.mainImage) || '/default-thumbnail.jpg'}
+                          src={item.image_url || '/default-thumbnail.jpg'}
                           alt={item.title}
                           width={48}
                           height={48}
@@ -87,12 +132,12 @@ const SearchModal: React.FC<SearchModalProps> = ({ initialQuery, onClose }) => {
                       </div>
                     ) : (
                       <div className="w-12 h-12 mr-2 flex-shrink-0 flex items-center justify-center bg-slate-300 dark:bg-slate-700 text-white rounded">
-                        {item._type === 'resource' ? <FiFileText size={24} /> : <FiBookOpen size={24} />}
+                        {item.type === 'resource' ? <FiFileText size={24} /> : <FiBookOpen size={24} />}
                       </div>
                     )}
                     <div>
-                      <div className={`text-xs font-semibold ${item._type === 'resource' ? 'text-blue-500' : 'text-green-500'}`}>
-                        {item._type === 'resource' ? 'Resource' : 'Training Step'}
+                      <div className={`text-xs font-semibold ${item.type === 'resource' ? 'text-blue-500' : 'text-green-500'}`}>
+                        {item.type === 'resource' ? 'Resource' : 'Training'}
                       </div>
                       {item.title}
                       {item.tags && (
