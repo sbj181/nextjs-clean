@@ -167,7 +167,7 @@ body {
 /* Sidebar */
 
 .sidebar-link {
-  @apply bg-slate-200 dark:bg-slate-900 flex rounded-lg text-center p-3 transition-all text-lg duration-300 mb-2 relative;
+  @apply flex rounded-lg text-center p-3 transition-all text-lg duration-300 mb-2 relative;
 }
 .sidebar-link.sub {
   @apply text-sm
