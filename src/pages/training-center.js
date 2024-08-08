@@ -151,7 +151,7 @@ const TrainingManager = () => {
                {/*  {training.completedSteps || 0}/{training.steps?.length || 0} steps */}
                 {training.steps?.length} {training.steps?.length === 1 ? 'Step' : 'Steps'}
               </div>
-              <h2 className="text-xl capitalize font-semibold">{training.title}</h2>
+              <h2 className="text-xl font-semibold">{training.title}</h2>
               <div className=''>
                 
                 <p className='opacity-65 min-h-32 text-sm'>{training.description}</p>
@@ -165,9 +165,9 @@ const TrainingManager = () => {
                 </Link>
                 <button
                   onClick={() => handleDeleteTraining(training.id)}
-                  className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                  className="px-4 py-2 bg-custom-black text-white bg-opacity-75 hover:bg-opacity-100 dark:text-white dark:bg-custom-black rounded-lg hover:bg-custom-black-dark transition"
                 >
-                  <FiTrash2 />
+                  <FiTrash2 size={18} />
                 </button>
               </div>
         
@@ -176,16 +176,16 @@ const TrainingManager = () => {
         ))}
       </div>
 
-      <section className='my-8'>
+      <section className='my-8 w-full flex items-center justify-center bg-slate-150 bg-opacity-25 rounded-xl p-10'>
         {!isAddingTraining ? (
           <button
             onClick={() => setIsAddingTraining(true)}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+            className="rounded-xl py-4 px-12 bg-custom-green dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition"
           >
             Add New Training
           </button>
         ) : (
-          <div className="mb-4">
+          <div className="mb-4 w-full">
             <h2 className="text-xl font-bold mb-4 mt-4">Add New Training</h2>
             <input
               type="text"

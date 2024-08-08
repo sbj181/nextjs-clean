@@ -2,7 +2,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiTrash2, FiHeart } from 'react-icons/fi';
+import {  FiHeart } from 'react-icons/fi';
 
 const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource }) => {
   return (
@@ -28,7 +28,7 @@ const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource }) => {
             <div className="text-sm mb-2">
               <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
             </div>
-            <Link href={`/resource/${resource.slug}`}><h2 className="text-xl capitalize font-semibold">{resource.title}</h2></Link>
+            <Link href={`/resource/${resource.slug}`}><h2 className="text-xl font-semibold">{resource.title}</h2></Link>
             <div className=''>
               <p className='opacity-65 min-h-32 text-sm'>{resource.description}</p>
             </div>
@@ -42,16 +42,11 @@ const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource }) => {
               )}
               <button
                 onClick={() => onRemoveFavorite(resource.id)}
-                className="px-3 py-2 text-sm bg-custom-green-dark text-white rounded-lg hover:bg-custom-green transition"
+                className="px-3 py-2 text-sm bg-pink-600 text-white dark:bg-slate-700 dark:text-pink-300 rounded-lg hover:bg-pink-800 transition"
               >
-                <FiHeart className="fill-current" />
+                <FiHeart size={18} className="fill-current" />
               </button>
-              <button
-                onClick={() => handleDeleteResource(resource.id)}
-                className="px-3 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-              >
-                <FiTrash2 />
-              </button>
+             
             </div>
           </div>
         ))}

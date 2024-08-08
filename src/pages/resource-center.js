@@ -254,7 +254,7 @@ const ResourceCenter = () => {
               <div className="text-sm mb-2">
                 <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
               </div>
-              <Link href={`/resource/${resource.slug}`}><h2 className="text-xl capitalize font-semibold">{resource.title}</h2></Link>
+              <Link href={`/resource/${resource.slug}`}><h2 className="text-xl font-semibold">{resource.title}</h2></Link>
               <div className=''>
                 <p className='opacity-65 min-h-32 text-sm'>{resource.description}</p>
               </div>
@@ -268,9 +268,9 @@ const ResourceCenter = () => {
                 )}
                 <button
                   onClick={() => handleFavoriteResource(resource.id)}
-                  className={`px-3 py-2 text-sm rounded-lg transition ${resource.is_favorite ? 'bg-custom-green text-white hover:bg-custom-green-dark' : 'bg-custom-green text-white hover:bg-custom-green-dark'}`}
+                  className={`px-3 py-2 bg-pink-600 text-white dark:bg-slate-700 dark:hover:bg-slate-800 dark:text-pink-300 hover:bg-pink-800 rounded-lg transition ${resource.is_favorite ? 'bg-custom-green text-white hover:bg-custom-green-dark' : 'bg-custom-green text-white hover:bg-custom-green-dark'}`}
                 >
-                  <FiHeart className={resource.is_favorite ? 'fill-current' : ''} />
+                  <FiHeart size={18} className={resource.is_favorite ? 'fill-current' : ''} />
                 </button>
                 
                 <button
@@ -285,15 +285,15 @@ const ResourceCenter = () => {
                     setIsEditingResource(true);
                     setIsAddingResource(true);
                   }}
-                  className="px-3 py-2 text-sm bg-slate-400 text-white rounded-lg hover:bg-slate-500 transition"
+                  className="px-3 py-2 text-sm bg-slate-400 dark:bg-slate-700 dark:hover:bg-slate-800 text-white rounded-lg hover:bg-slate-500 transition"
                 >
-                  <FiEdit2 />
+                  <FiEdit2 size={18} />
                 </button>
                 <button
                   onClick={() => handleDeleteResource(resource.id)}
-                  className="px-3 py-2 text-sm bg-custom-black text-white rounded-lg hover:bg-custom-black-dark transition"
+                  className="px-3 py-2 text-sm bg-custom-black bg-opacity-75 text-white rounded-lg hover:bg-custom-black-dark transition"
                 >
-                  <FiTrash2 />
+                  <FiTrash2 size={18} />
                 </button>
               </div>
             </div>

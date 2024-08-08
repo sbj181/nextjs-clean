@@ -248,7 +248,7 @@ export default function IndexPage(
                 <div className="text-sm mb-2">
                   <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
                 </div>
-                <Link href={`/resource/${resource.slug}`}><h2 className="text-xl capitalize font-semibold">{resource.title}</h2></Link>
+                <Link href={`/resource/${resource.slug}`}><h2 className="text-xl font-semibold">{resource.title}</h2></Link>
                 <div className=''>
                   <p className='opacity-65 min-h-32 text-sm'>{resource.description}</p>
                 </div>
@@ -262,9 +262,9 @@ export default function IndexPage(
                   )}
                   <button
                     onClick={() => handleFavoriteResource(resource.id)}
-                    className={`px-3 py-2 text-sm rounded-lg transition ${resource.is_favorite ? 'bg-custom-green text-white hover:bg-custom-green-dark' : 'bg-custom-green text-white hover:bg-custom-green-dark'}`}
+                    className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${resource.is_favorite ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}
                   >
-                    <FiHeart className={resource.is_favorite ? 'fill-current' : ''} />
+                    <FiHeart size={18} className={resource.is_favorite ? 'fill-current' : ''} />
                   </button>
                 </div>
               </div>
@@ -272,7 +272,7 @@ export default function IndexPage(
           ))}
         </div>
         <div className='w-full p-4 bg-opacity-20 rounded-xl flex items-center justify-center'>
-          <Link className='rounded-xl py-4 px-12 bg-slate-200 dark:bg-slate-950 bg-opacity-50 hover:bg-opacity-100 transition' href={'/resource-center'}>
+          <Link className='rounded-xl py-4 px-12 bg-slate-300 dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition' href={'/resource-center'}>
             View All Resources
           </Link>
         </div>
@@ -304,7 +304,7 @@ export default function IndexPage(
                 <div className="text-sm mb-2">
                   {training.steps?.length} {training.steps?.length === 1 ? 'Step' : 'Steps'}
                 </div>
-                <h2 className="text-xl capitalize font-semibold">{training.title}</h2>
+                <h2 className="text-xl font-semibold">{training.title}</h2>
                 <div className=''>
                   <p className='opacity-65 min-h-32 text-sm'>{training.description}</p>
                 </div>
@@ -320,7 +320,7 @@ export default function IndexPage(
           ))}
         </div>
         <div className='w-full p-4 bg-opacity-20 rounded-xl flex items-center justify-center'>
-          <Link className='rounded-xl py-4 px-12 bg-slate-200 dark:bg-slate-950 bg-opacity-50 hover:bg-opacity-100 transition' href={'/training-center'}>
+          <Link className='rounded-xl py-4 px-12 bg-slate-300 dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition' href={'/training-center'}>
             View All Training Modules
           </Link>
         </div>
