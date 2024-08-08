@@ -14,6 +14,11 @@ import ProgressTrackerNew from '~/components/ProgressTrackerNew';
 import { useAuth } from '../../lib/useAuth';
 import ImageModal from '~/components/ImageModal';
 
+// Add the slugify function here
+const slugify = (text) => {
+  return text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+};
+
 const TrainingDetail = () => {
   const session = useAuth();
   const [training, setTraining] = useState(null);
@@ -38,6 +43,8 @@ const TrainingDetail = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState('');
   const [modalImageAlt, setModalImageAlt] = useState('');
+  const [resources, setResources] = useState([]); // Add state for all resources
+  const [selectedResources, setSelectedResources] = useState([]); // Add state for selected resources
   const router = useRouter();
   const { slug } = router.query;
 
@@ -74,8 +81,18 @@ const TrainingDetail = () => {
       setTraining(data);
       setEditTitle(data.title);
       setEditDescription(data.description);
+      setSelectedResources(data.resources || []); // Set the selected resources
     }
   }, [slug, role]);
+
+  const fetchResources = useCallback(async () => {
+    const { data, error } = await supabase.from('resources').select('*');
+    if (error) {
+      console.error('Error fetching resources:', error);
+    } else {
+      setResources(data);
+    }
+  }, []);
 
   const fetchSteps = useCallback(async () => {
     if (!training || !role) return;
@@ -118,8 +135,9 @@ const TrainingDetail = () => {
     if (training) {
       fetchSteps();
       fetchCompletedSteps();
+      fetchResources(); // Fetch resources when training is fetched
     }
-  }, [fetchSteps, fetchCompletedSteps, training]);
+  }, [fetchSteps, fetchCompletedSteps, fetchResources, training]);
 
   const handleAddStep = async () => {
     if (!stepTitle || !stepDescription) return;
@@ -180,12 +198,21 @@ const TrainingDetail = () => {
 
   const handleUpdateTraining = async () => {
     if (!editTitle || !editDescription) return;
+  
+    // Regenerate the slug based on the new title
+    const newSlug = slugify(editTitle);
+  
     const { data, error } = await supabase
       .from('trainings')
-      .update({ title: editTitle, description: editDescription })
+      .update({
+        title: editTitle,
+        description: editDescription,
+        slug: newSlug,
+        related_resources: selectedResources, // Update with selected resources
+      })
       .eq('id', training.id)
       .select();
-
+  
     if (error) {
       console.error('Error updating training:', error);
       alert('Error updating training.');
@@ -194,8 +221,13 @@ const TrainingDetail = () => {
       setTraining(data[0]);
       setIsEditing(false);
       alert('Training updated successfully!');
+  
+      // Update the URL to reflect the new slug
+      router.replace(`/training/${newSlug}`);
     }
   };
+  
+  
 
   const handleDeleteStep = async (stepId) => {
     const { error } = await supabase
@@ -285,6 +317,14 @@ const TrainingDetail = () => {
     setModalImageAlt('');
   };
 
+  const handleResourceToggle = (resourceId) => {
+    if (selectedResources.includes(resourceId)) {
+      setSelectedResources(selectedResources.filter(id => id !== resourceId));
+    } else {
+      setSelectedResources([...selectedResources, resourceId]);
+    }
+  };
+
   const myLoader = ({ src }) => {
     return src;
   };
@@ -300,7 +340,7 @@ const TrainingDetail = () => {
       {training && (
       <>
         <Welcome title={isEditing ? 'Edit Training' : training.title} subtitle={isEditing ? '' : training.description} />
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-8">
           <button
             onClick={() => setIsEditing(!isEditing)}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
@@ -323,6 +363,20 @@ const TrainingDetail = () => {
               onChange={(e) => setEditDescription(e.target.value)}
               className="p-2 border border-gray-300 rounded w-full mb-2"
             />
+            <div className="mb-4">
+              <h3 className="font-semibold mb-2">Related Resources</h3>
+              {resources.map((resource) => (
+                <div key={resource.id} className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedResources.includes(resource.id)}
+                    onChange={() => handleResourceToggle(resource.id)}
+                    className="mr-2"
+                  />
+                  <label>{resource.title}</label>
+                </div>
+              ))}
+            </div>
             <div className="flex gap-2">
               <button
                 onClick={handleUpdateTraining}
@@ -334,6 +388,7 @@ const TrainingDetail = () => {
                 onClick={() => {
                   setEditTitle(training.title);
                   setEditDescription(training.description);
+                  setSelectedResources(training.resources || []); // Reset selected resources
                   setIsEditing(false);
                 }}
                 className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
@@ -582,6 +637,25 @@ const TrainingDetail = () => {
           onRequestClose={() => setIsMediaCenterOpen(false)}
           onSelectImage={handleImageSelect}
         />
+        <div className="mt-8">
+          <h2 className="text-xl font-bold mb-4">Related Resources</h2>
+          {selectedResources.length > 0 ? (
+            <ul>
+              {selectedResources.map((resourceId) => {
+                const resource = resources.find(r => r.id === resourceId);
+                return resource ? (
+                  <li key={resource.id}>
+                    <Link href={`/resource/${resource.slug}`}>
+                      <span className="text-blue-500">{resource.title}</span>
+                    </Link>
+                  </li>
+                ) : null;
+              })}
+            </ul>
+          ) : (
+            <p>No related resources selected.</p>
+          )}
+        </div>
       </>
     )}
     <ImageModal
