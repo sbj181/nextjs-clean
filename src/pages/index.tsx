@@ -89,24 +89,39 @@ export default function IndexPage(
 
   const fetchFavorites = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
+    
     if (user) {
-      // Fetch favorite resources
+      // Fetch user's favorite resource IDs from the 'favorites' table
       const { data: favoriteResources, error: favoritesError } = await supabase
-        .from('resources')
-        .select('*, categories(name)')
-        .eq('is_favorite', true)
-        .eq('user_id', user.id); // Assuming you have a user_id field to identify the user who favorited the resource
-
+        .from('favorites')
+        .select('resource_id')
+        .eq('user_id', user.id);
+  
       if (favoritesError) {
         console.error('Error fetching favorite resources:', favoritesError);
+      } else if (favoriteResources.length > 0) {
+        const resourceIds = favoriteResources.map(fav => fav.resource_id);
+        
+        // Fetch the resource details based on the resource IDs
+        const { data: resourcesData, error: resourcesError } = await supabase
+          .from('resources')
+          .select('*, categories(name)')
+          .in('id', resourceIds);
+  
+        if (resourcesError) {
+          console.error('Error fetching resources:', resourcesError);
+        } else {
+          setFavorites(resourcesData || []);
+        }
       } else {
-        setFavorites(favoriteResources || []);
+        setFavorites([]); // No favorites
       }
     }
   }, []);
+  
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfileAndFavorites = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data, error } = await supabase
@@ -114,6 +129,7 @@ export default function IndexPage(
           .select('display_name')
           .eq('id', user.id)
           .single();
+  
         if (error) {
           console.error('Error fetching profile:', error);
         } else {
@@ -121,11 +137,15 @@ export default function IndexPage(
           setFirstName(extractFirstName(data.display_name));
           setInitials(extractInitials(data.display_name));
         }
+  
+        // Fetch user favorites
+        fetchFavorites();
       }
     };
-    fetchProfile();
-    fetchFavorites();
+  
+    fetchProfileAndFavorites();
   }, [fetchFavorites]);
+  
 
   const extractFirstName = (name: string | null) => {
     if (!name) return null;
@@ -154,42 +174,38 @@ export default function IndexPage(
     }
   };
 
-  const handleFavoriteResource = async (id) => {
+  const handleFavoriteResource = async (resourceId) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       alert('You must be logged in to favorite a resource.');
       return;
     }
   
-    const resource = resources.find(r => r.id === id);
+    // Check if the resource is already favorited by this user
+    const { data: existingFavorite } = await supabase
+      .from('favorites')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('resource_id', resourceId)
+      .single();
   
-    if (!resource) {
-      console.error(`Resource with id ${id} not found`);
-      return;
+    if (existingFavorite) {
+      // If already favorited, remove it
+      await supabase
+        .from('favorites')
+        .delete()
+        .eq('id', existingFavorite.id);
+    } else {
+      // Otherwise, add it
+      await supabase
+        .from('favorites')
+        .insert({ user_id: user.id, resource_id: resourceId });
     }
   
-    const isFavorite = !resource.is_favorite;
-  
-    // Optimistically update the state
-    const updatedResources = resources.map(r => r.id === id ? { ...r, is_favorite: isFavorite, user_id: user.id } : r);
-    setResources(updatedResources);
-    setFavorites(updatedResources.filter(r => r.is_favorite && r.user_id === user.id));
-  
-    // Perform the API call
-    const { error } = await supabase
-      .from('resources')
-      .update({ is_favorite: isFavorite, user_id: isFavorite ? user.id : null }) // set user_id to null when unfavoriting
-      .eq('id', id);
-  
-    if (error) {
-      console.error('Error updating favorite status:', error);
-      alert('Error updating favorite status.');
-      // Rollback the optimistic update
-      const revertedResources = resources.map(r => r.id === id ? { ...r, is_favorite: !isFavorite, user_id: isFavorite ? user.id : null } : r);
-      setResources(revertedResources);
-      setFavorites(revertedResources.filter(r => r.is_favorite && r.user_id === user.id));
-    }
+    // Refresh the favorites list
+    fetchFavorites();
   };
+  
 
   if (!session) return <Loading />;
 
@@ -262,10 +278,11 @@ export default function IndexPage(
                   )}
                   <button
                     onClick={() => handleFavoriteResource(resource.id)}
-                    className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${resource.is_favorite ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}
+                    className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${favorites.some(fav => fav.id === resource.id) ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}
                   >
-                    <FiHeart size={18} className={resource.is_favorite ? 'fill-current' : ''} />
+                    <FiHeart size={18} className={favorites.some(fav => fav.id === resource.id) ? 'fill-current' : ''} />
                   </button>
+
                 </div>
               </div>
             )

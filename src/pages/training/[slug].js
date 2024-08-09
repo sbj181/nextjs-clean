@@ -13,6 +13,9 @@ import MediaCenter from '~/components/MediaCenter';
 import ProgressTrackerNew from '~/components/ProgressTrackerNew';
 import { useAuth } from '../../lib/useAuth';
 import ImageModal from '~/components/ImageModal';
+import Select from 'react-select';
+import ResourceCard from '~/components/ResourceCard';
+
 
 // Add the slugify function here
 const slugify = (text) => {
@@ -72,27 +75,36 @@ const TrainingDetail = () => {
   }, [session]);
 
   const fetchTraining = useCallback(async () => {
-    if (!slug || !role) return;
-    const { data, error } = await supabase.from('trainings').select('*').eq('slug', slug).single();
-    if (error) {
-      console.error('Error fetching training:', error);
-    } else {
-      console.log('Training data:', data); // Debug log
-      setTraining(data);
-      setEditTitle(data.title);
-      setEditDescription(data.description);
-      setSelectedResources(data.resources || []); // Set the selected resources
-    }
-  }, [slug, role]);
+  if (!slug || !role) return;
+  const { data, error } = await supabase.from('trainings').select('*').eq('slug', slug).single();
+  if (error) {
+    console.error('Error fetching training:', error);
+  } else {
+    console.log('Training data:', data); // Debug log
+    setTraining(data);
+    setEditTitle(data.title);
+    setEditDescription(data.description);
+    setSelectedResources(data.related_resources || []); // Set the selected resources
+  }
+}, [slug, role]);
 
-  const fetchResources = useCallback(async () => {
-    const { data, error } = await supabase.from('resources').select('*');
-    if (error) {
-      console.error('Error fetching resources:', error);
-    } else {
-      setResources(data);
-    }
-  }, []);
+
+const fetchResources = useCallback(async () => {
+  const { data, error } = await supabase
+    .from('resources')
+    .select(`
+      *,
+      categories(name)
+    `)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching resources:', error);
+  } else {
+    setResources(data);
+  }
+}, []);
+
 
   const fetchSteps = useCallback(async () => {
     if (!training || !role) return;
@@ -199,7 +211,6 @@ const TrainingDetail = () => {
   const handleUpdateTraining = async () => {
     if (!editTitle || !editDescription) return;
   
-    // Regenerate the slug based on the new title
     const newSlug = slugify(editTitle);
   
     const { data, error } = await supabase
@@ -222,10 +233,10 @@ const TrainingDetail = () => {
       setIsEditing(false);
       alert('Training updated successfully!');
   
-      // Update the URL to reflect the new slug
       router.replace(`/training/${newSlug}`);
     }
   };
+  
   
   
 
@@ -317,12 +328,10 @@ const TrainingDetail = () => {
     setModalImageAlt('');
   };
 
-  const handleResourceToggle = (resourceId) => {
-    if (selectedResources.includes(resourceId)) {
-      setSelectedResources(selectedResources.filter(id => id !== resourceId));
-    } else {
-      setSelectedResources([...selectedResources, resourceId]);
-    }
+  // Define the handleResourceSelect function
+  const handleResourceSelect = (selectedOptions) => {
+    // Map selected options to an array of resource IDs
+    setSelectedResources(selectedOptions.map(option => option.value));
   };
 
   const myLoader = ({ src }) => {
@@ -355,7 +364,7 @@ const TrainingDetail = () => {
               placeholder="Title"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="p-2 border border-gray-300 rounded w-full mb-2"
+              className="p-2 border border-gray-300 rounded w-full mb-2 text-2xl"
             />
             <textarea
               placeholder="Description"
@@ -364,20 +373,16 @@ const TrainingDetail = () => {
               className="p-2 border border-gray-300 rounded w-full mb-2"
             />
             <div className="mb-4">
-              <h3 className="font-semibold mb-2">Related Resources</h3>
-              {resources.map((resource) => (
-                <div key={resource.id} className="flex items-center mb-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedResources.includes(resource.id)}
-                    onChange={() => handleResourceToggle(resource.id)}
-                    className="mr-2"
-                  />
-                  <label>{resource.title}</label>
-                </div>
-              ))}
+              <h3 className="font-semibold mb-2">Are there related resources?</h3>
+              <Select
+                isMulti
+                options={resources.map(resource => ({ value: resource.id, label: resource.title }))}
+                value={selectedResources.map(id => ({ value: id, label: resources.find(r => r.id === id)?.title }))}
+                onChange={handleResourceSelect}
+                className='mb-4'
+              />
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 mb-8">
               <button
                 onClick={handleUpdateTraining}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
@@ -553,8 +558,7 @@ const TrainingDetail = () => {
           </Droppable>
         </DragDropContext>
         <section className='addnewstep -scroll-mt-8 mb-8 block justify-between p-2'>
-          <Link href="/training-center"><button className="px-4 py-2 flex items-center gap-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition mt-4 mr-2">
-          <FiArrowLeft />  Back to Training Center</button></Link>
+         
           {!isAddingStep ? (
             <button
               onClick={() => setIsAddingStep(true)}
@@ -571,26 +575,26 @@ const TrainingDetail = () => {
                   placeholder="Step Title"
                   value={stepTitle}
                   onChange={(e) => setStepTitle(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full mb-2"
+                  className="p-2 border dark:bg-slate-950 border-gray-300 border-opacity-50 rounded w-full mb-2"
                 />
                 <textarea
                   placeholder="Step Description"
                   value={stepDescription}
                   onChange={(e) => setStepDescription(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full mb-2"
+                  className="p-2 border dark:bg-slate-950 border-gray-300 border-opacity-50 rounded w-full mb-2"
                 />
                 <input
                   type="text"
                   placeholder="Video URL"
                   value={stepVideoUrl}
                   onChange={(e) => setStepVideoUrl(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full mb-2"
+                  className="p-2 border dark:bg-slate-950 border-gray-300 border-opacity-50 rounded w-full mb-2"
                 />
                 <div className="flex items-center gap-2 mb-2">
                   <input
                     type="file"
                     onChange={(e) => setStepImage(e.target.files[0])}
-                    className="p-2 border border-gray-300 rounded w-full"
+                    className="p-2 border border-gray-300 border-opacity-50 rounded w-full"
                   />
                   <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 text-sm leading-tight bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
                     Media Center
@@ -631,6 +635,13 @@ const TrainingDetail = () => {
               </div>
             </>
           )}
+            <div className='flex rounded-xl p-10 justify-center items-center mt-4'>
+              <Link href="/training-center">
+                <button className="rounded-xl py-4 px-12 bg-slate-300 dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition gap-2 flex items-center">
+                  <FiArrowLeft />  Back to Training Center
+                </button>
+              </Link>
+            </div>
         </section>
         <MediaCenter
           isOpen={isMediaCenterOpen}
@@ -640,18 +651,14 @@ const TrainingDetail = () => {
         <div className="mt-8">
           <h2 className="text-xl font-bold mb-4">Related Resources</h2>
           {selectedResources.length > 0 ? (
-            <ul>
-              {selectedResources.map((resourceId) => {
-                const resource = resources.find(r => r.id === resourceId);
-                return resource ? (
-                  <li key={resource.id}>
-                    <Link href={`/resource/${resource.slug}`}>
-                      <span className="text-blue-500">{resource.title}</span>
-                    </Link>
-                  </li>
-                ) : null;
-              })}
-            </ul>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {selectedResources.map((resourceId) => {
+              const resource = resources.find(r => r.id === resourceId);
+              return resource ? (
+                <ResourceCard key={resource.id} resource={resource} />
+              ) : null;
+            })}
+          </div>
           ) : (
             <p>No related resources selected.</p>
           )}

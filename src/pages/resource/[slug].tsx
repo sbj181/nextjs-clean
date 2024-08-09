@@ -1,15 +1,17 @@
-// pages/resource/[slug].tsx
-
 import { GetServerSideProps } from 'next';
+import { useState } from 'react';
 import { supabase } from '~/lib/supabaseClient';
+import Link from 'next/link';
 import Container from '~/components/Container';
 import { useRouter } from 'next/router';
-import { FiHeart, FiTrash2, FiEdit2 } from 'react-icons/fi';
+import { FiEdit2, FiArrowLeft } from 'react-icons/fi';
 import Image from 'next/image';
+import EditResourceModal from '~/components/EditResourceModal'; // Import the new component
 
-const ResourcePage = ({ resource }) => {
+const ResourcePage = ({ resource, categories }) => {
   const router = useRouter();
-  
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
@@ -31,14 +33,39 @@ const ResourcePage = ({ resource }) => {
         )}
         <p className="text-lg mb-4">{resource.description}</p>
         <div className="text-sm mb-4">
-          Category: <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.category ? resource.category.name : 'Uncategorized'}</span>
+          Category: <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
         </div>
+        <div className='flex gap-4 items-center mt-4'>
         {resource.download_url && (
           <a href={resource.download_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
             Download
           </a>
         )}
+        <button
+          onClick={() => setIsEditModalOpen(true)}
+          className="px-4 py-2 bg-gray-500 flex items-center gap-2 text-white rounded-lg hover:bg-gray-600 transition"
+        >
+          <FiEdit2 size={18} /> Edit Resource
+        </button>
+        </div>
       </div>
+
+      <div className='flex rounded-xl p-10 justify-center items-center mt-4'>
+        <Link href="/resource-center">
+          <button className="rounded-xl py-4 px-12 bg-slate-300 dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition gap-2 flex items-center">
+            <FiArrowLeft />  Back to Resource Center
+          </button>
+        </Link>
+      </div>
+
+      <EditResourceModal
+        isOpen={isEditModalOpen}
+        onRequestClose={() => setIsEditModalOpen(false)}
+        resource={resource}
+        categories={categories}
+        fetchResources={() => router.replace(router.asPath)} // Reload the page after editing
+      />
+      
     </Container>
   );
 };
@@ -51,6 +78,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     .eq('slug', slug)
     .single();
 
+  const { data: categories } = await supabase
+    .from('categories')
+    .select('*')
+    .order('name', { ascending: true });
+
   if (error) {
     console.error('Error fetching resource:', error);
     return {
@@ -61,6 +93,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       resource: data,
+      categories,
     },
   };
 };

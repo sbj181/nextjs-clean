@@ -57,21 +57,32 @@ const Profile = () => {
 
   const fetchFavorites = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    console.log('User:', user); // Log the user object
+    if (!user) return;
   
-    const { data, error } = await supabase
-      .from('resources')
-      .select('*')
-      .eq('is_favorite', true)
+    const { data: favorites, error } = await supabase
+      .from('favorites')
+      .select('resource_id')
       .eq('user_id', user.id);
   
     if (error) {
-      console.error('Error fetching favorite resources:', error);
+      console.error('Error fetching favorites:', error);
+      return;
+    }
+  
+    if (favorites.length > 0) {
+      const favoriteResourceIds = favorites.map(fav => fav.resource_id);
+  
+      const { data: favoriteResources } = await supabase
+        .from('resources')
+        .select('*')
+        .in('id', favoriteResourceIds);
+  
+      setFavorites(favoriteResources);
     } else {
-      console.log('Fetched favorites:', data); // Log the fetched favorite resources
-      setFavorites(data);
+      setFavorites([]); // No favorites
     }
   }, []);
+  
   
 
   useEffect(() => {

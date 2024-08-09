@@ -42,7 +42,7 @@ const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource }) => {
               )}
               <button
                 onClick={() => onRemoveFavorite(resource.id)}
-                className="px-3 py-2 text-sm bg-pink-600 text-white dark:bg-slate-700 dark:text-pink-300 rounded-lg hover:bg-pink-800 transition"
+                className="px-3 py-2 text-sm bg-pink-100 text-pink-600 dark:bg-slate-700 bg-opacity-25 rounded-lg hover:bg-pink-200 transition"
               >
                 <FiHeart size={18} className="fill-current" />
               </button>

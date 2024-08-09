@@ -59,6 +59,9 @@ dependencies:
   react-modal:
     specifier: ^3.16.1
     version: 3.16.1(react-dom@18.2.0)(react@18.2.0)
+  react-select:
+    specifier: ^5.8.0
+    version: 5.8.0(@types/react@18.2.55)(react-dom@18.2.0)(react@18.2.0)
   sanity:
     specifier: 3.28.0
     version: 3.28.0(@types/react@18.2.55)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8)

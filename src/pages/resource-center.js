@@ -27,6 +27,35 @@ const ResourceCenter = () => {
   const [isMediaCenterOpen, setIsMediaCenterOpen] = useState(false);
   const [categories, setCategories] = useState([]); // State to hold categories
 
+  const fetchFavorites = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+  
+    const { data: favorites, error } = await supabase
+      .from('favorites')
+      .select('resource_id')
+      .eq('user_id', user.id);
+  
+    if (error) {
+      console.error('Error fetching favorites:', error);
+      return;
+    }
+  
+    // Fetch the favorite resources based on the resource IDs
+    if (favorites.length > 0) {
+      const favoriteResourceIds = favorites.map(fav => fav.resource_id);
+  
+      const { data: favoriteResources } = await supabase
+        .from('resources')
+        .select('*, categories(name)')
+        .in('id', favoriteResourceIds);
+  
+      setFavorites(favoriteResources);
+    } else {
+      setFavorites([]); // No favorites
+    }
+  };
+
   const fetchResources = useCallback(async () => {
     const { data, error } = await supabase
       .from('resources')
@@ -35,8 +64,7 @@ const ResourceCenter = () => {
     if (error) console.error('Error fetching resources:', error);
     else {
       setResources(data);
-      const favoriteResources = data.filter(resource => resource.is_favorite);
-      setFavorites(favoriteResources);
+      fetchFavorites(); // Refresh favorites after fetching resources
     }
   }, []);
 
@@ -143,7 +171,6 @@ const ResourceCenter = () => {
 
     const slug = slugify(title);
 
-
     const { error } = await supabase
       .from('resources')
       .update({ title, description, category_id: categoryId, image_url: imageUrl, download_url: downloadUrl, slug })
@@ -178,40 +205,37 @@ const ResourceCenter = () => {
     }
   };
 
-  const handleFavoriteResource = async (id) => {
+  const handleFavoriteResource = async (resourceId) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       alert('You must be logged in to favorite a resource.');
       return;
     }
   
-    // Find the resource and its current favorite status
-    const resource = resources.find(r => r.id === id);
-    const isFavorite = !resource.is_favorite;
+    // Check if the resource is already favorited by this user
+    const { data: existingFavorite } = await supabase
+      .from('favorites')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('resource_id', resourceId)
+      .single();
   
-    // Optimistically update the state
-    const updatedResources = resources.map(r => r.id === id ? { ...r, is_favorite: isFavorite, user_id: user.id } : r);
-    setResources(updatedResources);
-    setFavorites(updatedResources.filter(r => r.is_favorite && r.user_id === user.id));
-  
-    // Perform the API call
-    const { error } = await supabase
-      .from('resources')
-      .update({ is_favorite: isFavorite, user_id: user.id })
-      .eq('id', id);
-  
-    if (error) {
-      console.error('Error updating favorite status:', error);
-      alert('Error updating favorite status.');
-      // Rollback the optimistic update
-      const revertedResources = resources.map(r => r.id === id ? { ...r, is_favorite: !isFavorite, user_id: null } : r);
-      setResources(revertedResources);
-      setFavorites(revertedResources.filter(r => r.is_favorite && r.user_id === user.id));
+    if (existingFavorite) {
+      // If already favorited, remove it
+      await supabase
+        .from('favorites')
+        .delete()
+        .eq('id', existingFavorite.id);
     } else {
-      // No further action needed since state is already updated optimistically
+      // Otherwise, add it
+      await supabase
+        .from('favorites')
+        .insert({ user_id: user.id, resource_id: resourceId });
     }
-  };
   
+    // Refresh the favorites list
+    fetchFavorites();
+  };
   
 
   const handleImageSelect = (url) => {
@@ -235,7 +259,6 @@ const ResourceCenter = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
         {resources.map((resource) => (
           resource && (
-            
             <div key={resource.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[400px] overflow-auto flex-col relative">
               {resource.image_url ? (
                 <div className='resourceImage h-20 w-full rounded-lg bg-slate-300 mb-4 overflow-hidden relative'>
@@ -261,17 +284,18 @@ const ResourceCenter = () => {
               <div className="flex gap-1 mt-8 absolute bottom-4">
                 {resource.download_url && (
                   <a href={resource.download_url} target="_blank" rel="noopener noreferrer">
-                    <button className="px-4 py-2 text-sm bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
+                    <button className="px-5 py-2 text-sm bg-custom-dark-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
                       Download
                     </button>
                   </a>
                 )}
                 <button
-                  onClick={() => handleFavoriteResource(resource.id)}
-                  className={`px-3 py-2 bg-pink-600 text-white dark:bg-slate-700 dark:hover:bg-slate-800 dark:text-pink-300 hover:bg-pink-800 rounded-lg transition ${resource.is_favorite ? 'bg-custom-green text-white hover:bg-custom-green-dark' : 'bg-custom-green text-white hover:bg-custom-green-dark'}`}
+                onClick={() => handleFavoriteResource(resource.id)}
+                className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${favorites.some(fav => fav.id === resource.id) ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}
                 >
-                  <FiHeart size={18} className={resource.is_favorite ? 'fill-current' : ''} />
+                <FiHeart size={18} className={favorites.some(fav => fav.id === resource.id) ? 'fill-current' : ''} />
                 </button>
+
                 
                 <button
                   onClick={() => {
@@ -285,13 +309,13 @@ const ResourceCenter = () => {
                     setIsEditingResource(true);
                     setIsAddingResource(true);
                   }}
-                  className="px-3 py-2 text-sm bg-slate-400 dark:bg-slate-700 dark:hover:bg-slate-800 text-white rounded-lg hover:bg-slate-500 transition"
+                  className="px-2 py-2 hover:bg-opacity-35 dark:text-slate-100 text-sm bg-opacity-25 bg-slate-100 text-custom-black rounded-lg hover:bg-slate-200 transition"
                 >
                   <FiEdit2 size={18} />
                 </button>
                 <button
                   onClick={() => handleDeleteResource(resource.id)}
-                  className="px-3 py-2 text-sm bg-custom-black bg-opacity-75 text-white rounded-lg hover:bg-custom-black-dark transition"
+                  className="px-2 py-2 hover:bg-opacity-35 dark:text-slate-100 text-sm bg-slate-100 bg-opacity-25 text-custom-black rounded-lg hover:bg-slate-200 transition"
                 >
                   <FiTrash2 size={18} />
                 </button>
@@ -301,11 +325,11 @@ const ResourceCenter = () => {
         ))}
       </div>
 
-      <section className='my-8'>
+      <section className='my-8 w-full flex items-center justify-center bg-slate-150 bg-opacity-25 rounded-xl'>
         {!isAddingResource ? (
           <button
             onClick={() => setIsAddingResource(true)}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+            className="rounded-xl py-4 px-12 bg-custom-green dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition"
           >
             Add New Resource
           </button>
