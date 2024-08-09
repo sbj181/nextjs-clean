@@ -71,7 +71,7 @@ export default function Sidebar() {
   return (
     <aside className={`fixed rounded-br-xl overflow-scroll no-scrollbar inset-y-0 left-0 z-40 pt-32 flex flex-col bg-slate-100 dark:bg-gradient-to-b dark:from-slate-950 dark:to-slate-800 w-80 p-5 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <ul className="w-full">
-        <div className="bg-slate-300 dark:bg-slate-800 mb-4 rounded-lg">
+        <div className="bg-slate-200 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between cursor-pointer">
             <Link href="/" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiHome /></span> Dashboard
@@ -79,12 +79,12 @@ export default function Sidebar() {
           </li>
         </div>
   
-        <div className="bg-slate-300 dark:bg-slate-800 mb-4 rounded-lg">
+        <div className="bg-slate-200 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between">
             <Link href="/resource-center" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiLayers /></span> Resources
             </Link>
-            <button onClick={() => toggleSection('resources')} className="bg-slate-900 bg-opacity-20 p-2 rounded-xl hover:bg-opacity-50 focus:outline-none">
+            <button onClick={() => toggleSection('resources')} className="bg-slate-400 bg-opacity-20 p-2 rounded-xl hover:bg-opacity-50 focus:outline-none">
               {openSection === 'resources' ? <FiChevronUp /> : <FiChevronDown />}
             </button>
           </li>
@@ -101,12 +101,12 @@ export default function Sidebar() {
           )}
         </div>
   
-        <div className="bg-slate-300 dark:bg-slate-800 mb-4 rounded-lg">
+        <div className="bg-slate-200 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between">
             <Link href="/training-center" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiBook /></span> Training
             </Link>
-            <button onClick={() => toggleSection('trainings')} className="bg-slate-900 bg-opacity-20 p-2 rounded-xl hover:bg-opacity-50 focus:outline-none">
+            <button onClick={() => toggleSection('trainings')} className="bg-slate-400 bg-opacity-20 p-2 rounded-xl hover:bg-opacity-50 focus:outline-none">
               {openSection === 'trainings' ? <FiChevronUp /> : <FiChevronDown />}
             </button>
           </li>
@@ -123,7 +123,7 @@ export default function Sidebar() {
           )}
         </div>
   
-        <div className="bg-slate-300 dark:bg-slate-800 mb-4 rounded-lg">
+        <div className="bg-slate-200 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between">
             <Link href="/profile" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiUser /></span> Profile

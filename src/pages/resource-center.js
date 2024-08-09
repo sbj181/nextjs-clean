@@ -6,14 +6,15 @@ import { FiArchive, FiTrash2, FiHeart, FiEdit2 } from 'react-icons/fi';
 import Image from 'next/image';
 import Head from 'next/head';
 import Link from 'next/link';
-import MediaCenter from '~/components/MediaCenter'; // Import the MediaCenter component
-import Favorites from '~/components/Favorites'; // Import the Favorites component
-import Modal from 'react-modal'; // Import react-modal
-import { uploadImage, slugify } from '../utils'; // Import the uploadImage function
+import MediaCenter from '~/components/MediaCenter';
+import Favorites from '~/components/Favorites';
+import Modal from 'react-modal';
+import { uploadImage, slugify } from '../utils';
 
 const ResourceCenter = () => {
   const [resources, setResources] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [loadingFavoriteId, setLoadingFavoriteId] = useState(null); // Track which resource is being favorited/unfavorited
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -25,7 +26,7 @@ const ResourceCenter = () => {
   const [isEditingResource, setIsEditingResource] = useState(false);
   const [editResourceId, setEditResourceId] = useState(null);
   const [isMediaCenterOpen, setIsMediaCenterOpen] = useState(false);
-  const [categories, setCategories] = useState([]); // State to hold categories
+  const [categories, setCategories] = useState([]);
 
   const fetchFavorites = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -41,7 +42,6 @@ const ResourceCenter = () => {
       return;
     }
   
-    // Fetch the favorite resources based on the resource IDs
     if (favorites.length > 0) {
       const favoriteResourceIds = favorites.map(fav => fav.resource_id);
   
@@ -52,7 +52,7 @@ const ResourceCenter = () => {
   
       setFavorites(favoriteResources);
     } else {
-      setFavorites([]); // No favorites
+      setFavorites([]);
     }
   };
 
@@ -64,7 +64,7 @@ const ResourceCenter = () => {
     if (error) console.error('Error fetching resources:', error);
     else {
       setResources(data);
-      fetchFavorites(); // Refresh favorites after fetching resources
+      fetchFavorites();
     }
   }, []);
 
@@ -96,123 +96,15 @@ const ResourceCenter = () => {
     };
   }, [fetchResources, fetchCategories]);
 
-  const handleAddResource = async () => {
-    if (!title || !description || (!category && !newCategory)) return;
-
-    let categoryId;
-    if (newCategory) {
-      const { data, error } = await supabase
-        .from('categories')
-        .insert([{ name: newCategory }])
-        .select()
-        .single();
-      if (error) {
-        console.error('Error adding new category:', error);
-        alert('Error adding new category.');
-        return;
-      }
-      categoryId = data.id;
-    } else {
-      categoryId = category;
-    }
-
-    let imageUrl = '';
-    if (file) {
-      imageUrl = await uploadImage(file);
-      if (!imageUrl) return;
-    }
-
-    const slug = slugify(title);
-
-    const { data, error } = await supabase
-      .from('resources')
-      .insert([{ title, description, category_id: categoryId, image_url: imageUrl, download_url: downloadUrl, slug }])
-      .single();
-    if (error) {
-      console.error('Error adding resource:', error);
-      alert('Error adding resource.');
-    } else {
-      setTitle('');
-      setDescription('');
-      setCategory('');
-      setNewCategory('');
-      setDownloadUrl('');
-      setFile(null);
-      setIsAddingResource(false);
-      alert('Resource added successfully!');
-    }
-  };
-
-  const handleUpdateResource = async () => {
-    if (!title || !description || (!category && !newCategory)) return;
-
-    let categoryId;
-    if (newCategory) {
-      const { data, error } = await supabase
-        .from('categories')
-        .insert([{ name: newCategory }])
-        .select()
-        .single();
-      if (error) {
-        console.error('Error adding new category:', error);
-        alert('Error adding new category.');
-        return;
-      }
-      categoryId = data.id;
-    } else {
-      categoryId = category;
-    }
-
-    let imageUrl = '';
-    if (file) {
-      imageUrl = await uploadImage(file);
-      if (!imageUrl) return;
-    }
-
-    const slug = slugify(title);
-
-    const { error } = await supabase
-      .from('resources')
-      .update({ title, description, category_id: categoryId, image_url: imageUrl, download_url: downloadUrl, slug })
-      .eq('id', editResourceId);
-    if (error) {
-      console.error('Error updating resource:', error);
-      alert('Error updating resource.');
-    } else {
-      setTitle('');
-      setDescription('');
-      setCategory('');
-      setNewCategory('');
-      setDownloadUrl('');
-      setFile(null);
-      setEditResourceId(null);
-      setIsEditingResource(false);
-      alert('Resource updated successfully!');
-      fetchResources(); // Refresh the resources list
-    }
-  };
-
-  const handleDeleteResource = async (id) => {
-    const { error } = await supabase
-      .from('resources')
-      .delete()
-      .eq('id', id);
-    if (error) {
-      console.error('Error deleting resource:', error);
-      alert('Error deleting resource.');
-    } else {
-      alert('Resource deleted successfully!');
-    }
-  };
-
   const handleFavoriteResource = async (resourceId) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       alert('You must be logged in to favorite a resource.');
       return;
     }
-  
-    // Check if the resource is already favorited by this user
+
+    setLoadingFavoriteId(resourceId); // Set loading state
+
     const { data: existingFavorite } = await supabase
       .from('favorites')
       .select('*')
@@ -221,22 +113,19 @@ const ResourceCenter = () => {
       .single();
   
     if (existingFavorite) {
-      // If already favorited, remove it
       await supabase
         .from('favorites')
         .delete()
         .eq('id', existingFavorite.id);
     } else {
-      // Otherwise, add it
       await supabase
         .from('favorites')
         .insert({ user_id: user.id, resource_id: resourceId });
     }
   
-    // Refresh the favorites list
+    setLoadingFavoriteId(null); // Clear loading state
     fetchFavorites();
   };
-  
 
   const handleImageSelect = (url) => {
     setFile(url);
@@ -290,13 +179,16 @@ const ResourceCenter = () => {
                   </a>
                 )}
                 <button
-                onClick={() => handleFavoriteResource(resource.id)}
-                className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${favorites.some(fav => fav.id === resource.id) ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}
+                  onClick={() => handleFavoriteResource(resource.id)}
+                  className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${favorites.some(fav => fav.id === resource.id) ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}
+                  disabled={loadingFavoriteId === resource.id} // Disable button while loading
                 >
-                <FiHeart size={18} className={favorites.some(fav => fav.id === resource.id) ? 'fill-current' : ''} />
+                  {loadingFavoriteId === resource.id ? (
+                    <div className="w-5 h-5 rounded-full border-2 border-pink-600 border-t-transparent animate-spin"></div>
+                  ) : (
+                    <FiHeart size={18} className={favorites.some(fav => fav.id === resource.id) ? 'fill-current' : ''} />
+                  )}
                 </button>
-
-                
                 <button
                   onClick={() => {
                     setTitle(resource.title);
@@ -345,7 +237,6 @@ const ResourceCenter = () => {
                 bottom: 'auto',
                 marginRight: '-50%',
                 transform: 'translate(-50%, -50%)',
-                
               },
               overlay: {
                 backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -446,7 +337,7 @@ const ResourceCenter = () => {
         isOpen={isMediaCenterOpen}
         onRequestClose={() => setIsMediaCenterOpen(false)}
         onSelectImage={handleImageSelect}
-        bucketName="training-images" // Pass the bucket name as a prop
+        bucketName="training-images"
       />
     </Container>
   );
