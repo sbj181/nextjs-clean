@@ -347,228 +347,249 @@ const fetchResources = useCallback(async () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {training && (
-      <>
-        <Welcome title={isEditing ? 'Edit Training' : training.title} subtitle={isEditing ? '' : training.description} />
-        <div className="flex justify-between items-center mb-8">
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-          >
-            {isEditing ? 'Cancel' : 'Edit Training'}
-          </button>
-        </div>
-        {isEditing && (
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Title"
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              className="p-2 border border-gray-300 rounded w-full mb-2 text-2xl"
-            />
-            <textarea
-              placeholder="Description"
-              value={editDescription}
-              onChange={(e) => setEditDescription(e.target.value)}
-              className="p-2 border border-gray-300 rounded w-full mb-2"
-            />
-            <div className="mb-4">
-              <h3 className="font-semibold mb-2">Are there related resources?</h3>
-              <Select
-                isMulti
-                options={resources.map(resource => ({ value: resource.id, label: resource.title }))}
-                value={selectedResources.map(id => ({ value: id, label: resources.find(r => r.id === id)?.title }))}
-                onChange={handleResourceSelect}
-                className='mb-4'
-              />
-            </div>
-            <div className="flex gap-2 mb-8">
-              <button
-                onClick={handleUpdateTraining}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-              >
-                Update Training
-              </button>
-              <button
-                onClick={() => {
-                  setEditTitle(training.title);
-                  setEditDescription(training.description);
-                  setSelectedResources(training.resources || []); // Reset selected resources
-                  setIsEditing(false);
-                }}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-              >
-                Cancel
-              </button>
-            </div>
+        <>
+          <Welcome title={isEditing ? 'Edit Training' : training.title} subtitle={isEditing ? '' : training.description} />
+          <div className="flex justify-between items-center mb-8">
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            >
+              {isEditing ? 'Cancel' : 'Edit Training'}
+            </button>
           </div>
-        )}
-
-        <ProgressTrackerNew trainingId={training.id} steps={steps} />
-
-        <h2 className="text-xl font-bold mb-4">Steps</h2>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="steps">
-            {(provided) => (
-              <ul
-                className="list-none"
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                {steps.map((step, index) => (
-                  <Draggable key={step.id} draggableId={step.id.toString()} index={index}>
-                    {(provided) => (
-                      <li
-                        className="block mb-4 p-4 border border-slate-300 border-opacity-50 rounded-lg items-start bg-slate-50 dark:bg-slate-800"
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        {editStepId === step.id ? (
-                          <div className="w-full">
-                            <input
-                              type="text"
-                              placeholder="Step Title"
-                              value={editStepTitle}
-                              onChange={(e) => setEditStepTitle(e.target.value)}
-                              className="p-2 border border-opacity-25 border-gray-300 rounded w-full mb-2"
-                            />
-                            <textarea
-                              placeholder="Step Description"
-                              value={editStepDescription}
-                              onChange={(e) => setEditStepDescription(e.target.value)}
-                              className="p-2 border border-gray-300 rounded w-full mb-2"
-                            />
-                            <input
-                              type="text"
-                              placeholder="Video URL"
-                              value={editStepVideoUrl}
-                              onChange={(e) => setEditStepVideoUrl(e.target.value)}
-                              className="p-2 border border-gray-300 rounded w-full mb-2"
-                            />
-                            <div className="flex items-center mb-2 gap-2">
-                              <input
-                                type="file"
-                                onChange={(e) => setEditStepImage(e.target.files[0])}
-                                className="p-2 border border-gray-300 rounded w-full"
-                              />
-                              <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 bg-green-500 text-white text-sm leading-tight rounded-lg hover:bg-green-600 transition">
-                                Media Center
-                              </button>
-                            </div>
-                            {editStepImage && (
-                              <Image
-                                loader={myLoader}
-                                src={typeof editStepImage === 'string' ? editStepImage : URL.createObjectURL(editStepImage)}
-                                alt={editStepTitle}
-                                className="mb-2 md:w-1/4"
-                                width={500}
-                                height={300}
-                              />
-                            )}
-                            <div className="flex gap-2 justify-end">
-                              <button
-                                onClick={() => handleUpdateStep(step.id)}
-                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                              >
-                                Update Step
-                              </button>
-                              <button
-                                onClick={() => setEditStepId(null)}
-                                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <div>
-                              <div className='flex items-center gap-4 pb-4 border-b border-slate-300 border-opacity-25 mb-6'>
-                                <div className={`h-10 w-10 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-slate-200 dark:bg-slate-950'}`}>
-                                  {completedSteps.includes(step.id) ? <FiCheck className='stroke-slate-50' size={24} /> : step.step_number}
-                                </div>
-                                <h3 className="font-bold text-xl">{step.title}</h3>
-                                <div className='ml-auto flex gap-2'>
-                                  <button
-                                    onClick={() => {
-                                      setEditStepId(step.id);
-                                      setEditStepTitle(step.title);
-                                      setEditStepDescription(step.description);
-                                      setEditStepImage(step.image_url);
-                                      setEditStepVideoUrl(step.video_url || '');
-                                    }}
-                                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                                  >
-                                    <FiEdit2 />
+          {isEditing && (
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Title"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="p-2 border border-gray-300 rounded w-full mb-2 text-2xl"
+              />
+              <textarea
+                placeholder="Description"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="p-2 border border-gray-300 rounded w-full mb-2"
+              />
+              <div className="mb-4">
+                <h3 className="font-semibold mb-2">Are there related resources?</h3>
+                <Select
+                  isMulti
+                  options={resources.map(resource => ({ value: resource.id, label: resource.title }))}
+                  value={selectedResources.map(id => ({ value: id, label: resources.find(r => r.id === id)?.title }))}
+                  onChange={handleResourceSelect}
+                  className='mb-4'
+                />
+              </div>
+              <div className="flex gap-2 mb-8">
+                <button
+                  onClick={handleUpdateTraining}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                >
+                  Update Training
+                </button>
+                <button
+                  onClick={() => {
+                    setEditTitle(training.title);
+                    setEditDescription(training.description);
+                    setSelectedResources(training.resources || []); // Reset selected resources
+                    setIsEditing(false);
+                  }}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+  
+          <ProgressTrackerNew trainingId={training.id} steps={steps} />
+  
+          <h2 className="text-xl font-bold mb-4">Steps</h2>
+  
+          {steps.length === 0 ? (
+            <div className="bg-custom-green bg-opacity-10 p-6 rounded-lg text-center">
+              <h3 className="text-3xl font-bold text-custom-green-dark">Add Your First Step!</h3>
+              <p className="text-custom-black dark:text-custom-white-dark mt-2">Start building your training by adding a new step.</p>
+              <div className='flex w-full justify-center'>
+                <button
+                  onClick={() => setIsAddingStep(true)}
+                  className="mt-5 px-5 py-3 bg-custom-green text-white rounded-lg hover:bg-custom-green-dark transition flex items-center gap-2"
+                >
+                  Add the first step<FiPlus />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="steps">
+                {(provided) => (
+                  <ul
+                    className="list-none"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                    {steps.map((step, index) => (
+                      <Draggable key={step.id} draggableId={step.id.toString()} index={index}>
+                        {(provided) => (
+                          <li
+                            className="block mb-4 p-4 border border-slate-300 border-opacity-50 rounded-lg items-start bg-slate-50 dark:bg-slate-800"
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            {editStepId === step.id ? (
+                              <div className="w-full">
+                                <input
+                                  type="text"
+                                  placeholder="Step Title"
+                                  value={editStepTitle}
+                                  onChange={(e) => setEditStepTitle(e.target.value)}
+                                  className="p-2 border bg-slate-50 dark:bg-slate-950 border-opacity-60 border-gray-300 rounded w-full mb-2"
+                                />
+                                <textarea
+                                  placeholder="Step Description"
+                                  value={editStepDescription}
+                                  onChange={(e) => setEditStepDescription(e.target.value)}
+                                  className="p-2 border bg-slate-50 dark:bg-slate-950 border-opacity-60 border-gray-300 rounded w-full mb-2"
+                                />
+                                <input
+                                  type="text"
+                                  placeholder="Video URL"
+                                  value={editStepVideoUrl}
+                                  onChange={(e) => setEditStepVideoUrl(e.target.value)}
+                                  className="p-2 border bg-slate-50 dark:bg-slate-950 border-opacity-60 border-gray-300 rounded w-full mb-2"
+                                />
+                                <div className="flex items-center mb-4 gap-2">
+                                  <input
+                                    type="file"
+                                    onChange={(e) => setEditStepImage(e.target.files[0])}
+                                    className="p-2 border border-opacity-60 border-gray-300 rounded w-full"
+                                  />
+                                  <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 bg-green-500 text-white text-sm leading-tight rounded-lg hover:bg-green-600 transition">
+                                    Media Center
                                   </button>
-                                  <button
-                                    onClick={() => handleDeleteStep(step.id)}
-                                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                                  >
-                                    <FiTrash2 />
-                                  </button>
                                 </div>
-                              </div>
-                              <div className='my-4'><p>{step.description}</p></div>
-                              {step.image_url && (
-                                <div className="relative group w-full md:w-1/4" onClick={() => openImageModal(step.image_url, step.title)}>
+                                {editStepImage && (
                                   <Image
                                     loader={myLoader}
-                                    src={step.image_url}
-                                    alt={step.title}
-                                    className="mb-2 transition cursor-pointer"
+                                    src={typeof editStepImage === 'string' ? editStepImage : URL.createObjectURL(editStepImage)}
+                                    alt={editStepTitle}
+                                    className="mb-2 md:w-1/4"
                                     width={500}
                                     height={300}
                                   />
-                                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-25 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                    <FiZoomIn className="text-white text-3xl" />
+                                )}
+                                <div className="flex gap-2 justify-end">
+                                  <button
+                                    onClick={() => handleUpdateStep(step.id)}
+                                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                                  >
+                                    Update Step
+                                  </button>
+                                  <button
+                                    onClick={() => setEditStepId(null)}
+                                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div>
+                                  <div className='flex items-center gap-4 pb-4 border-b border-slate-300 border-opacity-25 mb-6'>
+                                    <div className={`h-10 w-10 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-slate-200 dark:bg-slate-950'}`}>
+                                      {completedSteps.includes(step.id) ? <FiCheck className='stroke-slate-50' size={24} /> : step.step_number}
+                                    </div>
+                                    <h3 className="font-bold text-xl">{step.title}</h3>
+                                    <div className='ml-auto flex gap-2'>
+                                      <button
+                                        onClick={() => {
+                                          setEditStepId(step.id);
+                                          setEditStepTitle(step.title);
+                                          setEditStepDescription(step.description);
+                                          setEditStepImage(step.image_url);
+                                          setEditStepVideoUrl(step.video_url || '');
+                                        }}
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                                      >
+                                        <FiEdit2 />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteStep(step.id)}
+                                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                                      >
+                                        <FiTrash2 />
+                                      </button>
+                                    </div>
                                   </div>
+                                  <div className='my-4'><p>{step.description}</p></div>
+                                  {step.image_url && (
+                                    <div className="relative group w-full md:w-1/4" onClick={() => openImageModal(step.image_url, step.title)}>
+                                      <Image
+                                        loader={myLoader}
+                                        src={step.image_url}
+                                        alt={step.title}
+                                        className="mb-2 transition cursor-pointer"
+                                        width={500}
+                                        height={300}
+                                      />
+                                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-25 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                        <FiZoomIn className="text-white text-3xl" />
+                                      </div>
+                                    </div>
+                                  )}
+                                  {step.video_url && (
+                                    <div className='my-4'>
+                                      <iframe
+                                        width="560"
+                                        height="315"
+                                        src={step.video_url.replace("watch?v=", "embed/")}
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                        title={step.title}
+                                      ></iframe>
+                                    </div>
+                                  )}
+                                  <button
+                                    onClick={() => toggleStepCompletion(step.id)}
+                                    className={`mt-2 px-4 py-2 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-gray-500'} text-white rounded-lg`}
+                                  >
+                                    {completedSteps.includes(step.id) ? 'Completed' : 'Mark as Complete'}
+                                  </button>
                                 </div>
-                              )}
-                              {step.video_url && (
-                                <div className='my-4'>
-                                  <iframe
-                                    width="560"
-                                    height="315"
-                                    src={step.video_url.replace("watch?v=", "embed/")}
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                    title={step.title}
-                                  ></iframe>
-                                </div>
-                              )}
-                              <button
-                                onClick={() => toggleStepCompletion(step.id)}
-                                className={`mt-2 px-4 py-2 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-gray-500'} text-white rounded-lg`}
-                              >
-                                {completedSteps.includes(step.id) ? 'Completed' : 'Mark as Complete'}
-                              </button>
-                            </div>
-                          </>
+                              </>
+                            )}
+                          </li>
                         )}
-                      </li>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </ul>
-            )}
-          </Droppable>
-        </DragDropContext>
-        <section className='addnewstep -scroll-mt-8 mb-8 block justify-between p-2'>
-         
-          {!isAddingStep ? (
-            <button
-              onClick={() => setIsAddingStep(true)}
-              className="px-4 py-2 flex bg-green-500 items-center gap-2 text-white rounded-lg hover:bg-green-600 transition mt-4"
-            >
-              Add New Step <FiPlus />
-            </button>
-          ) : (
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </ul>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
+  
+          {steps.length > 0 && !isAddingStep && (
+            <section className='addnewstep -scroll-mt-8 mb-8 block justify-between p-2'>
+              <div className='w-full bg-slate-300 bg-opacity-25 rounded-lg p-10 flex justify-center items-center'>
+                <button
+                  onClick={() => setIsAddingStep(true)}
+                  className="mt-5 px-5 py-3 bg-custom-green text-white rounded-lg hover:bg-custom-green-dark transition flex items-center gap-2"
+                >
+                  Add a new step <FiPlus />
+                </button>
+              </div>
+            </section>
+          )}
+  
+          {isAddingStep && (
             <>
-              <h2 className="text-xl font-bold mb-4 mt-4">Add New Step</h2>
+              <h2 className="text-xl font-bold mb-4 mt-8">Add New Step</h2>
               <div className="mb-4">
                 <input
                   type="text"
@@ -612,67 +633,70 @@ const fetchResources = useCallback(async () => {
                 )}
                 <div className="block my-4">
                   <div className='gap-2 justify-start flex'>
-                  <button
-                    onClick={handleAddStep}
-                    className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
-                  >
-                    Add Step
-                  </button>
-                  <button
-                    onClick={() => {
-                      setStepTitle('');
-                      setStepDescription('');
-                      setStepImage(null);
-                      setStepVideoUrl('');
-                      setIsAddingStep(false);
-                    }}
-                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-                  >
-                    Cancel
-                  </button>
+                    <button
+                      onClick={handleAddStep}
+                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+                    >
+                      Add Step
+                    </button>
+                    <button
+                      onClick={() => {
+                        setStepTitle('');
+                        setStepDescription('');
+                        setStepImage(null);
+                        setStepVideoUrl('');
+                        setIsAddingStep(false);
+                      }}
+                      className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
               </div>
             </>
           )}
-            <div className='flex rounded-xl p-10 justify-center items-center mt-4'>
-              <Link href="/training-center">
-                <button className="rounded-xl py-4 px-12 bg-slate-300 dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition gap-2 flex items-center">
-                  <FiArrowLeft />  Back to Training Center
-                </button>
-              </Link>
-            </div>
-        </section>
-        <MediaCenter
-          isOpen={isMediaCenterOpen}
-          onRequestClose={() => setIsMediaCenterOpen(false)}
-          onSelectImage={handleImageSelect}
-        />
-        <div className="mt-8">
-          <h2 className="text-xl font-bold mb-4">Related Resources</h2>
-          {selectedResources.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {selectedResources.map((resourceId) => {
-              const resource = resources.find(r => r.id === resourceId);
-              return resource ? (
-                <ResourceCard key={resource.id} resource={resource} />
-              ) : null;
-            })}
+  
+          <div className='flex rounded-xl p-10 justify-center items-center mt-4'>
+            <Link href="/training-center">
+              <button className="rounded-xl py-4 px-12 bg-slate-300 dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition gap-2 flex items-center">
+                <FiArrowLeft />  Back to Training Center
+              </button>
+            </Link>
           </div>
-          ) : (
-            <p>No related resources selected.</p>
-          )}
-        </div>
-      </>
-    )}
-    <ImageModal
-      isOpen={isImageModalOpen}
-      onRequestClose={closeImageModal}
-      src={modalImageSrc}
-      alt={modalImageAlt}
-    />
-  </Container>
-);
+          
+          <MediaCenter
+            isOpen={isMediaCenterOpen}
+            onRequestClose={() => setIsMediaCenterOpen(false)}
+            onSelectImage={handleImageSelect}
+          />
+  
+          <div className="mt-8">
+            <h2 className="text-xl font-bold mb-4">Related Resources</h2>
+            {selectedResources.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {selectedResources.map((resourceId) => {
+                  const resource = resources.find(r => r.id === resourceId);
+                  return resource ? (
+                    <ResourceCard key={resource.id} resource={resource} />
+                  ) : null;
+                })}
+              </div>
+            ) : (
+              <p>No related resources selected.</p>
+            )}
+          </div>
+        </>
+      )}
+      <ImageModal
+        isOpen={isImageModalOpen}
+        onRequestClose={closeImageModal}
+        src={modalImageSrc}
+        alt={modalImageAlt}
+      />
+    </Container>
+  );
+  
 };
 
 export default TrainingDetail;
