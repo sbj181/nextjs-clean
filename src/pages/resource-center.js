@@ -9,12 +9,14 @@ import Link from 'next/link';
 import MediaCenter from '~/components/MediaCenter';
 import Favorites from '~/components/Favorites';
 import Modal from 'react-modal';
+import SkeletonLoader from '~/components/SkeletonLoader'; // Import SkeletonLoader
 import { uploadImage, slugify } from '../utils';
 
 const ResourceCenter = () => {
   const [resources, setResources] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  const [loadingFavoriteId, setLoadingFavoriteId] = useState(null); // Track which resource is being favorited/unfavorited
+  const [loading, setLoading] = useState(true); // Add a loading state
+  const [loadingFavoriteId, setLoadingFavoriteId] = useState(null); 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -57,6 +59,7 @@ const ResourceCenter = () => {
   };
 
   const fetchResources = useCallback(async () => {
+    setLoading(true); // Set loading state to true
     const { data, error } = await supabase
       .from('resources')
       .select('*, categories(name)')
@@ -66,6 +69,7 @@ const ResourceCenter = () => {
       setResources(data);
       fetchFavorites();
     }
+    setLoading(false); // Set loading state to false after fetching
   }, []);
 
   const fetchCategories = useCallback(async () => {
@@ -258,75 +262,79 @@ const ResourceCenter = () => {
         <Favorites favorites={favorites} onRemoveFavorite={handleFavoriteResource} />
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
-        {resources.map((resource) => (
-          resource && (
-            <div key={resource.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[400px] overflow-auto flex-col relative">
-              {resource.image_url ? (
-                <div className='resourceImage h-20 w-full rounded-lg bg-slate-300 mb-4 overflow-hidden relative'>
-                  <Image
-                    src={resource.image_url}
-                    alt={`Image for ${resource.title}`}
-                    layout="fill"
-                    objectFit="cover"
-                  />
-                </div>
-              ) : (
-                <div className='resourceImage h-20 text-slate-600 dark:text-slate-950 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-4 w-full'>
-                  <FiArchive size={32} />
-                </div>
-              )}
-              <div className="text-sm mb-2">
-                <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
-              </div>
-              <Link href={`/resource/${resource.slug}`}><h2 className="text-xl font-semibold">{resource.title}</h2></Link>
-              <div className=''>
-                <p className='opacity-65 min-h-32 text-sm'>{resource.description}</p>
-              </div>
-              <div className="flex gap-1 mt-8 absolute bottom-4">
-                {resource.download_url && (
-                  <a href={resource.download_url} target="_blank" rel="noopener noreferrer">
-                    <button className="px-5 py-2 text-sm bg-custom-dark-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
-                      Download
-                    </button>
-                  </a>
+        {loading ? (
+          Array.from({ length: 8 }).map((_, index) => <SkeletonLoader key={index} />)
+        ) : (
+          resources.map((resource) => (
+            resource && (
+              <div key={resource.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[400px] overflow-auto flex-col relative">
+                {resource.image_url ? (
+                  <div className='resourceImage h-20 w-full rounded-lg bg-slate-300 mb-4 overflow-hidden relative'>
+                    <Image
+                      src={resource.image_url}
+                      alt={`Image for ${resource.title}`}
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </div>
+                ) : (
+                  <div className='resourceImage h-20 text-slate-600 dark:text-slate-950 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-4 w-full'>
+                    <FiArchive size={32} />
+                  </div>
                 )}
-                <button
-                  onClick={() => handleFavoriteResource(resource.id)}
-                  className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${favorites.some(fav => fav.id === resource.id) ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}
-                  disabled={loadingFavoriteId === resource.id} // Disable button while loading
-                >
-                  {loadingFavoriteId === resource.id ? (
-                    <div className="w-5 h-5 rounded-full border-2 border-pink-600 border-t-transparent animate-spin"></div>
-                  ) : (
-                    <FiHeart size={18} className={favorites.some(fav => fav.id === resource.id) ? 'fill-current' : ''} />
+                <div className="text-sm mb-2">
+                  <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
+                </div>
+                <Link href={`/resource/${resource.slug}`}><h2 className="text-xl font-semibold">{resource.title}</h2></Link>
+                <div className=''>
+                  <p className='opacity-65 min-h-32 text-sm'>{resource.description}</p>
+                </div>
+                <div className="flex gap-1 mt-8 absolute bottom-4">
+                  {resource.download_url && (
+                    <a href={resource.download_url} target="_blank" rel="noopener noreferrer">
+                      <button className="px-5 py-2 text-sm bg-custom-dark-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
+                        Download
+                      </button>
+                    </a>
                   )}
-                </button>
-                <button
-                  onClick={() => {
-                    setTitle(resource.title);
-                    setDescription(resource.description);
-                    setCategory(resource.category_id || '');
-                    setNewCategory('');
-                    setDownloadUrl(resource.download_url);
-                    setFile(resource.image_url);
-                    setEditResourceId(resource.id);
-                    setIsEditingResource(true);
-                    setIsAddingResource(true);
-                  }}
-                  className="px-2 py-2 hover:bg-opacity-35 dark:text-slate-100 text-sm bg-opacity-25 bg-slate-100 text-custom-black rounded-lg hover:bg-slate-200 transition"
-                >
-                  <FiEdit2 size={18} />
-                </button>
-                <button
-                  onClick={() => handleDeleteResource(resource.id)}
-                  className="px-2 py-2 hover:bg-opacity-35 dark:text-slate-100 text-sm bg-slate-100 bg-opacity-25 text-custom-black rounded-lg hover:bg-slate-200 transition"
-                >
-                  <FiTrash2 size={18} />
-                </button>
+                  <button
+                    onClick={() => handleFavoriteResource(resource.id)}
+                    className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${favorites.some(fav => fav.id === resource.id) ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}
+                    disabled={loadingFavoriteId === resource.id} // Disable button while loading
+                  >
+                    {loadingFavoriteId === resource.id ? (
+                      <div className="w-5 h-5 rounded-full border-2 border-pink-600 border-t-transparent animate-spin"></div>
+                    ) : (
+                      <FiHeart size={18} className={favorites.some(fav => fav.id === resource.id) ? 'fill-current' : ''} />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setTitle(resource.title);
+                      setDescription(resource.description);
+                      setCategory(resource.category_id || '');
+                      setNewCategory('');
+                      setDownloadUrl(resource.download_url);
+                      setFile(resource.image_url);
+                      setEditResourceId(resource.id);
+                      setIsEditingResource(true);
+                      setIsAddingResource(true);
+                    }}
+                    className="px-2 py-2 hover:bg-opacity-35 dark:text-slate-100 text-sm bg-opacity-25 bg-slate-100 text-custom-black rounded-lg hover:bg-slate-200 transition"
+                  >
+                    <FiEdit2 size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteResource(resource.id)}
+                    className="px-2 py-2 hover:bg-opacity-35 dark:text-slate-100 text-sm bg-slate-100 bg-opacity-25 text-custom-black rounded-lg hover:bg-slate-200 transition"
+                  >
+                    <FiTrash2 size={18} />
+                  </button>
+                </div>
               </div>
-            </div>
-          )
-        ))}
+            )
+          ))
+        )}
       </div>
 
     

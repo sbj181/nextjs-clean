@@ -6,6 +6,7 @@ import { supabase } from '~/lib/supabaseClient';
 import Container from '~/components/Container';
 import Welcome from '~/components/Welcome';
 import Favorites from '~/components/Favorites';
+import SkeletonLoader from '~/components/SkeletonLoader'; // Import SkeletonLoader
 import { useAuth } from '~/lib/useAuth';
 import { FiHeart, FiBook, FiArchive } from 'react-icons/fi';
 import Image from 'next/image';
@@ -86,6 +87,7 @@ export default function IndexPage(
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string | null>(null);
   const [initials, setInitials] = useState<string | null>(null);
+  const [loadingFavoriteId, setLoadingFavoriteId] = useState<number | null>(null); // Track loading state per resource
 
   const fetchFavorites = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -161,25 +163,14 @@ export default function IndexPage(
     return nameParts[0].charAt(0).toUpperCase() + nameParts[1].charAt(0).toUpperCase();
   };
 
-  const handleDeleteResource = async (id) => {
-    const { error } = await supabase
-      .from('resources')
-      .delete()
-      .eq('id', id);
-    if (error) {
-      console.error('Error deleting resource:', error);
-      alert('Error deleting resource.');
-    } else {
-      alert('Resource deleted successfully!');
-    }
-  };
-
   const handleFavoriteResource = async (resourceId) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       alert('You must be logged in to favorite a resource.');
       return;
     }
+  
+    setLoadingFavoriteId(resourceId); // Start loading animation
   
     // Check if the resource is already favorited by this user
     const { data: existingFavorite } = await supabase
@@ -202,7 +193,7 @@ export default function IndexPage(
         .insert({ user_id: user.id, resource_id: resourceId });
     }
   
-    // Refresh the favorites list
+    setLoadingFavoriteId(null); // End loading animation
     fetchFavorites();
   };
   
@@ -225,16 +216,17 @@ export default function IndexPage(
         )}
         <Welcome 
           title={`Welcome to Core${firstName ? `, ${firstName}` : ''}!`}       
-          subtitle={<span>Visit the <Link href="/studio"><span className="text-custom-teal hover:text-custom-teal-dark underline">CMS Studio</span></Link> to manage content and add your own resources. Visit the <Link href="/profile"><span className="text-custom-teal hover:text-custom-teal-dark underline">Profile</span></Link> page to access user details.</span>}
+          subtitle={<span>Admins may add trainings and resources by visiting those pages. Visit the <Link href="/profile"><span className="text-custom-teal hover:text-custom-teal-dark underline">Profile</span></Link> page to access user details and track your progress!</span>}
         />
       </div>
       
       {favorites.length > 0 ? (
         <Favorites 
-  favorites={favorites} 
-  onRemoveFavorite={handleFavoriteResource} 
-  handleDeleteResource={handleDeleteResource} 
-/>      ) : (
+          favorites={favorites} 
+          onRemoveFavorite={handleFavoriteResource} 
+          handleDeleteResource={handleFavoriteResource} 
+        />
+      ) : (
         <div className='hidden'>No resources currently favorited.</div>
       )}
       
@@ -279,8 +271,13 @@ export default function IndexPage(
                   <button
                     onClick={() => handleFavoriteResource(resource.id)}
                     className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${favorites.some(fav => fav.id === resource.id) ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}
+                    disabled={loadingFavoriteId === resource.id} // Disable button while loading
                   >
-                    <FiHeart size={18} className={favorites.some(fav => fav.id === resource.id) ? 'fill-current' : ''} />
+                    {loadingFavoriteId === resource.id ? (
+                      <div className="w-5 h-5 rounded-full border-2 border-pink-600 border-t-transparent animate-spin"></div>
+                    ) : (
+                      <FiHeart size={18} className={favorites.some(fav => fav.id === resource.id) ? 'fill-current' : ''} />
+                    )}
                   </button>
 
                 </div>
