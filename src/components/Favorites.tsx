@@ -14,9 +14,9 @@ const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource }) => {
 
   return (
     <section className="relative mb-6 pb-6">
-      <div className="relative z-10 bg-gradient-to-tl dark:bg-gradient-to-tl from-slate-100 to-slate-200 dark:from-slate-950 dark:to-slate-900 rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-4">Favorited Resources</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="relative z-10 bg-gradient-to-tl dark:bg-gradient-to-tl from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 rounded-lg p-4">
+        <h2 className="text-2xl text-center font-bold mb-4">Favorited Resources</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {favorites.length > 0 ? (
             favorites.map((resource) => (
               <div key={resource.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-t-lg items-start min-h-[400px] overflow-auto flex-col relative">
@@ -32,7 +32,7 @@ const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource }) => {
                     />
                   </div>
                 ) : (
-                  <div className="resourceImage h-20 text-slate-600 dark:text-slate-950 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-4 w-full">
+                  <div className="resourceImage h-20 text-pink-600 dark:text-slate-950 rounded-lg bg-pink-300 opacity-25 flex items-center justify-center mb-4 w-full">
                     <FiHeart size={32} />
                   </div>
                 )}

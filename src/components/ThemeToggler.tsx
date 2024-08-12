@@ -27,7 +27,7 @@ const ThemeToggle = () => {
             <button
                 onClick={toggleTheme}
                 type="button"
-                className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${darkMode ? 'bg-slate-800' : 'bg-gray-400'}`}
+                className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${darkMode ? 'bg-slate-950' : 'bg-slate-400'}`}
                 role="switch"
                 aria-checked={darkMode}
             >

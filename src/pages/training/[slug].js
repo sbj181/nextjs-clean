@@ -674,7 +674,7 @@ const fetchResources = useCallback(async () => {
           <div className="mt-8">
             <h2 className="text-xl font-bold mb-4">Related Resources</h2>
             {selectedResources.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                 {selectedResources.map((resourceId) => {
                   const resource = resources.find(r => r.id === resourceId);
                   return resource ? (

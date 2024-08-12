@@ -25,19 +25,19 @@ export default function Header() {
           <div className="md:hidden mr-2 ml-auto">
             <SearchButton />
           </div>
-          <div className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg">
+          <div className="p-2 bg-slate-50 bg-opacity-25 dark:bg-opacity-25 dark:bg-slate-700 rounded-lg">
             <ThemeToggle />
           </div>
           
           <Link href="/profile" passHref
             
-            className="hidden p-2 ml-2 bg-slate-50 dark:bg-slate-700 rounded-lg sm:flex items-center"
+            className="hidden p-2 ml-2 bg-slate-50 bg-opacity-25 dark:bg-opacity-25 dark:bg-slate-700 rounded-lg sm:flex items-center"
           >
             <span className="inline-block"><FiUser className="h-6 w-6" /></span>
           </Link>
           <button
             onClick={toggleSidebar}
-            className="p-2 ml-2 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center"
+            className="p-2 ml-2 bg-slate-50 bg-opacity-25 dark:bg-opacity-25 dark:bg-slate-700 rounded-lg flex items-center"
           >
             {isSidebarOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
             <span className="hidden md:inline-block ml-2">Menu</span>

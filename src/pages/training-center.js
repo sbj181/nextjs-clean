@@ -127,7 +127,7 @@ const TrainingManager = () => {
       </Head>
       <Welcome title="Training Center" subtitle="Visit training modules below. Admins may add new trainings." />
       {message && <p className="mb-4 text-green-500">{message}</p>}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-4">
         {trainings.map((training) => (
           training && (
             <div key={training.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[360px] overflow-auto flex-col relative">

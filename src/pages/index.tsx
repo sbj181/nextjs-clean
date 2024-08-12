@@ -235,7 +235,7 @@ export default function IndexPage(
           <h2 className='text-3xl font-bold'>Recent Resources</h2>
           <p>Use the heart button to save your most used resources!</p>
         </div>
-        <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4`}>
+        <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4`}>
           {resources.map((resource) => (
             resource && (
               <div key={resource.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[400px] overflow-auto flex-col relative">
@@ -297,7 +297,7 @@ export default function IndexPage(
           <h2 className='text-3xl font-bold'>Recent Trainings</h2>
           <p>Complete your trainings to gain more knowledge!</p>
         </div>
-        <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4`}>
+        <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4`}>
           {props.trainings.map((training) => (
             training && (
               <div key={training.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[400px] overflow-auto flex-col relative">
