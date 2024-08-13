@@ -47,13 +47,24 @@ const Profile = () => {
     const { data: trainingsData, error: trainingsError } = await supabase
       .from('trainings')
       .select('*, training_steps(*)'); // Fetch trainings along with their steps
-
+  
     if (trainingsError) {
       console.error('Error fetching trainings:', trainingsError);
     } else {
-      setTrainings(trainingsData);
+      const trainingProgressList = trainingsData.map((training) => {
+        const completedSteps = trainingProgress[training.id] || [];
+        const totalSteps = training.training_steps ? training.training_steps.length : 0;
+        const progressPercentage = totalSteps > 0 ? (completedSteps.length / totalSteps) * 100 : 0;
+        return { ...training, progressPercentage, completedSteps: completedSteps.length, totalSteps };
+      });
+  
+      // Sort trainings by completion percentage, descending order
+      const sortedTrainings = trainingProgressList.sort((a, b) => b.progressPercentage - a.progressPercentage);
+  
+      setTrainings(sortedTrainings);
     }
-  }, []);
+  }, [trainingProgress]);
+  
 
   const fetchFavorites = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -170,7 +181,7 @@ const Profile = () => {
       <section className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="col-span-1 mb-8 md:mb-0">
-            <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
+            <div className="p-6 border  border-opacity-50 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
               <h1 className="text-xl font-bold mb-4">User Details</h1>
               <div className="mb-4">
                 <label className="block opacity-50">Email</label>
@@ -231,7 +242,7 @@ const Profile = () => {
           </div>
           <div className="col-span-1 md:col-span-2">
             <div className="mb-8">
-              <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
+              <div className="p-6 border border-opacity-50 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
                 <h2 className="text-xl font-bold mb-4">Favorite Resources</h2>
                 {favorites.length > 0 ? (
                   <ul className="list-disc">
@@ -255,7 +266,7 @@ const Profile = () => {
               </div>
             </div>
             <div>
-              <div className="p-6 border-2 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
+              <div className="p-6 border  border-opacity-50 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full">
                 <h2 className="text-xl font-bold mb-4">Training Progress</h2>
                 {trainings.length > 0 ? (
                   <div>
@@ -268,7 +279,7 @@ const Profile = () => {
                       return (
                         <div key={training.id} className="mb-4">
                           <div className='flex items-center gap-4 justify-between mb-1'>
-                            <h3 className="text-lg capitalize font-semibold">
+                            <h3 className="text-lg font-semibold">
                               {training.title}
                             </h3>
                             <Link href={`/training/${trainingSlug}`} passHref> <span className='text-blue-500 cursor-pointer'>Return to Training</span></Link>

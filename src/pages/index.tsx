@@ -6,6 +6,7 @@ import { supabase } from '~/lib/supabaseClient';
 import Container from '~/components/Container';
 import Welcome from '~/components/Welcome';
 import Favorites from '~/components/Favorites';
+import ProgressBar from '~/components/ProgressBar';
 import SkeletonLoader from '~/components/SkeletonLoader'; // Import SkeletonLoader
 import { useAuth } from '~/lib/useAuth';
 import { FiHeart, FiBook, FiArchive } from 'react-icons/fi';
@@ -89,6 +90,10 @@ export default function IndexPage(
   const [initials, setInitials] = useState<string | null>(null);
   const [loadingFavoriteId, setLoadingFavoriteId] = useState<number | null>(null); // Track loading state per resource
 
+  const slugify = (text) => {
+    return text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  };
+
   const fetchFavorites = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     
@@ -121,6 +126,48 @@ export default function IndexPage(
     }
   }, []);
   
+  const fetchTopTrainingProgress = useCallback(async (userId) => {
+    const { data: trainingProgressData, error: trainingProgressError } = await supabase
+      .from('training_step_completion')
+      .select('training_id, step_id, is_completed')
+      .eq('user_id', userId)
+      .eq('is_completed', true);
+  
+    if (trainingProgressError) {
+      console.error('Error fetching training progress:', trainingProgressError);
+      return [];
+    }
+  
+    const progress = trainingProgressData.reduce((acc, item) => {
+      if (!acc[item.training_id]) {
+        acc[item.training_id] = [];
+      }
+      acc[item.training_id].push(item.step_id);
+      return acc;
+    }, {});
+  
+    const { data: trainingsData, error: trainingsError } = await supabase
+      .from('trainings')
+      .select('id, title, training_steps(*)');
+  
+    if (trainingsError) {
+      console.error('Error fetching trainings:', trainingsError);
+      return [];
+    }
+  
+    const trainingProgressList = trainingsData.map((training) => {
+      const completedSteps = progress[training.id] || [];
+      const totalSteps = training.training_steps.length;
+      const progressPercentage = (completedSteps.length / totalSteps) * 100;
+      return { ...training, progressPercentage, completedSteps: completedSteps.length, totalSteps };
+    });
+    // Trainings that have the most progress 
+    return trainingProgressList.sort((a, b) => b.progressPercentage - a.progressPercentage).slice(0, 4);
+    // Date training was created
+    // return trainingProgressList.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 4);
+
+  }, []);
+  
 
   useEffect(() => {
     const fetchProfileAndFavorites = async () => {
@@ -147,6 +194,20 @@ export default function IndexPage(
   
     fetchProfileAndFavorites();
   }, [fetchFavorites]);
+
+  const [topTrainingProgress, setTopTrainingProgress] = useState([]);
+
+  useEffect(() => {
+    const fetchTopProgress = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const progress = await fetchTopTrainingProgress(user.id);
+        setTopTrainingProgress(progress);
+      }
+    };
+
+    fetchTopProgress();
+  }, [fetchTopTrainingProgress]);
   
 
   const extractFirstName = (name: string | null) => {
@@ -225,14 +286,55 @@ export default function IndexPage(
           favorites={favorites} 
           onRemoveFavorite={handleFavoriteResource} 
           handleDeleteResource={handleFavoriteResource} 
+          firstName={firstName}  // Pass the first name prop here
         />
       ) : (
         <div className='hidden'>No resources currently favorited.</div>
       )}
+
+      
+      {topTrainingProgress.length > 0 && (
+        <section className='mt-10 mb-6'>
+          <div className='mb-6'>
+            <h2 className='text-3xl font-bold'>Your Training Progress</h2>
+            <p>Pick up where you left off by selecting continue training below.</p>
+          </div>
+          <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4`}>
+            {topTrainingProgress.map(training => (
+              <div key={training.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[150px] overflow-auto flex-col relative">
+                <div className='flex flex-col flex-1 justify-between h-full w-full'>
+
+                
+
+                  <h3 className="!text-xl mb-2 !leading-snug min-h-12 font-semibold text-center">
+                    {training.title}
+                  </h3>
+                  
+                  <div className="flex-1 min-h-12 flex flex-col justify-center text-center">
+                    <ProgressBar percentage={training.progressPercentage} />
+                    {training.progressPercentage < 100 && (
+                      <div className='mt-2 text-sm text-center'>
+                        <p>{training.completedSteps} out of {training.totalSteps} steps completed</p>
+                      </div>
+                    )}
+                  </div>
+                  <Link href={`/training/${slugify(training.title)}`} passHref>
+                    <button className="mt-4 px-4 py-2 text-sm bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
+                      Continue Training
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+
+        </section>
+      )}
       
       <section className='mt-10 mb-6'>
         <div className='mb-6'>
-          <h2 className='text-3xl font-bold'>Recent Resources</h2>
+          <h2 className='text-3xl font-bold'>Recently Added Resources</h2>
           <p>Use the heart button to save your most used resources!</p>
         </div>
         <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4`}>
@@ -294,7 +396,7 @@ export default function IndexPage(
       
       <section className='mt-10 mb-6'>
         <div className='mb-6'>
-          <h2 className='text-3xl font-bold'>Recent Trainings</h2>
+          <h2 className='text-3xl font-bold'>New Training Modules</h2>
           <p>Complete your trainings to gain more knowledge!</p>
         </div>
         <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4`}>

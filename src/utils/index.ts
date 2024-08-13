@@ -58,3 +58,12 @@ export const slugify = (text: string): string => {
     .replace(/^-+/, '')             // Trim - from start of text
     .replace(/-+$/, '');            // Trim - from end of text
 };
+
+// Add role-based helper function
+export const isAdmin = (role: string): boolean => {
+  return role === 'admin';
+};
+
+export const isUser = (role: string): boolean => {
+  return role === 'user';
+};

@@ -10,13 +10,16 @@ import MediaCenter from '~/components/MediaCenter';
 import Favorites from '~/components/Favorites';
 import Modal from 'react-modal';
 import SkeletonLoader from '~/components/SkeletonLoader'; // Import SkeletonLoader
-import { uploadImage, slugify } from '../utils';
+import { uploadImage, slugify, isAdmin } from '../utils';
 
 const ResourceCenter = () => {
   const [resources, setResources] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true); // Add a loading state
   const [loadingFavoriteId, setLoadingFavoriteId] = useState(null); 
+  const [firstName, setFirstName] = useState(''); // New state for first name
+  const [userRole, setUserRole] = useState(null);
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -29,6 +32,31 @@ const ResourceCenter = () => {
   const [editResourceId, setEditResourceId] = useState(null);
   const [isMediaCenterOpen, setIsMediaCenterOpen] = useState(false);
   const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile, error } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user role:', error);
+        } else if (profile && profile.role) {
+          setUserRole(profile.role);
+        }
+      }
+    };
+
+    fetchUserRole();
+  }, []);
+
+
+  
+
 
   const fetchFavorites = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -246,6 +274,31 @@ const ResourceCenter = () => {
       fetchResources(); // Refresh the resources list after deletion
     }
   };
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile, error } = await supabase
+          .from('users')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+          
+        if (error) {
+          console.error('Error fetching user profile:', error);
+        } else if (profile && profile.display_name) {
+          // Extract first name from display name
+          const firstName = profile.display_name.split(' ')[0];
+          setFirstName(firstName);
+        }
+      }
+    };
+
+    fetchUserDetails();
+    fetchResources();
+    fetchCategories();
+  }, [fetchResources, fetchCategories]);
   
 
   return (
@@ -259,7 +312,7 @@ const ResourceCenter = () => {
       <Welcome title="Resource Center" subtitle="Visit resources below. Admins may add new resources." />
       {message && <p className="mb-4 text-green-500">{message}</p>}
       {favorites.length > 0 && (
-        <Favorites favorites={favorites} onRemoveFavorite={handleFavoriteResource} />
+        <Favorites favorites={favorites}  firstName={firstName}  onRemoveFavorite={handleFavoriteResource} />
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-4">
         {loading ? (
@@ -308,28 +361,32 @@ const ResourceCenter = () => {
                       <FiHeart size={18} className={favorites.some(fav => fav.id === resource.id) ? 'fill-current' : ''} />
                     )}
                   </button>
-                  <button
-                    onClick={() => {
-                      setTitle(resource.title);
-                      setDescription(resource.description);
-                      setCategory(resource.category_id || '');
-                      setNewCategory('');
-                      setDownloadUrl(resource.download_url);
-                      setFile(resource.image_url);
-                      setEditResourceId(resource.id);
-                      setIsEditingResource(true);
-                      setIsAddingResource(true);
-                    }}
-                    className="px-2 py-2 hover:bg-opacity-35 dark:text-slate-100 text-sm bg-opacity-25 bg-slate-100 text-custom-black rounded-lg hover:bg-slate-200 transition"
-                  >
-                    <FiEdit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteResource(resource.id)}
-                    className="px-2 py-2 hover:bg-opacity-35 dark:text-slate-100 text-sm bg-slate-100 bg-opacity-25 text-custom-black rounded-lg hover:bg-slate-200 transition"
-                  >
-                    <FiTrash2 size={18} />
-                  </button>
+                  {userRole && isAdmin(userRole) && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setTitle(resource.title);
+                          setDescription(resource.description);
+                          setCategory(resource.category_id || '');
+                          setNewCategory('');
+                          setDownloadUrl(resource.download_url);
+                          setFile(resource.image_url);
+                          setEditResourceId(resource.id);
+                          setIsEditingResource(true);
+                          setIsAddingResource(true);
+                        }}
+                        className="px-2 py-2 hover:bg-opacity-35 dark:text-slate-100 text-sm bg-opacity-25 bg-slate-100 text-custom-black rounded-lg hover:bg-slate-200 transition"
+                      >
+                        <FiEdit2 size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteResource(resource.id)}
+                        className="px-2 py-2 hover:bg-opacity-35 dark:text-slate-100 text-sm bg-slate-100 bg-opacity-25 text-custom-black rounded-lg hover:bg-slate-200 transition"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )
@@ -337,7 +394,7 @@ const ResourceCenter = () => {
         )}
       </div>
 
-    
+{userRole && isAdmin(userRole) && (       
 <section className='my-8 w-full flex items-center justify-center bg-slate-150 bg-opacity-25 rounded-xl'>
   {!isAddingResource ? (
     <button
@@ -465,7 +522,7 @@ const ResourceCenter = () => {
     </Modal>
   )}
 </section>
-
+)}
       <MediaCenter
         isOpen={isMediaCenterOpen}
         onRequestClose={() => setIsMediaCenterOpen(false)}

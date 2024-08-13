@@ -1,16 +1,39 @@
 import { GetServerSideProps } from 'next';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '~/lib/supabaseClient';
 import Link from 'next/link';
 import Container from '~/components/Container';
 import { useRouter } from 'next/router';
 import { FiEdit2, FiArrowLeft } from 'react-icons/fi';
 import Image from 'next/image';
-import EditResourceModal from '~/components/EditResourceModal'; // Import the new component
+import EditResourceModal from '~/components/EditResourceModal';
+import { isAdmin } from '~/utils';
 
 const ResourcePage = ({ resource, categories }) => {
   const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile, error } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user role:', error);
+        } else if (profile && profile.role) {
+          setUserRole(profile.role);
+        }
+      }
+    };
+
+    fetchUserRole();
+  }, []);
 
   if (router.isFallback) {
     return <div>Loading...</div>;
@@ -36,17 +59,19 @@ const ResourcePage = ({ resource, categories }) => {
           Category: <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
         </div>
         <div className='flex gap-4 items-center mt-4'>
-        {resource.download_url && (
-          <a href={resource.download_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
-            Download
-          </a>
-        )}
-        <button
-          onClick={() => setIsEditModalOpen(true)}
-          className="px-4 py-2 bg-gray-500 flex items-center gap-2 text-white rounded-lg hover:bg-gray-600 transition"
-        >
-          <FiEdit2 size={18} /> Edit Resource
-        </button>
+          {resource.download_url && (
+            <a href={resource.download_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
+              Download
+            </a>
+          )}
+          {userRole && isAdmin(userRole) && (
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="px-4 py-2 bg-gray-500 flex items-center gap-2 text-white rounded-lg hover:bg-gray-600 transition"
+            >
+              <FiEdit2 size={18} /> Edit Resource
+            </button>
+          )}
         </div>
       </div>
 

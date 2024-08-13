@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FiHeart } from 'react-icons/fi';
 
-const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource }) => {
+const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource, firstName }) => {
   const [loadingResourceId, setLoadingResourceId] = useState(null); // State to track loading
 
   const handleFavoriteClick = async (resourceId) => {
@@ -14,9 +14,11 @@ const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource }) => {
 
   return (
     <section className="relative mb-6 pb-6">
-      <div className="relative z-10 bg-gradient-to-tl dark:bg-gradient-to-tl from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 rounded-lg p-4">
-        <h2 className="text-2xl text-center font-bold mb-4">Favorited Resources</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+      <div className="relative border border-opacity-15 dark:border-opacity-15 border-slate-300 z-10 bg-gradient-to-tl dark:bg-gradient-to-tl from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 rounded-lg p-4">
+        <h2 className="text-2xl text-center font-bold mb-4">
+          {firstName ? `${firstName}'s Favorite Resources` : 'Your Favorite Resources'}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
           {favorites.length > 0 ? (
             favorites.map((resource) => (
               <div key={resource.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-t-lg items-start min-h-[400px] overflow-auto flex-col relative">

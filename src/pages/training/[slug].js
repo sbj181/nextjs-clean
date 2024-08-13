@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../lib/supabaseClient';
-import { uploadImage } from '../../utils';
+import { uploadImage, isAdmin, isUser } from '../../utils';
 import Head from 'next/head';
 import Link from 'next/link';
 import Welcome from '~/components/Welcome';
@@ -350,12 +350,14 @@ const fetchResources = useCallback(async () => {
         <>
           <Welcome title={isEditing ? 'Edit Training' : training.title} subtitle={isEditing ? '' : training.description} />
           <div className="flex justify-between items-center mb-8">
+          {role === 'admin' && (
             <button
               onClick={() => setIsEditing(!isEditing)}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
             >
               {isEditing ? 'Cancel' : 'Edit Training'}
             </button>
+          )}
           </div>
           {isEditing && (
             <div className="mb-4">
@@ -467,7 +469,7 @@ const fetchResources = useCallback(async () => {
                                     onChange={(e) => setEditStepImage(e.target.files[0])}
                                     className="p-2 border border-opacity-60 border-gray-300 rounded w-full"
                                   />
-                                  <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 bg-green-500 text-white text-sm leading-tight rounded-lg hover:bg-green-600 transition">
+                                  <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 bg-custom-green text-white text-sm leading-tight rounded-lg hover:bg-custom-green-dark transition">
                                     Media Center
                                   </button>
                                 </div>
@@ -500,11 +502,12 @@ const fetchResources = useCallback(async () => {
                               <>
                                 <div>
                                   <div className='flex items-center gap-4 pb-4 border-b border-slate-300 border-opacity-25 mb-6'>
-                                    <div className={`h-10 w-10 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-slate-200 dark:bg-slate-950'}`}>
+                                    <div className={`h-10 w-10 text-slate-500 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-custom-green' : 'bg-slate-200 dark:bg-slate-950'}`}>
                                       {completedSteps.includes(step.id) ? <FiCheck className='stroke-slate-50' size={24} /> : step.step_number}
                                     </div>
                                     <h3 className="font-bold text-xl">{step.title}</h3>
                                     <div className='ml-auto flex gap-2'>
+                                    {role === 'admin' && (
                                       <button
                                         onClick={() => {
                                           setEditStepId(step.id);
@@ -517,12 +520,15 @@ const fetchResources = useCallback(async () => {
                                       >
                                         <FiEdit2 />
                                       </button>
+                                    )}
+                                    {role === 'admin' && (
                                       <button
                                         onClick={() => handleDeleteStep(step.id)}
                                         className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
                                       >
                                         <FiTrash2 />
                                       </button>
+                                    )}
                                     </div>
                                   </div>
                                   <div className='my-4'><p>{step.description}</p></div>
@@ -542,7 +548,7 @@ const fetchResources = useCallback(async () => {
                                     </div>
                                   )}
                                   {step.video_url && (
-                                    <div className='my-4'>
+                                    <div className='my-4 video-container'>
                                       <iframe
                                         width="560"
                                         height="315"
@@ -554,12 +560,14 @@ const fetchResources = useCallback(async () => {
                                       ></iframe>
                                     </div>
                                   )}
+                                  <div className='w-full my-2 p-2 bg-slate-300 bg-opacity-15 flex justify-center'>
                                   <button
                                     onClick={() => toggleStepCompletion(step.id)}
-                                    className={`mt-2 px-4 py-2 ${completedSteps.includes(step.id) ? 'bg-green-500' : 'bg-gray-500'} text-white rounded-lg`}
+                                    className={` w-1/4 px-4 py-4 ${completedSteps.includes(step.id) ? 'bg-custom-green' : 'bg-gray-500'} text-white rounded-full`}
                                   >
                                     {completedSteps.includes(step.id) ? 'Completed' : 'Mark as Complete'}
                                   </button>
+                                  </div>
                                 </div>
                               </>
                             )}
@@ -575,7 +583,9 @@ const fetchResources = useCallback(async () => {
           )}
   
           {steps.length > 0 && !isAddingStep && (
+            
             <section className='addnewstep -scroll-mt-8 mb-8 block justify-between p-2'>
+              {role === 'admin' && (
               <div className='w-full bg-slate-300 bg-opacity-25 rounded-lg p-10 flex justify-center items-center'>
                 <button
                   onClick={() => setIsAddingStep(true)}
@@ -584,7 +594,9 @@ const fetchResources = useCallback(async () => {
                   Add a new step <FiPlus />
                 </button>
               </div>
+              )}
             </section>
+            
           )}
   
           {isAddingStep && (
@@ -617,7 +629,7 @@ const fetchResources = useCallback(async () => {
                     onChange={(e) => setStepImage(e.target.files[0])}
                     className="p-2 border border-gray-300 border-opacity-50 rounded w-full"
                   />
-                  <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 text-sm leading-tight bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                  <button onClick={() => setIsMediaCenterOpen(true)} className="px-4 py-2 text-sm leading-tight bg-custom-green text-white rounded-lg hover:bg-custom-green-dark transition">
                     Media Center
                   </button>
                 </div>
