@@ -12,6 +12,8 @@ import { useAuth } from '~/lib/useAuth';
 import { FiHeart, FiBook, FiArchive } from 'react-icons/fi';
 import Image from 'next/image';
 import Loading from '~/components/Loading';
+import { getButtonText } from '~/utils';
+
 
 export const getStaticProps: GetStaticProps = async () => {
   // Fetch recent resources
@@ -286,7 +288,8 @@ export default function IndexPage(
           favorites={favorites} 
           onRemoveFavorite={handleFavoriteResource} 
           handleDeleteResource={handleFavoriteResource} 
-          firstName={firstName}  // Pass the first name prop here
+          firstName={firstName}  
+          getButtonText={getButtonText}
         />
       ) : (
         <div className='hidden'>No resources currently favorited.</div>

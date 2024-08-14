@@ -67,3 +67,15 @@ export const isAdmin = (role: string): boolean => {
 export const isUser = (role: string): boolean => {
   return role === 'user';
 };
+
+export const getButtonText = (category: string | null) => {
+  switch (category?.toLowerCase()) {
+    case 'documentation':
+      return 'Download';
+    case 'website':
+    case 'project management':
+      return 'Visit Resource';
+    default:
+      return 'View Resource';
+  }
+};

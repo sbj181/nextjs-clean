@@ -10,7 +10,7 @@ import MediaCenter from '~/components/MediaCenter';
 import Favorites from '~/components/Favorites';
 import Modal from 'react-modal';
 import SkeletonLoader from '~/components/SkeletonLoader'; // Import SkeletonLoader
-import { uploadImage, slugify, isAdmin } from '../utils';
+import { uploadImage, slugify, isAdmin, getButtonText } from '../utils';
 
 const ResourceCenter = () => {
   const [resources, setResources] = useState([]);
@@ -53,10 +53,6 @@ const ResourceCenter = () => {
 
     fetchUserRole();
   }, []);
-
-
-  
-
 
   const fetchFavorites = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -312,7 +308,7 @@ const ResourceCenter = () => {
       <Welcome title="Resource Center" subtitle="Visit resources below. Admins may add new resources." />
       {message && <p className="mb-4 text-green-500">{message}</p>}
       {favorites.length > 0 && (
-        <Favorites favorites={favorites}  firstName={firstName}  onRemoveFavorite={handleFavoriteResource} />
+        <Favorites favorites={favorites}  firstName={firstName}  getButtonText={getButtonText}  onRemoveFavorite={handleFavoriteResource} />
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-4">
         {loading ? (
@@ -324,7 +320,7 @@ const ResourceCenter = () => {
                
                 {resource.image_url ? (
                   <div className='resourceImage h-20 w-full rounded-lg bg-slate-300 mb-4 overflow-hidden relative'>
-                    <Link className='hover:opacity-75' href={`/resource/${resource.slug}`}>
+                    <Link className='hover:opacity-75 transition' href={`/resource/${resource.slug}`}>
                         <Image
                         src={resource.image_url}
                         alt={`Image for ${resource.title}`}
@@ -334,26 +330,28 @@ const ResourceCenter = () => {
                     </Link>
                   </div>
                 ) : (
-                  <div className='resourceImage h-20 text-slate-600 dark:text-slate-950 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-4 w-full'>
-                    <FiArchive size={32} />
-                  </div>
+                    <Link className='hover:opacity-75 transition w-full' href={`/resource/${resource.slug}`}>
+                        <div className='resourceImage h-20 text-slate-600 dark:text-slate-950 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-4 w-full'>
+                            <FiArchive size={32} />
+                        </div>
+                    </Link>
                 )}
                 
                 <div className="text-sm mb-2">
                   <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
                 </div>
-                <Link href={`/resource/${resource.slug}`}><h2 className="text-xl font-semibold">{resource.title}</h2></Link>
+                <Link className='hover:opacity-85 transition' href={`/resource/${resource.slug}`}><h2 className="text-xl font-semibold">{resource.title}</h2></Link>
                 <div className=''>
                   <p className='opacity-65 min-h-32 text-sm'>{resource.description}</p>
                 </div>
                 <div className="flex gap-1 mt-8 absolute bottom-4">
-                  {resource.download_url && (
-                    <a href={resource.download_url} target="_blank" rel="noopener noreferrer">
-                      <button className="px-5 py-2 text-sm bg-custom-dark-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
-                        Download
-                      </button>
-                    </a>
-                  )}
+                {resource.download_url && (
+                <a href={resource.download_url} target="_blank" rel="noopener noreferrer">
+                    <button className="px-3 py-2 text-sm bg-custom-dark-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
+                    {getButtonText(resource.categories ? resource.categories.name : '')}
+                    </button>
+                </a>
+                )}
                   <button
                     onClick={() => handleFavoriteResource(resource.id)}
                     className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${favorites.some(fav => fav.id === resource.id) ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}

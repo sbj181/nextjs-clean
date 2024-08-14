@@ -3,7 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FiHeart } from 'react-icons/fi';
 
-const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource, firstName }) => {
+
+const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource, firstName, getButtonText }) => {
   const [loadingResourceId, setLoadingResourceId] = useState(null); // State to track loading
 
   const handleFavoriteClick = async (resourceId) => {
@@ -26,24 +27,28 @@ const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource, firstNam
                   <div className="animate-pulse w-full h-20 bg-slate-300 dark:bg-slate-800 rounded-lg mb-4"></div>
                 ) : resource.image_url ? (
                   <div className="resourceImage h-20 w-full rounded-lg bg-slate-300 mb-4 overflow-hidden relative">
-                    <Image
-                      src={resource.image_url}
-                      alt={`Image for ${resource.title}`}
-                      layout="fill"
-                      objectFit="cover"
-                    />
+                    <Link className='hover:opacity-75 transition' href={`/resource/${resource.slug}`}>
+                        <Image
+                        src={resource.image_url}
+                        alt={`Image for ${resource.title}`}
+                        layout="fill"
+                        objectFit="cover"
+                        />
+                    </Link>
                   </div>
                 ) : (
-                  <div className="resourceImage h-20 text-pink-600 dark:text-slate-950 rounded-lg bg-pink-300 opacity-25 flex items-center justify-center mb-4 w-full">
-                    <FiHeart size={32} />
-                  </div>
+                    <Link className='hover:opacity-75 transition w-full' href={`/resource/${resource.slug}`}> 
+                        <div className="resourceImage h-20 text-pink-600 dark:text-slate-950 rounded-lg bg-pink-300 opacity-25 flex items-center justify-center mb-4 w-full">
+                            <FiHeart size={32} />
+                        </div>
+                    </Link>
                 )}
                 <div className="text-sm mb-2">
                   <span className="bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block">
                     {resource.categories ? resource.categories.name : 'Uncategorized'}
                   </span>
                 </div>
-                <Link href={`/resource/${resource.slug}`}>
+                <Link className='hover:opacity-75 transition' href={`/resource/${resource.slug}`}>
                   <h2 className="text-xl font-semibold">{resource.title}</h2>
                 </Link>
                 <div className="">
@@ -53,7 +58,7 @@ const Favorites = ({ favorites, onRemoveFavorite, handleDeleteResource, firstNam
                   {resource.download_url && (
                     <a href={resource.download_url} target="_blank" rel="noopener noreferrer">
                       <button className="px-4 py-2 text-sm bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
-                        Download
+                        {getButtonText(resource.categories ? resource.categories.name : '')}
                       </button>
                     </a>
                   )}
