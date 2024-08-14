@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { FiEdit2, FiArrowLeft } from 'react-icons/fi';
 import Image from 'next/image';
 import EditResourceModal from '~/components/EditResourceModal';
-import { isAdmin } from '~/utils';
+import { isAdmin, formatDate } from '~/utils';
 
 const ResourcePage = ({ resource, categories }) => {
   const router = useRouter();
@@ -41,37 +41,54 @@ const ResourcePage = ({ resource, categories }) => {
 
   return (
     <Container>
-      <div className="flex flex-col items-center md:items-start">
-        <h1 className="text-3xl font-bold mb-4">{resource.title}</h1>
-        {resource.image_url && (
-          <div className='resourceImage w-full max-w-md rounded-lg mb-4 overflow-hidden relative'>
-            <Image
-              src={resource.image_url}
-              alt={`Image for ${resource.title}`}
-              layout="responsive"
-              width={800}
-              height={450}
-            />
+      <h1 className="text-3xl font-bold mb-4">{resource.title}</h1>
+      <div className="flex flex-col md:flex-row gap-8 items-start">
+        
+        <div className="w-full md:w-2/3">
+          
+          {resource.image_url && (
+            <div className='resourceImage w-full rounded-lg mb-4 overflow-hidden relative'>
+              <Image
+                src={resource.image_url}
+                alt={`Image for ${resource.title}`}
+                layout="responsive"
+                width={800}
+                height={450}
+              />
+            </div>
+          )}
+          <p className="text-lg mb-4">{resource.description}</p>
+         
+          <div className='flex gap-4 items-center mt-4'>
+            {resource.download_url && (
+              <a href={resource.download_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
+                Download
+              </a>
+            )}
+            {userRole && isAdmin(userRole) && (
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="px-4 py-2 bg-gray-500 flex items-center gap-2 text-white rounded-lg hover:bg-gray-600 transition"
+              >
+                <FiEdit2 size={18} /> Edit Resource
+              </button>
+            )}
           </div>
-        )}
-        <p className="text-lg mb-4">{resource.description}</p>
-        <div className="text-sm mb-4">
-          Category: <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
         </div>
-        <div className='flex gap-4 items-center mt-4'>
-          {resource.download_url && (
-            <a href={resource.download_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
-              Download
-            </a>
-          )}
-          {userRole && isAdmin(userRole) && (
-            <button
-              onClick={() => setIsEditModalOpen(true)}
-              className="px-4 py-2 bg-gray-500 flex items-center gap-2 text-white rounded-lg hover:bg-gray-600 transition"
-            >
-              <FiEdit2 size={18} /> Edit Resource
-            </button>
-          )}
+
+        <div className="w-full md:w-1/3 flex flex-col gap-4">
+          <div className='p-6 border  border-opacity-50 border-slate-400 dark:border-slate-600 bg-slate-100 dark:bg-slate-950 bg-opacity-50 rounded-2xl w-full'>
+            <h3 className="text-xl font-semibold mb-2">Resource Details</h3>
+            <div className="text-sm my-1">
+              <div><strong>Date Added:</strong> {formatDate(resource.created_at)}</div>
+              {resource.updated_at && (
+                <div><strong>Last Modified:</strong> {formatDate(resource.updated_at)}</div>
+              )}
+            </div>
+            <div className="text-sm my-1">
+              <strong>Category:</strong> <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -90,7 +107,6 @@ const ResourcePage = ({ resource, categories }) => {
         categories={categories}
         fetchResources={() => router.replace(router.asPath)} // Reload the page after editing
       />
-      
     </Container>
   );
 };
