@@ -120,7 +120,7 @@ const TrainingManager = () => {
   return (
     <Container>
       <Head>
-        <title>Training Manager | CORE RMS by The Grovery</title>
+        <title>Training Center | CORE RMS by The Grovery</title>
         <meta name="description" content="Manage training modules." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />

@@ -321,20 +321,24 @@ const ResourceCenter = () => {
           resources.map((resource) => (
             resource && (
               <div key={resource.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[400px] overflow-auto flex-col relative">
+               
                 {resource.image_url ? (
                   <div className='resourceImage h-20 w-full rounded-lg bg-slate-300 mb-4 overflow-hidden relative'>
-                    <Image
-                      src={resource.image_url}
-                      alt={`Image for ${resource.title}`}
-                      layout="fill"
-                      objectFit="cover"
-                    />
+                    <Link className='hover:opacity-75' href={`/resource/${resource.slug}`}>
+                        <Image
+                        src={resource.image_url}
+                        alt={`Image for ${resource.title}`}
+                        layout="fill"
+                        objectFit="cover"
+                        />
+                    </Link>
                   </div>
                 ) : (
                   <div className='resourceImage h-20 text-slate-600 dark:text-slate-950 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-4 w-full'>
                     <FiArchive size={32} />
                   </div>
                 )}
+                
                 <div className="text-sm mb-2">
                   <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
                 </div>

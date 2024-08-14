@@ -341,11 +341,11 @@ const fetchResources = useCallback(async () => {
   return (
     <Container>
       <Head>
-        <title>{training ? training.title : 'Training Detail'} | CORE RMS by The Grovery</title>
-        <meta name="description" content="Manage training steps." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+  <title>{training?.title ? `${training.title} | CORE RMS by The Grovery` : 'Training Detail | CORE RMS by The Grovery'}</title>
+  <meta name="description" content="Manage training steps." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/favicon.ico" />
+</Head>
       {training && (
         <>
           <Welcome title={isEditing ? 'Edit Training' : training.title} subtitle={isEditing ? '' : training.description} />
@@ -502,7 +502,7 @@ const fetchResources = useCallback(async () => {
                               <>
                                 <div>
                                   <div className='flex items-center gap-4 pb-4 border-b border-slate-300 border-opacity-25 mb-6'>
-                                    <div className={`h-10 w-10 text-slate-500 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-custom-green' : 'bg-slate-200 dark:bg-slate-950'}`}>
+                                    <div className={`h-10 w-10 min-w-10 text-slate-500 flex items-center justify-center font-bold text-sm rounded-full p-1 ${completedSteps.includes(step.id) ? 'bg-custom-green' : 'bg-slate-200 dark:bg-slate-950'}`}>
                                       {completedSteps.includes(step.id) ? <FiCheck className='stroke-slate-50' size={24} /> : step.step_number}
                                     </div>
                                     <h3 className="font-bold text-xl">{step.title}</h3>
@@ -563,7 +563,7 @@ const fetchResources = useCallback(async () => {
                                   <div className='w-full my-2 p-2 bg-slate-300 bg-opacity-15 flex justify-center'>
                                   <button
                                     onClick={() => toggleStepCompletion(step.id)}
-                                    className={` w-1/4 px-4 py-4 ${completedSteps.includes(step.id) ? 'bg-custom-green' : 'bg-gray-500'} text-white rounded-full`}
+                                    className={`md:w-1/4 px-8 py-4 ${completedSteps.includes(step.id) ? 'bg-custom-green' : 'bg-gray-500'} text-white rounded-full`}
                                   >
                                     {completedSteps.includes(step.id) ? 'Completed' : 'Mark as Complete'}
                                   </button>

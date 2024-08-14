@@ -64,7 +64,7 @@ export default function Sidebar() {
 
   const closeSidebarOnMobile = () => {
     if (window.innerWidth < 1024) {
-      setSidebarOpen(false);
+      setSidebarOpen(true);
     }
   };
 

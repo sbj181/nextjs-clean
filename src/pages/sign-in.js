@@ -21,7 +21,7 @@ const SignIn = () => {
       alert(error.message);
     } else {
       alert('Signed in successfully!');
-      router.push('/profile');
+      router.push('/');
     }
   };
 
