@@ -62,18 +62,38 @@ export default function Sidebar() {
     setOpenSection(openSection === section ? null : section);
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+  
+    window.addEventListener('resize', handleResize);
+  
+    // Clean up the event listener
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const closeSidebarOnMobile = () => {
     if (window.innerWidth < 1024) {
-      setSidebarOpen(true);
+      setSidebarOpen(false);
     }
   };
+  
+  const handleTouchEnd = () => {
+    closeSidebarOnMobile();
+  };
+  
 
   return (
     <aside className={`fixed rounded-br-xl overflow-scroll no-scrollbar inset-y-0 left-0 z-40 pt-32 flex flex-col bg-slate-100 dark:bg-gradient-to-b dark:from-slate-950 dark:to-slate-800 w-80 p-5 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <ul className="w-full">
         <div className="bg-slate-200 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between cursor-pointer">
-            <Link href="/" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
+            <Link href="/" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile} onTouchEnd={handleTouchEnd}>
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiHome /></span> Dashboard
             </Link>
           </li>
@@ -81,7 +101,7 @@ export default function Sidebar() {
   
         <div className="bg-slate-200 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between">
-            <Link href="/resource-center" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
+            <Link href="/resource-center" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile} onTouchEnd={handleTouchEnd}>
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiLayers /></span> Resources
             </Link>
             <button onClick={() => toggleSection('resources')} className="bg-slate-400 bg-opacity-20 p-2 rounded-xl hover:bg-opacity-50 focus:outline-none">
@@ -92,7 +112,7 @@ export default function Sidebar() {
             <ul>
               {resources.map((resource) => (
                 <li key={resource.id}>
-                  <Link className='sidebar-link sub !text-left' href={`/resource/${resource.slug}`} onClick={closeSidebarOnMobile}>
+                  <Link className='sidebar-link sub !text-left' href={`/resource/${resource.slug}`} onClick={closeSidebarOnMobile} onTouchEnd={handleTouchEnd}>
                     {resource.title}
                   </Link>
                 </li>
@@ -103,7 +123,7 @@ export default function Sidebar() {
   
         <div className="bg-slate-200 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between">
-            <Link href="/training-center" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
+            <Link href="/training-center" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile} onTouchEnd={handleTouchEnd}>
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiBook /></span> Training
             </Link>
             <button onClick={() => toggleSection('trainings')} className="bg-slate-400 bg-opacity-20 p-2 rounded-xl hover:bg-opacity-50 focus:outline-none">
@@ -114,7 +134,7 @@ export default function Sidebar() {
             <ul>
               {trainings.map((training) => (
                 <li key={training.id}>
-                  <Link className='sidebar-link sub !text-left' href={`/training/${training.slug}`} onClick={closeSidebarOnMobile}>
+                  <Link className='sidebar-link sub !text-left' href={`/training/${training.slug}`} onClick={closeSidebarOnMobile} onTouchEnd={handleTouchEnd}>
                     {training.title}
                   </Link>
                 </li>
@@ -125,7 +145,7 @@ export default function Sidebar() {
   
         <div className="bg-slate-200 dark:bg-slate-800 mb-4 rounded-lg">
           <li className="sidebar-link flex items-center justify-between">
-            <Link href="/profile" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile}>
+            <Link href="/profile" className="flex items-center w-full font-normal" onClick={closeSidebarOnMobile} onTouchEnd={handleTouchEnd}>
               <span className='bg-slate-50 w-8 h-8 flex items-center justify-center mr-2 rounded-xl bg-opacity-30 border-1 border-slate-50'><FiUser /></span> Profile
             </Link>
           </li>

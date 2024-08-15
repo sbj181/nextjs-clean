@@ -183,6 +183,30 @@ body {
   height: 100%;
 }
 
+/* Carousel */
+
+.embla {
+  overflow-x: clip;
+ 
+}
+
+.embla__viewport {
+ 
+  width: 100%;
+  padding: 0 .5em;
+}
+
+.embla__container {
+  display: flex;
+}
+
+.embla__slide {
+  cursor: grab;
+  /* flex: 0 0 25%; */
+  padding: 0 10px; /* Optional spacing */
+}
+
+
 /* Sidebar */
 
 .sidebar-link {

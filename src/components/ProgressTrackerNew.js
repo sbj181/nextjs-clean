@@ -82,8 +82,8 @@ const ProgressTrackerNew = ({ trainingId, steps }) => {
       <div className="flex items-center justify-start mb-4 bg-slate-200 bg-opacity-10 w-full p-4 border rounded-xl border-slate-400 border-opacity-25">
         {steps.sort((a, b) => a.step_number - b.step_number).map(step => (
           <div key={step.id} className="flex items-center">
-            <div className={` bg-slate-400 bg-opacity-25 w-20 h-20 mx-4 first:ml-0 flex font-bold text-xl justify-center items-center rounded-full ${completedSteps.includes(step.id) ? 'text-custom-green !border-0' : 'text-slate-500'}`}>
-              {completedSteps.includes(step.id) ? <span className='bg-custom-green w-full h-full flex justify-center items-center rounded-full'><FiCheck size={38} className='stroke-white' /></span> : <span className='text-slate-500 text-2xl'>{step.step_number}</span>}
+            <div className={` bg-slate-400 bg-opacity-25 w-14 h-14 md:w-20 md:h-20 mx-4 first:ml-0 flex font-bold text-xl justify-center items-center rounded-full ${completedSteps.includes(step.id) ? 'text-custom-green !border-0' : 'text-slate-500'}`}>
+              {completedSteps.includes(step.id) ? <span className='bg-custom-green w-full h-full flex justify-center items-center rounded-full text-2xl md:text-4xl'><FiCheck  className='stroke-white' /></span> : <span className='text-slate-500 text-lg md:text-2xl'>{step.step_number}</span>}
             </div>
             {/* Step Line */}
             {/* {step.step_number < steps.length && <div className="h-1 w-8 bg-gray-300 mx-2"></div>} */}

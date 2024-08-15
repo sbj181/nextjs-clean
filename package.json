@@ -24,6 +24,8 @@
     "@sanity/vision": "3.28.0",
     "@supabase/supabase-js": "^2.44.2",
     "@tailwindcss/typography": "0.5.10",
+    "embla-carousel": "^8.1.8",
+    "embla-carousel-react": "^8.1.8",
     "groq": "^3.41.2",
     "next": "14.1.0",
     "next-sanity": "5.5.11",

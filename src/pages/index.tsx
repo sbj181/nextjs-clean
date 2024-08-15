@@ -13,7 +13,7 @@ import { FiHeart, FiBook, FiArchive } from 'react-icons/fi';
 import Image from 'next/image';
 import Loading from '~/components/Loading';
 import { getButtonText } from '~/utils';
-
+import TrainingProgressCarousel from '~/components/TrainingProgressCarousel';
 
 export const getStaticProps: GetStaticProps = async () => {
   // Fetch recent resources
@@ -164,7 +164,7 @@ export default function IndexPage(
       return { ...training, progressPercentage, completedSteps: completedSteps.length, totalSteps };
     });
     // Trainings that have the most progress 
-    return trainingProgressList.sort((a, b) => b.progressPercentage - a.progressPercentage).slice(0, 4);
+    return trainingProgressList.sort((a, b) => b.progressPercentage - a.progressPercentage).slice(0, 12);
     // Date training was created
     // return trainingProgressList.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 4);
 
@@ -302,34 +302,8 @@ export default function IndexPage(
             <h2 className='text-3xl font-bold'>Your Training Progress</h2>
             <p>Pick up where you left off by selecting continue training below.</p>
           </div>
-          <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4`}>
-            {topTrainingProgress.map(training => (
-              <div key={training.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[150px] overflow-auto flex-col relative">
-                <div className='flex flex-col flex-1 justify-between h-full w-full'>
+            <TrainingProgressCarousel trainings={topTrainingProgress} />
 
-                
-
-                  <h3 className="!text-xl mb-2 !leading-snug min-h-12 font-semibold text-center">
-                    {training.title}
-                  </h3>
-                  
-                  <div className="flex-1 min-h-12 flex flex-col justify-center text-center">
-                    <ProgressBar percentage={training.progressPercentage} />
-                    {training.progressPercentage < 100 && (
-                      <div className='mt-2 text-sm text-center'>
-                        <p>{training.completedSteps} out of {training.totalSteps} steps completed</p>
-                      </div>
-                    )}
-                  </div>
-                  <Link href={`/training/${slugify(training.title)}`} passHref>
-                    <button className="mt-4 px-4 py-2 text-sm bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
-                      Continue Training
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
 
 
         </section>
