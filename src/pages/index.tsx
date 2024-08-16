@@ -6,11 +6,10 @@ import { supabase } from '~/lib/supabaseClient';
 import Container from '~/components/Container';
 import Welcome from '~/components/Welcome';
 import Favorites from '~/components/Favorites';
-import ProgressBar from '~/components/ProgressBar';
-import SkeletonLoader from '~/components/SkeletonLoader'; // Import SkeletonLoader
+import RecentResourcesCarousel from '~/components/RecentResourcesCarousel'; // Import the new carousel component
+
 import { useAuth } from '~/lib/useAuth';
-import { FiHeart, FiBook, FiArchive } from 'react-icons/fi';
-import Image from 'next/image';
+
 import Loading from '~/components/Loading';
 import { getButtonText } from '~/utils';
 import TrainingProgressCarousel from '~/components/TrainingProgressCarousel';
@@ -21,7 +20,7 @@ export const getStaticProps: GetStaticProps = async () => {
     .from('resources')
     .select('*, categories(name)')
     .order('created_at', { ascending: false })
-    .limit(4);
+    .limit(12);
 
   if (resourcesError) {
     console.error('Error fetching resources:', resourcesError);
@@ -198,18 +197,21 @@ export default function IndexPage(
   }, [fetchFavorites]);
 
   const [topTrainingProgress, setTopTrainingProgress] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
+
 
   useEffect(() => {
     const fetchTopProgress = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const progress = await fetchTopTrainingProgress(user.id);
-        setTopTrainingProgress(progress);
-      }
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            const progress = await fetchTopTrainingProgress(user.id);
+            setTopTrainingProgress(progress);
+        }
+        setIsLoading(false); // Set loading to false once data is fetched
     };
 
     fetchTopProgress();
-  }, [fetchTopTrainingProgress]);
+}, [fetchTopTrainingProgress]);
   
 
   const extractFirstName = (name: string | null) => {
@@ -302,10 +304,14 @@ export default function IndexPage(
             <h2 className='text-3xl font-bold'>Your Training Progress</h2>
             <p>Pick up where you left off by selecting continue training below.</p>
           </div>
-            <TrainingProgressCarousel trainings={topTrainingProgress} />
-
-
-
+            {/* Training Carousel */}
+            <TrainingProgressCarousel trainings={topTrainingProgress} isLoading={isLoading} />
+            {/* View All Trainings Button */}
+            <div className='w-full mt-4 p-4 bg-opacity-20 rounded-xl flex items-center justify-center'>
+              <Link className='rounded-xl py-4 px-12 bg-slate-300 dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition' href={'/training-center'}>
+                View All Training Modules
+              </Link>
+            </div>
         </section>
       )}
       
@@ -314,110 +320,22 @@ export default function IndexPage(
           <h2 className='text-3xl font-bold'>Recently Added Resources</h2>
           <p>Use the heart button to save your most used resources!</p>
         </div>
-        <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4`}>
-          {resources.map((resource) => (
-            resource && (
-              <div key={resource.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[400px] overflow-auto flex-col relative">
-                {resource.image_url ? (
-                  <div className='resourceImage h-20 w-full rounded-lg bg-slate-300 mb-4 overflow-hidden relative'>
-                    <Image
-                      src={resource.image_url}
-                      alt={`Image for ${resource.title}`}
-                      layout="fill"
-                      objectFit="cover"
-                    />
-                  </div>
-                ) : (
-                  <div className='resourceImage h-20 text-slate-600 dark:text-slate-950 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-4 w-full'>
-                    <FiArchive size={32} />
-                  </div>
-                )}
-                <div className="text-sm mb-2">
-                  <span className='bg-custom-teal px-3 bg-opacity-25 rounded-full inline-block'>{resource.categories ? resource.categories.name : 'Uncategorized'}</span>
-                </div>
-                <Link href={`/resource/${resource.slug}`}><h2 className="text-xl font-semibold">{resource.title}</h2></Link>
-                <div className=''>
-                  <p className='opacity-65 min-h-32 text-sm'>{resource.description}</p>
-                </div>
-                <div className="flex gap-1 mt-8 absolute bottom-4">
-                  {resource.download_url && (
-                    <a href={resource.download_url} target="_blank" rel="noopener noreferrer">
-                      <button className="px-4 py-2 text-sm bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
-                        Download
-                      </button>
-                    </a>
-                  )}
-                  <button
-                    onClick={() => handleFavoriteResource(resource.id)}
-                    className={`px-3 py-2 bg-opacity-25 text-sm rounded-lg transition ${favorites.some(fav => fav.id === resource.id) ? 'bg-pink-200 text-pink-600 hover:bg-pink-100' : 'bg-pink-100 text-pink-600 hover:bg-pink-200'}`}
-                    disabled={loadingFavoriteId === resource.id} // Disable button while loading
-                  >
-                    {loadingFavoriteId === resource.id ? (
-                      <div className="w-5 h-5 rounded-full border-2 border-pink-600 border-t-transparent animate-spin"></div>
-                    ) : (
-                      <FiHeart size={18} className={favorites.some(fav => fav.id === resource.id) ? 'fill-current' : ''} />
-                    )}
-                  </button>
-
-                </div>
-              </div>
-            )
-          ))}
-        </div>
-        <div className='w-full p-4 bg-opacity-20 rounded-xl flex items-center justify-center'>
+        {/* Resources Carousel */}
+        <RecentResourcesCarousel 
+          resources={resources} 
+          favorites={favorites} 
+          handleFavoriteResource={handleFavoriteResource} 
+          loadingFavoriteId={loadingFavoriteId}
+        />
+        {/* View All Resources Button */}
+        <div className='w-full mt-4 p-4 bg-opacity-20 rounded-xl flex items-center justify-center'>
           <Link className='rounded-xl py-4 px-12 bg-slate-300 dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition' href={'/resource-center'}>
             View All Resources
           </Link>
         </div>
       </section>
       
-      <section className='mt-10 mb-6'>
-        <div className='mb-6'>
-          <h2 className='text-3xl font-bold'>New Training Modules</h2>
-          <p>Complete your trainings to gain more knowledge!</p>
-        </div>
-        <div className={`cardWrap grid gap-4 xl:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4`}>
-          {props.trainings.map((training) => (
-            training && (
-              <div key={training.id} className="card border-[4px] border-slate-50 flex w-full bg-slate-100 dark:bg-slate-950 h-full px-4 py-4 rounded-lg items-start min-h-[400px] overflow-auto flex-col relative">
-                {training.firstStepImage ? (
-                  <div className='trainingImage h-20 w-full rounded-lg bg-slate-300 mb-4 overflow-hidden relative'>
-                    <Image
-                      src={training.firstStepImage}
-                      alt={`Image for ${training.title}`}
-                      layout="fill"
-                      objectFit="cover"
-                    />
-                  </div>
-                ) : (
-                  <div className='trainingImage h-20 text-slate-600 dark:text-slate-950 rounded-lg bg-slate-300 opacity-25 flex items-center justify-center mb-4 w-full'>
-                    <FiBook size={32} />
-                  </div>
-                )}
-                <div className="text-sm mb-2">
-                  {training.steps?.length} {training.steps?.length === 1 ? 'Step' : 'Steps'}
-                </div>
-                <h2 className="text-xl font-semibold">{training.title}</h2>
-                <div className=''>
-                  <p className='opacity-65 min-h-32 text-sm'>{training.description}</p>
-                </div>
-                <div className="flex gap-2 mt-8 absolute bottom-4">
-                  <Link href={`/training/${training.slug}`} passHref>
-                    <button className="px-4 py-2 text-sm bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark transition">
-                      View Training
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            )
-          ))}
-        </div>
-        <div className='w-full p-4 bg-opacity-20 rounded-xl flex items-center justify-center'>
-          <Link className='rounded-xl py-4 px-12 bg-slate-300 dark:bg-slate-950 dark:hover:bg-slate-700 bg-opacity-50 hover:bg-opacity-100 transition' href={'/training-center'}>
-            View All Training Modules
-          </Link>
-        </div>
-      </section>
+      
     </Container>
   );
 }

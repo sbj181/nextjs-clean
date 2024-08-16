@@ -186,14 +186,14 @@ body {
 /* Carousel */
 
 .embla {
-  overflow-x: clip;
+  /* overflow-x: clip; */
  
 }
 
 .embla__viewport {
  
   width: 100%;
-  padding: 0 .5em;
+  /* padding: 0 .5em; */
 }
 
 .embla__container {
@@ -203,7 +203,7 @@ body {
 .embla__slide {
   cursor: grab;
   /* flex: 0 0 25%; */
-  padding: 0 10px; /* Optional spacing */
+  /* padding: 0 10px;  */
 }
 
 
