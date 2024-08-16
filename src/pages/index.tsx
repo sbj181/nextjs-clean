@@ -300,7 +300,7 @@ export default function IndexPage(
       
       {topTrainingProgress.length > 0 && (
         <section className='mt-10 mb-6'>
-          <div className='mb-6'>
+          <div className='mb-6 text-center'>
             <h2 className='text-3xl font-bold'>Your Training Progress</h2>
             <p>Pick up where you left off by selecting continue training below.</p>
           </div>
@@ -316,7 +316,7 @@ export default function IndexPage(
       )}
       
       <section className='mt-10 mb-6'>
-        <div className='mb-6'>
+        <div className='mb-6 text-center'>
           <h2 className='text-3xl font-bold'>Recently Added Resources</h2>
           <p>Use the heart button to save your most used resources!</p>
         </div>

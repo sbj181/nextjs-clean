@@ -533,7 +533,7 @@ main {
 /* Card */
 
 .card {
-  @apply border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-950 rounded-2xl relative hover:shadow-lg shadow-slate-500 hover:-translate-y-1 transition ;
+  @apply border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-950 rounded-2xl relative hover:shadow-lg shadow-slate-500 md:hover:-translate-y-1 transition ;
 }
 .card .cardImg {
   @apply rounded-t-2xl;
